@@ -13,6 +13,7 @@
     btn.addEventListener('click', async function () {
       var path = window.location.pathname.replace(/\/$/, '');
       var url = path + '.md';
+      if (window.trackEvent) window.trackEvent('copy_for_ai', 'engagement', path);
       var label = btn.querySelector('span');
       var original = label ? label.textContent : '';
       try {
