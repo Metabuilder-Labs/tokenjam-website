@@ -4,7 +4,7 @@ import { getAuthor } from './authors';
 const SITE = 'https://tokenjam.dev';
 
 export function articleSchema(post: BlogPost) {
-  const author = getAuthor(post.data.author) ?? getAuthor('anil');
+  const author = getAuthor(post.data.author) ?? getAuthor('anil-murty');
   return {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',

@@ -319,6 +319,15 @@ footer.tj-footer .footer-right {
 .article-byline a { color: var(--white-dim); text-decoration: none; }
 .article-byline a:hover { color: var(--white); }
 
+.article-cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--blue-line);
+  margin-bottom: 32px;
+}
+
 /* ── AEO helper components ────────────────────────── */
 .tj-tldr {
   margin: 24px 0;
@@ -382,6 +391,36 @@ footer.tj-footer .footer-right {
   color: var(--green);
   border-color: rgba(var(--green-rgb), 0.4);
 }
+
+/* Author card (bottom of post) */
+.author-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-top: 48px;
+  padding: 20px;
+  border: 1px solid var(--blue-line);
+  border-radius: 8px;
+  background: var(--white-ghost);
+}
+.author-card-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--navy-2);
+}
+.author-card-body { flex: 1; min-width: 0; }
+.author-card-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; margin-bottom: 6px; }
+.author-card-name { color: var(--white); text-decoration: none; font-weight: 600; font-size: 15px; }
+.author-card-name:hover { color: var(--accent-blue); }
+.author-card-role {
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  color: var(--white-faint);
+}
+.author-card-bio { color: var(--white-dim); font-size: 14px; line-height: 1.55; }
 
 /* Related posts */
 .related-posts { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--blue-line); }

@@ -10,7 +10,7 @@ interface Props {
   post: BlogPost;
 }
 const { post } = Astro.props;
-const author = getAuthor(post.data.author) ?? getAuthor('anil');
+const author = getAuthor(post.data.author) ?? getAuthor('anil-murty');
 const minutes = readingTimeMinutes(post.body);
 
 const all = await getPublishedPosts();
@@ -53,6 +53,15 @@ const imageUrl = post.data.image ?? '/og-image.png';
       </div>
     </header>
 
+    {post.data.image && (
+      <img
+        src={post.data.image}
+        alt={post.data.title}
+        class="article-cover"
+        loading="eager"
+      />
+    )}
+
     <CopyForAI />
 
     <div class="prose">
@@ -65,6 +74,19 @@ const imageUrl = post.data.image ?? '/og-image.png';
           <a href={`/blog/tags/${tag}`} class="chip">#{tag}</a>
         ))}
       </div>
+    )}
+
+    {author && (
+      <aside class="author-card">
+        <img src={author.avatar} alt={author.name} class="author-card-avatar" loading="lazy" />
+        <div class="author-card-body">
+          <div class="author-card-head">
+            <a href={`/blog/authors/${author.slug}`} class="author-card-name">{author.name}</a>
+            <span class="author-card-role">{author.role}</span>
+          </div>
+          <p class="author-card-bio">{author.bio}</p>
+        </div>
+      </aside>
     )}
 
     {related.length > 0 && (

@@ -1,0 +1,172 @@
+---
+title: "Agents 101: Reasoning, Actions & Autonomy"
+description: "A foundational definition: what AI agents are, how they differ from chatbots and workflows, and the components that make them work."
+author: "anil-murty"
+publishDate: 2026-05-08
+tags: ["agents", "fundamentals", "definitions"]
+pillar: "foundational"
+image: "/blog/agents-101.jpg"
+---
+
+import TLDR from '@/components/TLDR.astro';
+import FAQBlock from '@/components/FAQBlock.astro';
+
+<TLDR>
+- An AI agent uses an LLM to reason about a goal and decide what actions to take, calling tools and observing results until the goal is reached.
+- Agents differ fundamentally from chatbots (which don't act) and workflows (which don't decide).
+- The ReAct pattern (reasoning + acting) is the dominant architecture in modern agent systems.
+- Agents range from copilots that suggest actions to fully autonomous systems that run unattended for hours.
+- Key components: the LLM (reasoning), tools (actions), context/memory (state), and a control loop (orchestration).
+</TLDR>
+
+An AI agent is a system that uses a large language model to make decisions and take actions in pursuit of a goal. It calls tools, observes what they return, and iterates until the goal is reached. A chatbot waits for the next message; an agent plans and executes its own sequence of steps.
+
+## Why it matters
+
+The term entered the mainstream in late 2022, when projects like AutoGPT showed that LLMs could direct their own execution. The concept wasn't new. Researchers had been studying goal-directed autonomous systems for decades. What changed was accessibility: capable base models (GPT-4, Claude) and standardized tool-calling APIs made it practical to build a working agent in a few dozen lines of code.
+
+The word AGENT now gets used loosely. Some vendors call a chatbot with a search feature an agent. Others claim that any LLM inference with retrieval is "agentic." This inflation matters. It obscures what's actually new and what's repackaging. Precision helps you know what you're building or evaluating.
+
+Agents represent a shift in how LLMs are deployed. The old model: user asks a question, system returns an answer, conversation ends. Agents invert that. The system receives a goal, decides on sub-goals, gathers information, corrects itself, and iterates without waiting for permission between steps. New architecture. New error handling. New thinking about safety and observability.
+
+## Agents vs. chatbots vs. workflows vs. traditional AI
+
+A quick way to distinguish these four categories is to ask: does it use an LLM to decide what to do next? And can it call tools to act on those decisions?
+
+**Chatbots** use an LLM to generate text. They don't call tools, and they don't pursue goals across steps. A customer-service chatbot answers your question. It doesn't modify your account or call internal APIs unless you ask. Even then, it tends to suggest options or retrieve data rather than decide and act. The LLM's job is to understand and respond.
+
+**Workflows** call tools and pursue goals. They don't use an LLM to decide which tool to call or how to interpret the result. A workflow might be: fetch customer data, run a validation rule, log an event, send an email. Each step is predefined. Branching is rule-based. The LLM is not in the loop. Workflows are predictable and cheap. They break when the task is ambiguous or open-ended.
+
+**Agents** combine both. The LLM observes the current state and decides which tool to call next. It adapts and self-corrects as it goes. If a tool call fails, the agent reasons about why and tries something else. The flexibility costs you something. Agents are less predictable, more expensive per inference, and harder to debug. The reward is open-ended tasks, where the path isn't predetermined.
+
+**Traditional AI/ML systems** (classifiers, regressions, recommenders) optimize a fixed function learned from data. They have no LLM, and they don't pursue multi-step goals. They are specialized and efficient. Generalizing to a new task means retraining.
+
+| Aspect | Chatbot | Workflow | Agent | Traditional ML |
+| --- | --- | --- | --- | --- |
+| Uses LLM to decide next step? | No (generates text) | No (follows rules) | Yes | No |
+| Calls tools? | Rarely; usually retrieval only | Yes; predefined sequence | Yes; chosen by LLM | No |
+| Pursues multi-step goal? | No (responds to input) | Yes; fixed path | Yes; adaptive path | No |
+| Handles ambiguous tasks? | Moderate (can discuss) | Poor (requires rigid structure) | Good (can reason and adapt) | Poor |
+
+## The ReAct pattern and core components
+
+Most agents built since 2023 follow a pattern called **ReAct (Reasoning and Acting)**, introduced in Yao et al.'s 2022 paper from Google Research and Princeton. The idea is straightforward. The LLM produces reasoning steps (thinking aloud about what it needs to do) interleaved with actions (tool calls). It observes the result, then reasons further.
+
+A ReAct loop looks like this:
+
+1. **Observation:** the agent observes the current state (the original goal, prior tool results, conversation history).
+2. **Reasoning:** the LLM thinks through the problem: "I need to fetch the user's account, check their history, then decide whether to approve the request."
+3. **Action:** the agent calls a tool, say `fetch_account(user_id)`.
+4. **Observation:** the agent receives the result and feeds it back to the LLM.
+5. **Loop:** the LLM reasons again, decides on the next action, and repeats until it either reaches the goal or determines that the goal isn't achievable.
+
+The pattern works because the reasoning traces make the LLM's decisions interpretable. You can see why it chose an action. They also enable self-correction: if a tool result is unexpected, the LLM can reason about what went wrong.
+
+An agent's core components are:
+
+- **The LLM (reasoning engine):** decides what action to take based on the goal and current state. The decision-making layer.
+- **Tools (action layer):** functions the agent can call — APIs, database queries, code execution, web searches, file operations. Tools are how the agent affects the world.
+- **Context and memory (state):** everything the agent knows — the original goal, conversation history, prior tool results, and any persistent state it needs. Without good memory management, agents hallucinate and repeat mistakes.
+- **Control loop (orchestration):** the code that runs the loop. It calls the LLM, parses the output for tool calls, executes them, and feeds results back. Modern frameworks (Anthropic's Claude SDK, LangChain, LlamaIndex) handle this. You can also implement it from scratch.
+
+## Levels of autonomy
+
+Agents exist on a spectrum. On one end they are suggestion-based copilots that nudge you. On the other are autonomous systems that run unattended for hours.
+
+**Copilot mode (suggestion):** the agent observes what you're doing and suggests the next action. You approve before it executes. Example: Cursor's autocomplete suggests the next line of code; you hit Tab to accept or Escape to reject. The model is doing some reasoning. You stay in control of execution.
+
+**Agentic mode (supervised autonomy):** the agent makes and executes decisions within a scope you define. You might say "add tests for this file" and the agent writes tests, runs them, and shows you the result, all without asking permission between steps. You can pause or override at any point. Example: Claude Code in an IDE, or an agent working a bounded coding task. The agent is autonomous within the scope, not globally.
+
+**Autonomous agent (unattended):** the agent pursues a goal with minimal human oversight. You set a goal ("reduce our average response time by 10%") and the agent decides what to measure, what to try, what to roll back, and what to keep. It might run for days, making changes and watching outcomes. Example: an agent managing an experimentation platform, or optimizing an ad-bidding algorithm. These are rare and tend to be domain-specific. The cost of mistakes is too high for general-purpose deployment.
+
+## Notable tools
+
+The agent landscape is wide. Grouping by category is more useful than a flat list. Below: the categories that matter as of 2026, with prominent examples in each.
+
+### Coding agents
+
+The most visible category, and the one most builders encounter first.
+
+- **[Claude Code](https://anthropic.com/product/claude-code)** (Anthropic): agentic coding tool in the terminal, IDE, and browser. Native OTLP telemetry support.
+- **[Codex](https://openai.com/codex)** (OpenAI): CLI and IDE-based coding agent. Recently rebuilt; supports OAuth-based authentication.
+- **[Cursor](https://cursor.com)**: AI code editor with agent mode. Autonomously explores codebases, edits files, runs tests.
+- **[OpenHands](https://openhands.dev)** (formerly OpenDevin): open-source autonomous agent for software engineering. Runs in a Docker sandbox.
+- **[Aider](https://aider.chat)**: open-source AI pair programmer for the terminal. Integrates with git, supports multiple LLM providers.
+- **[Continue](https://continue.dev)**: open-source IDE extension for VS Code and JetBrains.
+
+### Personal / general-purpose agents
+
+This category emerged sharply in 2026. These agents aren't tied to a single domain like coding — they bridge messaging, scheduling, search, and personal automation.
+
+- **[OpenClaw](https://openclaw.ai/)** (Peter Steinberger, MIT-licensed): the breakout OSS agent of 2026. Local-first personal assistant running across WhatsApp, Telegram, Slack, Discord, iMessage, and 20+ other channels. At 369k+ GitHub stars, currently the most-starred GitHub repo in history; defines the personal-agent category.
+- **[Hermes Agent](https://hermes-agent.nousresearch.com/)** (Nous Research, MIT-licensed): open-source self-improving agent with persistent memory and skill learning. ~32k stars in two months. Built around the `agentskills.io` standard; differentiates by retaining what it learns across sessions.
+- **[NemoClaw](https://www.nvidia.com/en-us/ai/nemoclaw/)** (NVIDIA, built on OpenClaw): enterprise-hardened OpenClaw distribution with sandboxing, audit logging, and on-device inference. Targets DGX Spark for local enterprise workloads.
+
+### Agent frameworks and SDKs
+
+For builders, not end users. These are how you build agents rather than run pre-built ones.
+
+- **[LangChain Agents / LangGraph](https://langchain.com)**: the LangChain ecosystem. LangGraph is the newer state-machine-based approach; LangChain Agents is the older flexible API. Widely used despite ongoing critique of the abstraction layers.
+- **[OpenAI Agents SDK](https://developers.openai.com/api/docs/guides/agents)**: OpenAI's official SDK for building agents on their models. Native HITL primitives, tool calling, and tracing.
+- **[Anthropic Agent SDK](https://code.claude.com/docs/en/agent-sdk/overview)**: `claude-agent-sdk`, built-in tool use, prompt caching, and agentic patterns.
+- **[CrewAI](https://crewai.com)**: multi-agent orchestration framework, organized around "crews" of role-defined agents that collaborate.
+- **[AutoGen](https://github.com/microsoft/autogen)** (Microsoft): multi-agent conversation framework. Heavier than CrewAI, more research-flavored.
+- **[Mastra](https://mastra.ai)**: TypeScript-native agent framework. Newer, growing fast in the JS/TS ecosystem.
+- **[smolagents](https://github.com/huggingface/smolagents)** (Hugging Face): minimal-abstraction agent framework, designed to be small enough to read end-to-end.
+- **[LlamaIndex](https://llamaindex.ai)**: primarily a RAG framework, but ships agent capabilities for retrieval-heavy use cases.
+
+### Web-acting / computer-use agents
+
+A distinct emerging category: agents that control browsers or full desktops rather than calling APIs.
+
+- **[Anthropic Computer Use](https://docs.anthropic.com/en/docs/build-with-claude/computer-use)**: Claude can control a computer via screenshots and mouse/keyboard.
+- **[Browser Use](https://github.com/browser-use/browser-use)**: open-source library for browser-controlling agents.
+- **[Skyvern](https://skyvern.com)**: browser automation agent with vision capabilities.
+
+(OpenAI's Operator was in this category but was reportedly retired in early 2026.)
+
+### Vertical and domain-specific agents
+
+- **[Devin](https://cognition.ai)** (Cognition): autonomous software-engineering agent. The original "agent that does the whole job" demo.
+- **[Sierra](https://sierra.ai)**: customer-service agent platform.
+- **[Manus](https://manus.im/)**: Chinese personal-agent platform; heavy integration with Chinese consumer apps.
+
+### Historical mention
+
+- **AutoGPT** (2023): open-source autonomous agent framework that brought the concept of LLM-driven agents to a wide audience. Architecturally important; today more historical than active.
+
+## Common questions
+
+<FAQBlock items={[
+  {
+    question: "How is an agent different from a chatbot?",
+    answer: "A chatbot responds. An agent pursues. Ask a chatbot 'book me a flight' and it asks clarifying questions, then waits for you to confirm. Ask an agent and it gathers options, checks your calendar, considers your budget, and books, without asking permission between steps. The chatbot reacts. The agent acts."
+  },
+  {
+    question: "What's the difference between an agent and a workflow?",
+    answer: "A workflow is a fixed sequence of steps determined in advance. You define 'do A, then B, then C, with these rules for branching.' A workflow always takes the same path for the same inputs. An agent reasons about which steps to take and in what order, adapting based on intermediate results. Workflows are predictable and efficient. Agents trade predictability for flexibility."
+  },
+  {
+    question: "Why does my agent keep calling the same tool five times in a row?",
+    answer: "That's a loop, and the LLM probably doesn't recognize what the tool returned as the answer it was looking for. Common causes: the tool returned an error and the agent retried with the same inputs; the response shape was different from what the LLM expected, so it kept trying; the system prompt left the goal vague enough that the LLM thrashes between candidates. Fixes that work: clearer descriptions in your tool schema, explicit error messages from the tool ('not found' rather than null), and a hard call-count budget so the loop terminates rather than burning tokens."
+  },
+  {
+    question: "How autonomous do agents actually get?",
+    answer: "Depends on the task and the risk. In low-risk domains (code suggestions, documentation), agents run nearly unsupervised. In higher-risk domains (financial transactions, customer-facing decisions), agents operate under constraints: bounded scope, human review loops, or escalation to a human when confidence is low. Most production agents are supervised autonomy, not full autonomy."
+  },
+  {
+    question: "Is it normal for a single Claude Code session to cost $40?",
+    answer: "Not normal, not rare. A long session that maintains a big context and re-reads files often will pile up tokens fast. Three places to look. First, prompt caching: is the run hitting the cache, or rebuilding the prompt every turn? Second, context bloat: huge system prompts, large repos, and many open files multiply per-call cost. Third, model choice: Opus is meaningfully pricier than Sonnet on the same workload. Set a hard spend cap and watch tokens per turn. Most overruns trace to context size, not call count."
+  },
+  {
+    question: "Why do some agents get stuck or make silly mistakes?",
+    answer: "Agents inherit their LLM's limitations. An LLM can hallucinate or misinterpret what a tool returned. Across multiple reasoning steps, these errors compound. A bad tool result leads the agent down the wrong path. Confirmation bias makes it ignore contradictory evidence. Good design mitigates the failure modes: clear tool descriptions, explicit error signals from tools, and a memory model that lets the agent backtrack rather than press on with bad state."
+  }
+]} />
+
+## Further reading
+
+- [ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629) — Yao et al., 2022 (ICLR 2023). The foundational paper introducing the ReAct pattern.
+- [Building Effective AI Agents](https://www.anthropic.com/engineering/building-effective-agents) — Anthropic's guide to architecture patterns, tool design, and implementation frameworks for single and multi-agent systems.
+- [Writing Effective Tools for AI Agents](https://www.anthropic.com/engineering/writing-tools-for-agents) — Anthropic's technical advice on tool design for agentic systems.
+- [Anthropic Cookbook: Patterns and Agents](https://github.com/anthropics/anthropic-cookbook) — reference implementations and code examples.
