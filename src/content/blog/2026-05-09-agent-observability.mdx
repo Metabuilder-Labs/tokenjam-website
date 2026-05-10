@@ -1,0 +1,97 @@
+---
+title: "What is agent observability?"
+description: "How AI agent observability works: capturing tool calls, token costs, traces, and behavioral patterns at production scale."
+author: "anil-murty"
+publishDate: 2026-05-09
+tags: ["observability", "agents", "telemetry"]
+pillar: "observability"
+image: "/blog/agent-observability.jpg"
+---
+
+import TLDR from '@/components/TLDR.astro';
+import FAQBlock from '@/components/FAQBlock.astro';
+
+<TLDR>
+- Agent observability captures what an agent did (tool calls, token costs, latency, reasoning chains) at detail sufficient to debug and audit behavior in production.
+- Traditional logs and metrics aren't enough; you need traces that record the LLM's step-by-step decisions, tool invocations, and outcomes.
+- Agents are harder to observe than services because of nondeterminism, deeply nested calls, prompts and completions as data, and vocabulary that didn't exist three years ago.
+- OpenTelemetry GenAI semantic conventions are becoming the emerging standard for agent telemetry.
+</TLDR>
+
+Agent observability is the practice of capturing what an AI agent did, its tool calls, token costs, behavioral patterns, and outcomes, at a level of detail sufficient to debug, optimize, and audit agent behavior in production. You record the agent's full journey: every decision point, every tool invocation, every LLM call with inputs and outputs, latencies, costs, and errors. Service observability captures what your code did. Agent observability captures the reasoning chain itself: the sequence of thoughts and decisions that led the agent to act.
+
+## Why agent observability is harder than service observability
+
+Service observability is built on a predictable model. A request comes in, your code executes a series of steps, a response goes out. Each step is deterministic. Logs tell you what happened. Metrics tell you how long it took and whether it succeeded.
+
+Agents break this model.
+
+**Nondeterminism is the core problem.** The same input to an agent with the same model and parameters might produce different outputs on different runs. The LLM samples from a probability distribution. You can't debug an agent from logs alone. You have to capture the complete trace of that specific run to understand what reasoning led to that specific output.
+
+**Tool calls are deeply nested.** A service call stack might be five or ten levels deep. An agentic system can have an agent call a tool, which triggers a retrieval operation, which calls an embedding model, which calls a database, which triggers another tool. The nesting is deep and irregular. A trace that doesn't capture every step in this chain will miss the real bottleneck.
+
+**Prompts and completions are your actual data.** In a service, your data is SQL queries and JSON payloads. In an agent, your data is the prompt sent to the LLM and the completion it returned. These are large and unstructured. They're often sensitive: they contain user context, proprietary information, internal state. Traditional logging systems don't handle this well. Observability for agents has to be built around capturing and safely storing these artifacts.
+
+**The vocabulary didn't exist three years ago.** Terms like "token usage," "tool selection," "context window," and "hallucination" are specific to the agentic context. Existing APM tools (application performance monitoring tools like Datadog, New Relic, Dynatrace) were built for microservices. They have no native concept of an LLM call, a token count, or a tool invocation. Shoehorning agent data into these systems works. It's also awkward.
+
+## The three pillars, adapted for agents
+
+Observability has three pillars: traces, metrics, logs. The definitions shift when you apply them to agents.
+
+**Traces** capture the complete execution path of a request. In a microservice, a trace is a sequence of function calls and RPC hops. In an agent, a trace is the agent's full journey: the user input, each LLM call (with prompt and completion), each tool invocation and result, latency at each step, token usage at each step, and the final output. A trace is the highest-fidelity record you have. It answers questions like "Why did the agent choose tool X instead of tool Y?" or "Where did the latency spike occur?"
+
+**Metrics** are aggregations: counts and percentiles. In services, you track request latency, error rate, throughput. For agents, you track cost per request (sum of token usage × model pricing), latency per LLM call, tool invocation frequency, error rates (both LLM errors and tool errors), and token efficiency (useful output tokens vs. wasted context). Metrics let you spot trends over time and set up alerts when something goes wrong at scale.
+
+**Logs** are raw events: "This LLM call failed," "Token limit exceeded," "Tool returned an error." In a service, logs focus on errors. In an agent, logs are also informational: "Agent selected tool X." "Retry attempt 2 of 3." Logs are lower resolution than traces. They're faster to query and more storage-efficient.
+
+## What you actually capture
+
+A production-grade agent observability system captures:
+
+- **LLM calls:** model name, parameters (temperature, max_tokens, top_p), the prompt sent, the completion received, token counts (input and output), latency, cost, success or failure. This is the core of agent observation.
+- **Tool invocations:** tool name, input parameters, output, latency, whether the tool succeeded or failed, and any retry information. Tools are where your agent touches the outside world. They cause most of your latency and most of your errors.
+- **Token usage per call:** not just total tokens consumed. A breakdown: how many tokens in the context window, how many in the prompt, how many in the response. This helps you optimize context and identify tokens wasted on irrelevant content.
+- **The agent's reasoning chain:** the intermediate thoughts or justifications the agent produced at each step. Some LLM frameworks (like ReAct) explicitly generate these; others encode them implicitly. Capturing this chain is what lets you debug why an agent made a particular decision.
+- **Model and parameters:** which model was used, which version, what temperature and sampling parameters. This matters because the same agent with different parameters can behave very differently.
+- **Errors and retries:** when a tool call failed, did the agent retry? How many times? Did it eventually succeed or give up? This tells you if your agent is robust or brittle.
+- **Latency per layer:** total latency is a sum of LLM latency + tool latency + overhead. Breaking this down tells you where to optimize.
+
+These signals should conform to the OpenTelemetry semantic conventions for generative AI. The conventions define a standard schema for representing LLM calls, tool use, embeddings, and agent systems in trace data. Adopting the standard means your agent traces can be ingested by any OpenTelemetry-compatible backend (Jaeger, Datadog, Elastic, or a custom system) without vendor lock-in.
+
+## Common questions
+
+<FAQBlock items={[
+  {
+    question: "Why does my trace show 47 LLM calls when I only invoked the agent once?",
+    answer: "Three common causes. First, the framework you're using (LangChain, LlamaIndex, AutoGen, CrewAI) might be making nested chains where each step is itself an LLM call: a planning call, an action call, a reflection call, a synthesis call. A single user request fans out fast. Second, retries: if a tool call returns an unexpected error or the LLM produces malformed output, many frameworks silently retry with backoff, multiplying calls. Third, agent loops: if the agent can't converge on an answer, it keeps reasoning and acting until it hits a max-iteration limit. Open the trace tree and look at timestamps. Tightly clustered calls with the same model and parameters mean retries. Spread-out calls with different prompts mean the framework is decomposing the task more than you expected."
+  },
+  {
+    question: "My agent traces are 50MB each. Should I be worried?",
+    answer: "Yes, in a specific way. Trace size is dominated by prompt and completion text. A 50MB trace means you're sending massive prompts to the LLM: huge system prompts, retrieved documents, long conversation history, included file contents. The cost is real: that's a lot of input tokens per call. The performance hit is also real because most trace UIs struggle to render or query traces above ~10MB. Two fixes work. First, reduce what you put in the prompt: tighter system prompts, smarter retrieval, summarize conversation history rather than passing it raw. Second, configure your observability tool to truncate long fields above a threshold (Langfuse, Arize Phoenix, and Datadog all support this). Truncated traces are still useful for navigation, and you can fetch the full prompt from your application logs if you actually need it."
+  },
+  {
+    question: "Can I use my existing APM (Datadog, New Relic) for agents?",
+    answer: "Partially. Datadog and New Relic have built LLM modules onto their existing platforms. They work, but they weren't designed for agents from the ground up. They're better at capturing that an LLM call happened than at capturing the reasoning chain or the interaction between multiple tool calls. If you're already in Datadog, LLM Observability is a reasonable choice. If you're starting fresh, a tool built for agents will give you more signal."
+  },
+  {
+    question: "What should I capture in production agent traces?",
+    answer: "Start with: every LLM call (prompt and completion), every tool invocation (name and result), latency per call, total token usage, and final outcome (success or failure). Add error details if the agent failed. Once that's stable, add cost breakdown per model and tool selection reasoning. Don't try to capture everything on day one."
+  },
+  {
+    question: "How do I avoid storing sensitive data in traces?",
+    answer: "Most tools support redaction: marking which fields should not be logged (API keys, user PII, secrets). Some (like Datadog LLM Observability) ship with automatic PII detection. Build redaction into your SDK wrapper early; it's easier to add than to retrofit. Also consider sampling. You don't need to trace every request, just a statistically significant sample."
+  },
+  {
+    question: "How much overhead does observability add?",
+    answer: "Good observability SDKs are asynchronous. Traces are queued locally and sent in batches in the background, so they add minimal latency to your agent's response time. Expect overhead of 5 to 15 percent at the p99, depending on the tool and your stack. That's a worthwhile trade-off for production visibility."
+  }
+]} />
+
+## Further reading
+
+- [OpenTelemetry semantic conventions for generative AI](https://opentelemetry.io/docs/specs/semconv/gen-ai/). The emerging standard for agent telemetry. Start with the GenAI spans spec.
+- [What is an AI agent?](/blog/2026-05-08-agents-101). Background on agent architecture, ReAct, and how agents differ from chatbots and workflows.
+- What is OpenTelemetry for AI agents (forthcoming). Deep dive into OpenTelemetry's GenAI semantic conventions and how to instrument agents with OTel.
+- What is agent token economics (forthcoming). How to measure and optimize the cost side of observability once you have traces.
+- [Braintrust: Agent observability tracing guide](https://www.braintrust.dev/docs/guides/tracing). Practical walkthrough of what to trace.
+- [Langfuse: AI agent observability](https://langfuse.com/docs/observability/overview). Case study of agent tracing in practice.

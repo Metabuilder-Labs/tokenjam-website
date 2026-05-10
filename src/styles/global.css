@@ -498,24 +498,6 @@ footer.tj-footer .footer-right {
   border-color: rgba(var(--green-rgb), 0.4);
 }
 
-/* Author card (bottom of post) */
-.author-card {
-  margin-top: 48px;
-  padding: 20px;
-  border: 1px solid var(--blue-line);
-  border-radius: 8px;
-  background: var(--white-ghost);
-}
-.author-card-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; margin-bottom: 6px; }
-.author-card-name { color: var(--white); text-decoration: none; font-weight: 600; font-size: 15px; }
-.author-card-name:hover { color: var(--accent-blue); }
-.author-card-role {
-  font-family: 'Geist Mono', monospace;
-  font-size: 12px;
-  color: var(--white-faint);
-}
-.author-card-bio { color: var(--white-dim); font-size: 14px; line-height: 1.55; }
-
 /* Related posts */
 .related-posts { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--blue-line); }
 .related-posts h3 { font-size: 14px; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: .08em; color: var(--white-faint); margin-bottom: 16px; }

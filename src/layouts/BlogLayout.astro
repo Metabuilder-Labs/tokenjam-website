@@ -76,20 +76,6 @@ const imageUrl = post.data.image ?? '/og-image.png';
       </div>
     )}
 
-    {author && (
-      <aside class="author-card">
-        <div class="author-card-head">
-          {author.link ? (
-            <a href={author.link} class="author-card-name" target="_blank" rel="noopener noreferrer">{author.name} ↗</a>
-          ) : (
-            <a href={`/blog/authors/${author.slug}`} class="author-card-name">{author.name}</a>
-          )}
-          <span class="author-card-role">{author.role}</span>
-        </div>
-        <p class="author-card-bio">{author.bio}</p>
-      </aside>
-    )}
-
     {related.length > 0 && (
       <section class="related-posts">
         <h3>Related</h3>
