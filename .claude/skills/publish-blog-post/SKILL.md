@@ -35,7 +35,7 @@ Ask the user for (or extract from their message):
 | `publishDate` | yes | ISO date `YYYY-MM-DD`. Posts with `publishDate > today` are hidden from the build. |
 | `tags` | yes | Array of lowercase tag strings, e.g. `["agents", "observability"]`. |
 | `pillar` | yes | Must match one of the enum values in `src/content.config.ts`. As of writing: `foundational`, `observability`, `evaluation`, `environments`, `gateways`, `memory`, `guardrails`, `hitl`, `control-plane`, `optimization`, `comparison`, `thesis`. |
-| `image` | optional | Path under `/blog/...`. If absent, BlogLayout falls back to `/og-image.png` for social previews and renders no inline cover. |
+| `image` | **yes** | Path under `/blog/...`. Ask the user for a source image if they don't supply one; do not publish without one. See Section 6 for optimization. (BlogLayout will technically fall back to `/og-image.png`, but that fallback is not acceptable for normal posts.) |
 | `canonicalUrl` | optional | Override the canonical URL if the post is syndicated. |
 | `lastUpdated` | optional | ISO date. Adds an "Updated …" line to the byline. |
 | `draft` | optional, default `false` | When `true`, post is excluded from the build regardless of `publishDate`. |
@@ -291,8 +291,16 @@ Should return nothing.
 
 ## 6. Cover image
 
-Optional but recommended. Without one, social previews fall back to
-`/og-image.png` and no inline cover renders.
+**Required.** Every published post on this site has a cover image, and the
+user expects every new post to ship with one. If the user hasn't supplied
+an image in their initial message, **ask for one before publishing** —
+don't proceed and don't fall back to `/og-image.png` silently. The user
+typically drops the source in `~/Downloads/`, `~/Desktop/`, or a Google
+Drive folder; ask where they've put it.
+
+Without a cover image, social previews fall back to `/og-image.png` and
+no inline cover renders on the post page — both of which break the
+established look across the existing posts.
 
 ### Where to put it
 
@@ -503,7 +511,7 @@ Before declaring a post complete:
 - [ ] `/blog` lists the new post at the top.
 - [ ] `/blog/<slug>` renders end-to-end without missing components or broken layout.
 - [ ] `/blog/<slug>.md` returns `text/markdown`.
-- [ ] If `image:` set: image file exists at the right path, OG meta tag points to absolute URL.
+- [ ] `image:` is set (required for every post — see Section 6), file exists at the right path, OG meta tag points to absolute URL, image is optimized (≤500 KB, ≤1600 wide).
 - [ ] No em-dashes (`grep '—' src/content/blog/<file>.mdx` returns nothing).
 - [ ] Frontmatter `author` matches a real slug in `src/lib/authors.ts`.
 - [ ] `publishDate` matches the date in the filename.
