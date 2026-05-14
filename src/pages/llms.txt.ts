@@ -18,11 +18,11 @@ export const GET: APIRoute = async () => {
 
   const content = `# TokenJam
 
-> Open-source agent observability for autonomous AI agents. OTel-native, multi-runtime, local-first. Cost tracking, telemetry, and safety alerts for Claude Code, Codex, Cursor, OpenHands, and custom SDKs.
+> Open-source token economics for AI agents. Observability, cost optimization, and behavioral control for autonomous agents — local-first, OTel-native, no signup. Works with Claude Code, Codex, Cursor, OpenHands, and custom SDKs.
 
 ## About
 
-TokenJam helps developers building AI agents understand what their agents do and what they cost. Multi-runtime support, no signup, MIT-licensed.
+TokenJam helps developers building AI agents see where their tokens go, find where they're wasted, and keep agents in line. Multi-runtime support, no signup, MIT-licensed.
 
 ## Blog
 

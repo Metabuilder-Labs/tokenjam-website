@@ -12,10 +12,10 @@
   gtag('js', new Date());
   gtag('config', 'G-C3WCWQW0WR');
 </script>
-<title>TokenJam — Open-source agent observability</title>
-<meta name="description" content="Open-source, OTel-native observability for autonomous AI agents. Full telemetry, cost tracking, and safety alerts — on your machine, no backend required.">
-<meta property="og:title" content="TokenJam — Open-source agent observability">
-<meta property="og:description" content="Observe every agent. Locally. Full OTel-native telemetry, cost tracking, and safety alerts for autonomous AI agents.">
+<title>TokenJam — Token economics for AI agents</title>
+<meta name="description" content="Open-source, local-first observability and cost control for autonomous AI agents. See where your tokens go, find where they're wasted, and keep agents in line. Works with Claude Code, Codex, and any OTel-native agent.">
+<meta property="og:title" content="TokenJam — Token economics for AI agents">
+<meta property="og:description" content="See where your tokens go. Find where they're wasted. Keep agents in line. Open-source, local-first.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://tokenjam.dev/">
 <meta property="og:image" content="https://tokenjam.dev/og-image.png">
@@ -23,16 +23,16 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:type" content="image/png">
-<meta property="og:image:alt" content="TokenJam — Observe every agent. Locally.">
+<meta property="og:image:alt" content="TokenJam — Token economics for AI agents">
 <meta property="og:site_name" content="TokenJam">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:domain" content="tokenjam.dev">
 <meta name="twitter:url" content="https://tokenjam.dev/">
-<meta name="twitter:title" content="TokenJam — Open-source agent observability">
-<meta name="twitter:description" content="Observe every agent. Locally. Full OTel-native telemetry, cost tracking, and safety alerts for autonomous AI agents.">
+<meta name="twitter:title" content="TokenJam — Token economics for AI agents">
+<meta name="twitter:description" content="See where your tokens go. Find where they're wasted. Keep agents in line. Open-source, local-first.">
 <meta name="twitter:image" content="https://tokenjam.dev/og-image.png">
-<meta name="twitter:image:alt" content="TokenJam — Observe every agent. Locally.">
+<meta name="twitter:image:alt" content="TokenJam — Token economics for AI agents">
 <meta name="theme-color" content="#000000">
 <meta name="msapplication-TileColor" content="#000000">
 <link rel="canonical" href="https://tokenjam.dev/">
@@ -1191,6 +1191,7 @@
     <li><a href="#features">Features</a></li>
     <li><a href="#install">Install</a></li>
     <li><a href="#compare">Compare</a></li>
+    <li><a href="#coming-next">What's next</a></li>
     <li><a href="/docs">Docs</a></li>
     <li><a href="/blog">Blog</a></li>
   </ul>
@@ -1233,16 +1234,16 @@
   <div class="hero-inner">
     <div class="hero-badge">
       <div class="hero-badge-dot"></div>
-      MIT License · OTel GenAI SemConv · No signup required
+      Open-source · Runs locally · No signup, no proxy, no SaaS account
     </div>
 
     <h1 class="hero-title">
-      Observe every agent. <span class="hero-title-accent">Locally.</span>
+      Token economics<br>for AI agents.<span class="hero-title-accent"> Locally.</span>
     </h1>
 
     <p class="hero-subtitle">
-      Open-source, OTel-native observability for autonomous AI agents.
-      Now available on PyPI and npm. MIT licensed.
+      See where your tokens go. Find where they're wasted. Keep your agents in line.
+      Open-source, OTel-native, runs on your machine. Works with Claude Code, Codex, and any agent.
     </p>
 
     <div class="hero-ctas">
@@ -1257,14 +1258,14 @@
     </div>
 
     <!-- Feature pills -->
-    <p class="hero-strip-label">FEATURES</p>
+    <p class="hero-strip-label">WHAT TOKENJAM DOES</p>
     <div class="hero-integrations" style="margin-bottom: 24px;">
-      <span class="hero-integration-pill hero-feature-pill">OTel-native telemetry</span>
-      <span class="hero-integration-pill hero-feature-pill">Token &amp; cost tracking</span>
-      <span class="hero-integration-pill hero-feature-pill">Autonomous agent safety alerts</span>
-      <span class="hero-integration-pill hero-feature-pill">Local behavioral drift detection</span>
-      <span class="hero-integration-pill hero-feature-pill">Output schema validation</span>
-      <span class="hero-integration-pill hero-feature-pill">CLI + local REST API</span>
+      <span class="hero-integration-pill hero-feature-pill">See where tokens go</span>
+      <span class="hero-integration-pill hero-feature-pill">Find where they're wasted</span>
+      <span class="hero-integration-pill hero-feature-pill">Keep agents in line</span>
+      <span class="hero-integration-pill hero-feature-pill">OTel-native</span>
+      <span class="hero-integration-pill hero-feature-pill">Local-first</span>
+      <span class="hero-integration-pill hero-feature-pill">CLI + web UI</span>
     </div>
 
     <!-- Integration showcase -->
@@ -1301,6 +1302,7 @@
           <button class="step-tab" id="tab-1" onclick="showStep(1)">onboard</button>
           <button class="step-tab" id="tab-2" onclick="showStep(2)">status</button>
           <button class="step-tab" id="tab-3" onclick="showStep(3)">traces</button>
+          <button class="step-tab" id="tab-4" onclick="showStep(4)">optimize <span style="color:var(--amber);font-size:9px;letter-spacing:0.08em;margin-left:4px;">SOON</span></button>
         </div>
       </div>
     </div>
@@ -1338,9 +1340,9 @@
     <div class="problem-grid">
       <div>
         <div class="section-label">the problem</div>
-        <h2>Your agent ran.<br>But did it behave?</h2>
+        <h2>Your agent ran.<br>How much did it cost?<br>What did it do?</h2>
         <p class="section-desc" style="margin-bottom: 32px;">
-          Every other observability tool is built for LLM developers. TokenJam is built for people whose agents have real-world side effects.
+          Every observability tool is built for LLM developers. TokenJam is built for people whose agents have real-world side effects — and real-world bills.
         </p>
 
         <div class="problem-point">
@@ -1349,7 +1351,7 @@
           </div>
           <div class="problem-text">
             <h4>No visibility into what agents do while you sleep</h4>
-            <p>Agents running overnight have full access to email, files, and services. Without observability, you find out what happened when a customer complains.</p>
+            <p>Coding agents and autonomous workflows run for hours unattended. They edit files, send emails, hit APIs. Without observability, you find out what happened when something breaks — or when the bill arrives.</p>
           </div>
         </div>
 
@@ -1358,8 +1360,8 @@
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8l4 4 6-8"/></svg>
           </div>
           <div class="problem-text">
-            <h4>Silent cost blowouts</h4>
-            <p>An agent looping on a failing tool call can burn $40/hr. Without per-agent cost tracking, you get the bill at the end of the month.</p>
+            <h4>Surprise bills, no obvious fix</h4>
+            <p>A Claude Code session can rack up $45 in an hour. Most calls don't need the most expensive model — but without per-task cost attribution, you can't tell which ones do.</p>
           </div>
         </div>
 
@@ -1369,7 +1371,7 @@
           </div>
           <div class="problem-text">
             <h4>Every tool requires a SaaS account</h4>
-            <p>Behavioral drift detection, safety alerts, schema validation — they all require API keys, hosted backends, and credit cards. TokenJam runs on your machine.</p>
+            <p>Behavioral drift, sensitive-action alerts, eval-to-production correlation — they all require API keys, hosted backends, and credit cards. TokenJam runs on your machine.</p>
           </div>
         </div>
       </div>
@@ -1382,37 +1384,37 @@
             <div class="solution-item-check">
               <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l2.5 2.5 3.5-4"/></svg>
             </div>
-            <span>Full OTel-native telemetry — agent spans, tool calls, token metrics — conforming to GenAI SemConv, exportable to Grafana or Jaeger</span>
+            <span><strong>See where your tokens go</strong> — Real-time USD cost per LLM call, per agent, per task. Per-session, per-day, and per-prompt breakdowns. Works for Claude Code, Codex CLI, OpenAI Agents SDK, LangChain, CrewAI, or any OTel-native agent.</span>
           </div>
           <div class="solution-item">
             <div class="solution-item-check">
               <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l2.5 2.5 3.5-4"/></svg>
             </div>
-            <span>Real-time USD cost tracking per agent, per model, per task — with configurable daily budget alerts</span>
+            <span><strong>Find where they're wasted</strong> — Trace-driven detection of model-downgrade opportunities, cache-eligible duplicates, prompt bloat, and tool-call retry loops.<span style="font-family:'Geist Mono',monospace;font-size:11px;color:var(--amber);margin-left:6px;letter-spacing:0.05em;">soon</span></span>
           </div>
           <div class="solution-item">
             <div class="solution-item-check">
               <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l2.5 2.5 3.5-4"/></svg>
             </div>
-            <span>Sensitive action alerts — fires when your agent sends email, writes files, or submits forms, before the session ends</span>
+            <span><strong>Keep agents in line</strong> — Sensitive-action alerts (email sends, file writes, payment actions, form submits). Behavioral drift detection. Cost budget alerts with optional enforcement.</span>
           </div>
           <div class="solution-item">
             <div class="solution-item-check">
               <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l2.5 2.5 3.5-4"/></svg>
             </div>
-            <span>Local behavioral drift detection — catches when agent behavior diverges from its baseline without any cloud dependency</span>
+            <span><strong>Connect evals to production</strong> — Import results from Inspect AI, DeepEval, Promptfoo, and others. Correlate eval failures with matching production sessions.<span style="font-family:'Geist Mono',monospace;font-size:11px;color:var(--amber);margin-left:6px;letter-spacing:0.05em;">soon</span></span>
           </div>
           <div class="solution-item">
             <div class="solution-item-check">
               <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l2.5 2.5 3.5-4"/></svg>
             </div>
-            <span>Full-featured CLI + local REST API — pipe to jq, grep, tail, or any tool you already use</span>
+            <span><strong>OTel-native, no vendor lock-in</strong> — Full GenAI Semantic Conventions compliance. Exportable to Grafana, Jaeger, Datadog, or any OTel backend.</span>
           </div>
           <div class="solution-item">
             <div class="solution-item-check">
               <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l2.5 2.5 3.5-4"/></svg>
             </div>
-            <span>Works with OpenClaw, LangChain, LangGraph, LlamaIndex, CrewAI, AutoGen, OpenAI Agents SDK, Anthropic (direct), Google Gemini, AWS Bedrock, NemoClaw, or any custom agent</span>
+            <span><strong>Local-first, CLI-first</strong> — Single <code>pip install</code>. No signup, no proxy, no SaaS account. Full-featured CLI (<code>tj status</code> / <code>traces</code> / <code>cost</code> / <code>drift</code>) with JSON output. Local REST API + Prometheus <code>/metrics</code>.</span>
           </div>
         </div>
       </div>
@@ -1426,17 +1428,17 @@
   <div class="container">
     <div style="margin-bottom: 40px;">
       <div class="section-label">features</div>
-      <h2>Everything a single developer needs.<br>Nothing they don't.</h2>
+      <h2>Built for individuals.<br>Architected for teams.</h2>
     </div>
 
     <div class="features-grid">
       <div class="feature-card">
         <div class="feature-icon">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><path d="M10 6v4l2.5 2.5"/></svg>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3l2 5h5l-4 3.5 1.5 5.5L10 14l-4.5 3 1.5-5.5L3 8h5z"/></svg>
         </div>
-        <div class="feature-title">OTel-native telemetry</div>
-        <p class="feature-desc">Full GenAI Semantic Conventions compliance from day one. Agent spans, tool calls, token metrics — exportable to Grafana, Jaeger, Datadog, or any OTel backend without transformation.</p>
-        <span class="feature-badge badge-oss">OTel SemConv v1.37+</span>
+        <div class="feature-title">Autonomous agent safety alerts</div>
+        <p class="feature-desc">The only observability tool built for agents with real-world side effects. Configurable alerts fire on email sends, file writes, form submissions, and payment actions.</p>
+        <span class="feature-badge badge-new">unique to TokenJam</span>
       </div>
 
       <div class="feature-card">
@@ -1450,20 +1452,20 @@
 
       <div class="feature-card">
         <div class="feature-icon">
-          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3l2 5h5l-4 3.5 1.5 5.5L10 14l-4.5 3 1.5-5.5L3 8h5z"/></svg>
-        </div>
-        <div class="feature-title">Autonomous agent safety alerts</div>
-        <p class="feature-desc">The only observability tool built for agents with real-world side effects. Configurable alerts fire on email sends, file writes, form submissions, and payment actions.</p>
-        <span class="feature-badge badge-new">unique to TokenJam</span>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">
           <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10h4l3-7 4 14 3-7h3"/></svg>
         </div>
         <div class="feature-title">Local behavioral drift detection</div>
         <p class="feature-desc">Deterministic, no-cloud drift detection. Automatically baselines token usage, tool call sequences, output schema, and session duration — alerts when agents deviate.</p>
         <span class="feature-badge badge-new">no API key required</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><path d="M10 6v4l2.5 2.5"/></svg>
+        </div>
+        <div class="feature-title">OTel-native telemetry</div>
+        <p class="feature-desc">Full GenAI Semantic Conventions compliance from day one. Agent spans, tool calls, token metrics — exportable to Grafana, Jaeger, Datadog, or any OTel backend without transformation.</p>
+        <span class="feature-badge badge-oss">OTel SemConv v1.37+</span>
       </div>
 
       <div class="feature-card">
@@ -1482,6 +1484,15 @@
         <div class="feature-title">CLI + local REST API</div>
         <p class="feature-desc">A full-featured CLI (tj status / traces / cost / drift) with JSON output on every command. Local API at localhost with Prometheus /metrics endpoint, OpenAPI spec included.</p>
         <span class="feature-badge badge-oss">pipe-friendly · scriptable</span>
+      </div>
+
+      <div class="feature-card" style="grid-column: 1 / -1; background: linear-gradient(135deg, var(--bg-light), rgba(var(--accent-rgb),0.02));">
+        <div class="feature-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 16l5-8 3 4 4-7 4 11"/><circle cx="10" cy="10" r="1.5" fill="currentColor"/></svg>
+        </div>
+        <div class="feature-title">Trace-driven cost optimization <span style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--amber);margin-left:8px;letter-spacing:0.08em;">COMING SOON</span></div>
+        <p class="feature-desc">Most coding-agent calls don't need the most expensive model. TokenJam will analyze your traces and recommend concrete fixes — model downgrades that don't lose quality, cache-eligible duplicates, prompt-bloat cleanup. Driven by your real sessions, not generic heuristics. <a href="https://github.com/metabuilder-labs/tokenjam/discussions" style="color:var(--blue);text-decoration:underline;">Watch the discussion</a> for the design-partner invite.</p>
+        <span class="feature-badge badge-new">tj optimize</span>
       </div>
     </div>
 
@@ -1511,7 +1522,7 @@
 <section class="section-dark" id="compare">
   <div class="container">
     <div class="section-label" style="color: var(--blue);">comparison</div>
-    <h2>Everything monitoring tells you the agent ran.<br>TokenJam tells you what it did.</h2>
+    <h2>Other tools tell you the agent ran.<br>TokenJam tells you what it did,<br>what it cost, and what to fix.</h2>
     <p class="section-desc">
       The tools your team already uses are built for LLM developers. TokenJam fills the gap they all leave open.
     </p>
@@ -1521,19 +1532,21 @@
         <thead>
           <tr>
             <th style="text-align: left; width: 28%;">Feature</th>
-            <th class="tj-col">TJ OSS</th>
+            <th class="tj-col">TokenJam</th>
             <th>Langfuse</th>
             <th>LangSmith</th>
+            <th>Helicone</th>
             <th>Guardrails AI</th>
           </tr>
         </thead>
         <tbody>
-          <tr class="section-row"><td colspan="5">Observability</td></tr>
+          <tr class="section-row"><td colspan="6">Observability</td></tr>
           <tr>
             <td class="feat-name">OTel GenAI SemConv native<span class="comp-table td.feat-sub" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(var(--accent-rgb),0.3);display:block;margin-top:2px;">compliant from day one</span></td>
             <td class="tj-col"><span class="yes">✓</span></td>
             <td><span class="partial">~</span></td>
             <td><span class="partial">~</span></td>
+            <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
           </tr>
           <tr>
@@ -1541,11 +1554,13 @@
             <td class="tj-col"><span class="yes">✓</span></td>
             <td><span class="yes">✓</span></td>
             <td><span class="yes">✓</span></td>
+            <td><span class="yes">✓</span></td>
             <td><span class="no">—</span></td>
           </tr>
           <tr>
             <td class="feat-name">Token &amp; cost tracking</td>
             <td class="tj-col"><span class="yes">✓</span></td>
+            <td><span class="yes">✓</span></td>
             <td><span class="yes">✓</span></td>
             <td><span class="yes">✓</span></td>
             <td><span class="no">—</span></td>
@@ -1556,12 +1571,14 @@
             <td><span class="yes">✓</span></td>
             <td><span class="no">—</span></td>
             <td><span class="yes">✓</span></td>
+            <td><span class="yes">✓</span></td>
           </tr>
 
-          <tr class="section-row"><td colspan="5">Autonomous agent safety</td></tr>
+          <tr class="section-row"><td colspan="6">Autonomous agent safety</td></tr>
           <tr>
             <td class="feat-name">Sensitive action alerts<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(var(--accent-rgb),0.3);display:block;margin-top:2px;">email, file write, payment, form submit</span></td>
             <td class="tj-col"><span class="yes">✓</span></td>
+            <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
@@ -1572,10 +1589,12 @@
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
+            <td><span class="no">—</span></td>
           </tr>
           <tr>
             <td class="feat-name">NemoClaw sandbox events</td>
             <td class="tj-col"><span class="yes">✓</span></td>
+            <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
@@ -1586,12 +1605,14 @@
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
+            <td><span class="no">—</span></td>
           </tr>
 
-          <tr class="section-row"><td colspan="5">Runtime verification</td></tr>
+          <tr class="section-row"><td colspan="6">Runtime verification</td></tr>
           <tr>
             <td class="feat-name">Behavioral drift detection</td>
             <td class="tj-col"><span class="yes">✓</span></td>
+            <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
@@ -1601,20 +1622,57 @@
             <td class="tj-col"><span class="yes">✓</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
+            <td><span class="no">—</span></td>
             <td><span class="yes">✓</span></td>
           </tr>
 
-          <tr class="section-row"><td colspan="5">Developer experience</td></tr>
+          <tr class="section-row"><td colspan="6">Token economics</td></tr>
+          <tr>
+            <td class="feat-name">Trace-driven cost recommendations<span style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(var(--accent-rgb),0.3);display:block;margin-top:2px;">model-downgrade analysis, prompt bloat, cache opportunities</span></td>
+            <td class="tj-col"><span class="partial">~</span></td>
+            <td><span class="no">—</span></td>
+            <td><span class="no">—</span></td>
+            <td><span class="partial">~</span></td>
+            <td><span class="no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Eval-to-production correlation<span style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(var(--accent-rgb),0.3);display:block;margin-top:2px;">import Inspect / DeepEval / Promptfoo</span></td>
+            <td class="tj-col"><span class="partial">~</span></td>
+            <td><span class="no">—</span></td>
+            <td><span class="partial">~</span></td>
+            <td><span class="no">—</span></td>
+            <td><span class="no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">MCP server for agent self-introspection<span style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(var(--accent-rgb),0.3);display:block;margin-top:2px;">13 MCP tools shipped</span></td>
+            <td class="tj-col"><span class="yes">✓</span></td>
+            <td><span class="no">—</span></td>
+            <td><span class="no">—</span></td>
+            <td><span class="no">—</span></td>
+            <td><span class="no">—</span></td>
+          </tr>
+          <tr>
+            <td class="feat-name">Multi-agent fleet aggregation<span style="font-family:'Geist Mono',monospace;font-size:11px;color:rgba(var(--accent-rgb),0.3);display:block;margin-top:2px;">cloud.tokenjam.dev — coming soon</span></td>
+            <td class="tj-col"><span class="cloud-only">cloud</span></td>
+            <td><span class="partial">~</span></td>
+            <td><span class="yes">✓</span></td>
+            <td><span class="no">—</span></td>
+            <td><span class="no">—</span></td>
+          </tr>
+
+          <tr class="section-row"><td colspan="6">Developer experience</td></tr>
           <tr>
             <td class="feat-name">Fully local, no signup</td>
             <td class="tj-col"><span class="yes">✓</span></td>
             <td><span class="yes">✓</span></td>
             <td><span class="no">—</span></td>
+            <td><span class="partial">~</span></td>
             <td><span class="yes">✓</span></td>
           </tr>
           <tr>
             <td class="feat-name">CLI interface</td>
             <td class="tj-col"><span class="yes">✓</span></td>
+            <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
@@ -1625,12 +1683,14 @@
             <td><span class="yes">✓</span></td>
             <td><span class="no">—</span></td>
             <td><span class="no">—</span></td>
+            <td><span class="no">—</span></td>
           </tr>
           <tr>
             <td class="feat-name">Open source / self-hostable</td>
             <td class="tj-col"><span class="yes">✓</span></td>
             <td><span class="yes">✓</span></td>
             <td><span class="no">—</span></td>
+            <td><span class="yes">✓</span></td>
             <td><span class="yes">✓</span></td>
           </tr>
         </tbody>
@@ -1641,6 +1701,46 @@
       <span><span class="yes">✓</span> Supported</span>
       <span><span class="partial">~</span> Partial or roadmap</span>
       <span><span class="no">—</span> Not available</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- COMING NEXT -->
+<section class="section-light" id="coming-next">
+  <div class="container">
+    <div class="section-label">coming next</div>
+    <h2>Trace-driven optimization.<br>Eval-to-production correlation.</h2>
+    <p class="section-desc">
+      The optimization layer turns observability into action. Eval correlation closes the loop from
+      offline testing to live production. Both are in active development. The OSS roadmap is public.
+    </p>
+
+    <div class="features-grid" style="grid-template-columns: 1fr 1fr;">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14l5-8 3 4 4-7 4 11"/></svg>
+        </div>
+        <div class="feature-title">tj optimize <span style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--amber);margin-left:8px;letter-spacing:0.08em;">Q3 2026</span></div>
+        <p class="feature-desc">One command, one number. Analyzes your real traces and outputs concrete cost-recovery recommendations — model cascade analysis, cache opportunities, prompt-bloat detection. Apply commands generate hot-reloadable runtime rules.</p>
+        <span class="feature-badge badge-new">design-partner program open</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="2.5"/><circle cx="14" cy="14" r="2.5"/><path d="M7.5 7.5l5 5"/></svg>
+        </div>
+        <div class="feature-title">tj eval import <span style="font-family:'Geist Mono',monospace;font-size:10px;color:var(--amber);margin-left:8px;letter-spacing:0.08em;">Q2 2026</span></div>
+        <p class="feature-desc">Ingest results from Inspect AI, DeepEval, Promptfoo, HUD, and Coval. Correlate failed eval cases with matching production sessions. The only OSS layer that connects what graded your agent offline with what it's doing in production.</p>
+        <span class="feature-badge badge-oss">5 importers planned</span>
+      </div>
+    </div>
+
+    <div style="margin-top: 32px; text-align: center;">
+      <a href="https://github.com/metabuilder-labs/tokenjam/discussions" target="_blank" rel="noopener noreferrer" class="cta-secondary" onclick="trackEvent('cta_click', 'conversion', 'roadmap_discussions')">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Discussions &amp; roadmap on GitHub
+      </a>
     </div>
   </div>
 </section>
@@ -1848,6 +1948,27 @@ const steps = [
       { txt: '  trace-j1k2l3   tool: read_file    0.1s   —      ✓', c: ['t-val'], delay: 1500 },
       { txt: '  trace-m4n5o6   invoke_agent       2.1s  $0.014  ✓', c: ['t-val'], delay: 1700 },
     ]
+  },
+  {
+    label: 'optimize',
+    lines: [
+      { txt: '$ tj optimize --last 30d --agent claude-code', c: ['t-prompt','t-cmd'], delay: 0 },
+      { txt: '', delay: 300 },
+      { txt: 'Analyzing 247 sessions, 148M tokens, $4,287 spend...', c: ['t-dim'], delay: 500 },
+      { txt: '', delay: 900 },
+      { txt: '  ① Model downgrade: 47% of sessions safe for Haiku', c: ['t-blue'], delay: 1100 },
+      { txt: '     Est. savings: $1,632/mo (-38%)', c: ['t-success'], delay: 1300 },
+      { txt: '', delay: 1500 },
+      { txt: '  ② Cache opportunities: 12% duplicate request rate', c: ['t-blue'], delay: 1700 },
+      { txt: '     Est. savings: $317/mo (-7%)', c: ['t-success'], delay: 1900 },
+      { txt: '', delay: 2100 },
+      { txt: '  ③ Prompt bloat: system prompt +38% over 30d', c: ['t-blue'], delay: 2300 },
+      { txt: '     Cost of repeated transmission: $94/mo', c: ['t-success'], delay: 2500 },
+      { txt: '', delay: 2700 },
+      { txt: '─── Estimated monthly savings: $2,043 (-48%) ───', c: ['t-warn'], delay: 2900 },
+      { txt: '', delay: 3100 },
+      { txt: '# Preview — full feature ships Q3 2026', c: ['t-dim'], delay: 3300 },
+    ]
   }
 ];
 
@@ -1862,7 +1983,7 @@ function clearAnimations() {
 function showStep(idx) {
   clearAnimations();
   currentStep = idx;
-  const tabNames = ['install', 'onboard', 'status', 'traces'];
+  const tabNames = ['install', 'onboard', 'status', 'traces', 'optimize'];
   trackEvent('terminal_tab', 'engagement', tabNames[idx]);
 
   // Update tabs

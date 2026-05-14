@@ -1,6 +1,8 @@
 # TokenJam
 
-Open-source, OTel-native observability for autonomous AI agents. Full telemetry, cost tracking, and safety alerts — on your machine, no backend required.
+The website for **TokenJam** — open-source token economics for AI agents. Observability, cost optimization, and behavioral control for autonomous agents, running locally on your machine. Works with Claude Code, Codex, OpenAI Agents SDK, LangChain, CrewAI, and any OTel-native agent.
+
+Live at [tokenjam.dev](https://tokenjam.dev). The OSS tool itself lives at [github.com/metabuilder-labs/tokenjam](https://github.com/metabuilder-labs/tokenjam).
 
 ## What is TokenJam?
 
