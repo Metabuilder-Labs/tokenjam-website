@@ -1,0 +1,136 @@
+---
+title: "What is Agent Memory and why does it matter?"
+description: "How AI agents persist state across sessions, why memory is different from RAG, and the open-source projects building this layer."
+author: "anil-murty"
+publishDate: 2026-05-13
+tags: ["memory", "agents", "llm", "opensource"]
+pillar: "memory"
+image: "/blog/agent-memory.jpg"
+---
+
+import TLDR from '@/components/TLDR.astro';
+import FAQBlock from '@/components/FAQBlock.astro';
+
+<TLDR>
+- Agent memory is persistent state (facts, decisions, relationships) that an AI agent carries across sessions and beyond a single context window.
+- Memory is not RAG. RAG retrieves static documents; memory is dynamic state the agent writes to as it learns.
+- The hard parts: bounded context windows, approximate semantic recall, and deciding what to remember versus forget.
+- Four useful categories: short-term (in-context), long-term (persisted), semantic (facts), and episodic (time-stamped events).
+- The active projects: Letta (tiered OS-style memory), Mem0 (vector + graph hybrid), Zep (temporal knowledge graphs), LangMem, Cognee, Supermemory.
+</TLDR>
+
+**Agent memory** is the persistent state an AI agent maintains across sessions and beyond the LLM's context window. It stores facts the agent has learned, decisions it has made, and relationships it has tracked, so a future interaction can retrieve and act on them. Without memory, every session starts from zero.
+
+## Why it matters
+
+A stateless LLM forgets everything when the conversation ends. That is fine for one off questions, similar to a search engine, but in order for AI agents to be more useful than just a search engine they need to be able to track a multi-week conversation and progress towards a goal. They also need to improve over time based on what they learn from the user.
+
+Memory is what turns a chatbot into something you can hand ongoing work to. It is also where the hardest unsolved problems live: how to compress conversations into useful facts, how to retrieve the right fact at the right time, and how to handle the moment when a user's stated preference today contradicts what they said three months ago.
+
+## Why memory is hard
+
+Three problems make this a live research area.
+
+**Context windows are bounded.** Claude Sonnet 4.5 has a 200K context. GPT-5 reaches 400K. Even at the high end, an agent serving one customer over six months accumulates more conversational data than any context can hold. You cannot just stuff history into the prompt.
+
+**Semantic recall is approximate.** Vector embeddings let you ask "find facts similar to this query," but the result quality depends on phrasing, embedding model, and how facts were chunked when stored. Multi-hop reasoning ("connect fact A and fact B to answer question C") and temporal reasoning ("was that true last month?") both stress current approaches. Graph-based memory helps with multi-hop questions, at the cost of curating structure from unstructured chat.
+
+**Deciding what to forget is itself a design problem.** Should the agent store every word, or distill summaries? When a user contradicts an earlier preference, do you delete the old fact, mark it invalid with a timestamp, or keep both and let retrieval pick? There are no universal answers. The right policy depends on whether you are building a personal assistant, a customer-support agent, or a coding agent that needs to remember repo conventions.
+
+## Categories of memory
+
+Memory systems organize knowledge along two axes: temporal scope (within a session or across sessions) and representation (what form the knowledge takes).
+
+### Short-term and long-term
+
+**Short-term memory** lives in the LLM's context window. It is the transcript of the current exchange. Cheap to implement, capped by context size, and gone when the session ends.
+
+**Long-term memory** persists outside the context window in a database, vector store, or knowledge graph. The agent compresses short-term context into long-term facts before a session ends, then retrieves the relevant slice in the next session.
+
+### Semantic and episodic
+
+**Semantic memory** holds knowledge without a timestamp: "this user prefers dark mode," "the team lead is Sarah," "our API rate limit is 1000 req/sec." It answers "what is true" questions. Vector indexes and knowledge graphs are the usual representations.
+
+**Episodic memory** is tied to time and context: "on 2026-04-12 the user reported a checkout bug," "in session 147 the agent escalated to a human." It answers "what happened" questions and underwrites causal reasoning. Event logs or timestamped graph edges are typical.
+
+Production systems blend both. Zep tracks when facts were true. Mem0 combines vector retrieval with graph relationships. Letta tiers everything through an OS-style hierarchy.
+
+## Memory is not RAG
+
+This is the distinction worth being precise about, because the two get conflated constantly.
+
+**RAG (retrieval-augmented generation)** reads from a fixed external corpus: a product manual, a docs site, a corpus of papers. The LLM consults that corpus at inference time. It does not write to it. The corpus is authoritative; the agent is a reader. RAG is excellent for "what is the API rate limit?" because the answer lives in one place and does not change based on conversation.
+
+**Agent memory** is bidirectional. The agent writes facts during conversations ("the user prefers tea"), reads from memory to personalize responses, and updates memory when facts change. Memory is about the agent's own accumulated experience, not an external reference. An agent serving the same customer five times hits the same product docs each visit via RAG, and recalls what the customer asked about last time via memory.
+
+The [xMemory paper](https://arxiv.org/abs/2602.02007) put it this way: RAG targets large heterogeneous corpora with diverse passages; agent memory deals with bounded, coherent dialogue streams whose spans are highly correlated. Most production agents use both. RAG for reference knowledge, memory for personalization and continuity.
+
+## Notable projects
+
+The agent memory space matured fast across 2024 and 2025. Here are the systems worth knowing.
+
+### Letta (formerly MemGPT)
+
+[Letta](https://www.letta.com/) grew out of the [MemGPT](https://arxiv.org/abs/2310.08560) research project from UC Berkeley. MemGPT proposed a tiered architecture borrowed from operating systems: a small "core" context that acts like CPU cache, an "archival" store that acts like RAM, and a vector index for semantic retrieval. The agent decides what to keep in core context and what to push to archival, writing explicit calls like `core_memory_replace()` as part of its action loop. Letta now offers a framework for building, inspecting, and deploying agents with multi-level memory, with both open-source and managed deployment paths.
+
+### Mem0
+
+[Mem0](https://mem0.ai/) is a drop-in memory layer with a hybrid architecture: vector store for semantic search, graph store for relationship reasoning, key-value store for direct lookups. The platform extracts facts from conversations automatically, classifies them, and routes them to the appropriate backend. Storage is pluggable (Pinecone, Neo4j, others). Mem0 also publishes research on memory-aware LLM evaluation.
+
+### Zep
+
+[Zep](https://www.getzep.com/) built [Graphiti](https://github.com/getzep/graphiti), a temporal knowledge graph engine that tracks not just facts but when those facts were true. Graphiti uses a bi-temporal model: transaction time (when the fact was learned) and valid time (when the fact was true in the world). That lets agents query historical state and avoid the "user once said coffee, now says tea" contradiction problem. Zep reports strong results on the Deep Memory Retrieval benchmark relative to MemGPT.
+
+### LangMem
+
+[LangMem](https://www.langchain.com/blog/langmem-sdk-launch) is LangChain's lightweight SDK for long-term memory in LangGraph agents, released in early 2025. It ships pre-built tools for extracting procedural, episodic, and semantic memories, a background manager that consolidates memories over time, and integration with LangGraph's long-term memory store. Storage-backend-agnostic, which makes it a reasonable choice if you are already invested in LangChain.
+
+### Cognee
+
+[Cognee](https://www.cognee.ai/) frames itself as a memory control plane: a unified layer for building knowledge graphs from conversational data. Cognee ingests from 30+ sources (Notion, Slack, email, S3), enriches with embeddings and relationship extraction, and exposes four operations: remember, recall, forget, improve. The "memify" process continuously prunes stale knowledge and strengthens frequently-used connections.
+
+### Supermemory
+
+[Supermemory](https://supermemory.ai/) combines a custom vector-graph engine with ontology-aware edges, hybrid vector and keyword search, and automatic ingestion from common tools (Gmail, Drive, Slack). It ranks #1 on three benchmarks: LongMemEval, LoCoMo, and ConvoMem. Also ships a browser extension and an MCP server, which makes memory accessible to any compatible agent.
+
+## Evaluating memory
+
+How do you measure whether an agent is remembering the right things? The honest answer: poorly, and the field knows it.
+
+[LongMemEval](https://arxiv.org/abs/2410.10813), published in 2024, was the first serious attempt. It tests five abilities: information extraction (recalling specific facts from long histories), multi-session reasoning (synthesizing across separate conversations), temporal reasoning (understanding when things happened), knowledge updates (correcting itself when facts change), and abstention (knowing what it does not know). The benchmark embeds 500 curated questions in realistic chat histories spanning 115K tokens at the short end and up to 1.5M tokens at the long end. Even GPT-4o lands around 30 to 70 percent accuracy depending on the slice, which gives you a sense of how unsolved this is.
+
+LoCoMo and ConvoMem cover overlapping ground from different angles. None of them measures usefulness in production, where the question is whether memory actually improved the user experience, not whether retrieval was technically correct.
+
+In practice, teams evaluate memory through retrieval accuracy (did the system return the fact you stored?), behavioral change (did the agent's next response reflect what it learned?), temporal consistency (after a contradiction, does the agent know the current truth?), and context efficiency (did memory reduce the need to pass long history every turn?). Observability tools like [LangSmith](https://smith.langchain.com/) can log memory operations. Automated evaluation of what *should* have been remembered remains mostly manual.
+
+## Common questions
+
+<FAQBlock items={[
+  {
+    question: "Isn't memory just RAG with a vector store?",
+    answer: "No. RAG reads from a fixed external corpus. Memory is dynamic state the agent writes to as it learns. You can build memory on top of a vector store, but the distinction is direction: RAG is read-only against authoritative content; memory is read-write against the agent's own experience. Production systems use both, for different jobs."
+  },
+  {
+    question: "Do I need memory for a short-running agent?",
+    answer: "Probably not. If your agent handles single-turn or within-session interactions, short-term context history is enough. Long-term memory pays off when the agent needs to recognize returning users, track multi-session goals, or adapt to a specific person over time. A chatbot handling 100 independent queries a day does not need it. A personal assistant working with the same user for weeks does."
+  },
+  {
+    question: "Can I just use a 1M-token context window instead of building memory?",
+    answer: "Not for long-running agents. A 200K or 400K context sounds large until you do the math: six months of daily conversations with one user runs into millions of tokens. Stuffing all of it into every call is expensive and wasteful, because most of it is irrelevant to the current turn. Memory systems exist to retrieve the right slice. Long context and memory are complements, not substitutes."
+  },
+  {
+    question: "How do I evaluate whether my memory system is working?",
+    answer: "Start with a manual test loop. Insert a fact via the agent, pause, query memory directly to confirm storage, then resume the agent in a fresh session and ask about that fact. If it recalls correctly, retrieval works end to end. Then add harder cases: multi-hop queries that require combining two facts, temporal queries that ask whether something was true at a specific time, and behavioral checks that test whether agent decisions actually shift based on memory. Formal benchmarks like LongMemEval exist if you want to compare across systems, but they require non-trivial setup."
+  },
+  {
+    question: "Vector, graph, or hybrid? How do I choose?",
+    answer: "Start with vectors. They are simpler and fast, and most queries are 'find facts similar to this.' Add graph reasoning if you discover you have multi-hop questions that vectors handle badly: 'find people this user knows who work in fintech.' Hybrid systems like Mem0, Zep, and Cognee combine both. Pick a hybrid system from day one if you already know your queries are relationship-heavy."
+  }
+]} />
+
+## Further reading
+
+- [MemGPT: Towards LLMs as Operating Systems](https://arxiv.org/abs/2310.08560).
+- [Zep: A Temporal Knowledge Graph Architecture for Agent Memory](https://arxiv.org/abs/2501.13956).
+- [LongMemEval: Benchmarking Chat Assistants on Long-Term Interactive Memory](https://arxiv.org/abs/2410.10813).
+- [RAG is not Agent Memory](https://www.letta.com/blog/rag-vs-agent-memory) (Letta blog).
