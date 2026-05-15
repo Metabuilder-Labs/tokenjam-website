@@ -1,0 +1,193 @@
+---
+title: "How to monitor Claude Code: a practical guide for indie devs running it unsupervised"
+description: "A step-by-step guide to monitoring Claude Code on your own laptop. Turn on Anthropic's OTel telemetry, route the spans somewhere useful, and wire up alerts that fire while the agent is still running."
+author: "ansh-saxena"
+publishDate: 2026-05-18
+tags: ["claude-code", "monitoring", "observability", "opentelemetry", "tokenjam"]
+pillar: "observability"
+image: "/blog/agent-observability.jpg"
+draft: false
+---
+
+import TLDR from '@/components/TLDR.astro';
+import Callout from '@/components/Callout.astro';
+import FAQBlock from '@/components/FAQBlock.astro';
+
+<TLDR>
+- **How to monitor Claude Code in one paragraph:** set `CLAUDE_CODE_ENABLE_TELEMETRY=1`, point `OTEL_EXPORTER_OTLP_ENDPOINT` at a local collector, store spans in a local database, and wire alerts on retry loops and budget breaches to Discord or ntfy. The whole thing runs on your laptop.
+- The reason most people don't do this is that the existing OTel collector → ClickHouse → Grafana stack is a weekend project. There are now lighter options.
+- `/cost` inside Claude Code only shows the current session. It does not alert. It does not detect retry loops. It does not survive a restart.
+- Budget caps like `--max-budget-usd` are a hard ceiling, not a brake. They don't catch silent failures, drift, or retry loops below the cap.
+- A correct setup catches the failure mode while it's happening, not from the invoice the next morning.
+</TLDR>
+
+I keep getting asked some variation of *"so what does it actually take to monitor Claude Code without waking up to a $1,700 bill?"* This is the post I wish someone had written before I learned [how to monitor Claude Code](https://github.com/anthropics/claude-code/issues/37686) the hard way. The dollar figure in that link is real. The author had run a ralph loop overnight for the first time and woke up to the receipt.
+
+There are five concrete steps. None of them require a cloud account. None of them require Docker Compose. They take about 15 minutes if you've never touched OpenTelemetry, and about 90 seconds if you have.
+
+## Why monitoring Claude Code is harder than it sounds
+
+Claude Code ships two visibility surfaces out of the box: the `/cost` slash command and an OpenTelemetry telemetry pipe gated behind `CLAUDE_CODE_ENABLE_TELEMETRY=1`. Both are real and both are insufficient for autonomous runs.
+
+`/cost` is per-session and read-only. You type it, you see a number, you move on. It does not persist across restarts. It does not page you. It does not know what a retry loop looks like. It is a meter, not a brake.
+
+The telemetry pipe is more useful, but only after you point it somewhere that actually does something with the data. Anthropic emits OTel spans for prompts, tool calls, costs, and session lifecycle events. Where those spans go is up to you. By default they go nowhere.
+
+The deeper problem is the shape of the failure mode. As one [dev.to post-mortem](https://dev.to/magicrails/i-let-my-ai-agent-run-overnight-it-cost-437-dd7) of an overnight $437 run put it: *"agents don't fail loudly, they fail expensively."* A hung process at least stops responding. A looping agent actively reports that everything is fine. Span counts go up. The trace says completed. The invoice arrives in the morning. So "monitoring" here doesn't mean "log the runs." It means "fire something at me while the bad version is still happening."
+
+## What you need before starting
+
+Three things:
+
+1. **A Claude Code install you actually run unsupervised.** If you only ever invoke Claude Code in the foreground with your eyes on the terminal, you can skip this whole post. The cost of monitoring is paid by people running with `--dangerously-skip-permissions`, ralph loops, overnight runs, or any flow where the agent might still be working after you close the lid.
+2. **A place to send OTLP spans.** This is the choice that branches everything downstream. Options range from a hosted dashboard (LangSmith, Langfuse Cloud, Arize) to a self-hosted server stack (Langfuse via Docker + ClickHouse, Phoenix in a notebook) to a local CLI daemon (`tj`, what we built, which is the easiest path if you don't want to operate infrastructure). All three accept OTLP. None of them require code changes to Claude Code itself.
+3. **A notification channel you actually check.** Discord webhook, ntfy topic, Telegram bot, or even a `mailto:` if you're a weirdo. Email is the wrong default. Your invoice arrives by email and you didn't open that one in time either.
+
+## Step 1: Turn on Anthropic's built-in OTel telemetry
+
+Add this to your shell profile or to the environment Claude Code launches under:
+
+```bash
+export CLAUDE_CODE_ENABLE_TELEMETRY=1
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:7391
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+```
+
+That's it. Claude Code will now emit OTel spans for tool calls, completions, costs, and session events to whatever collector is listening on port 7391. The variable names are exactly what the OTel SDK looks for, so any OTLP-compliant receiver works. Restart Claude Code. Run one command. Confirm spans are arriving at your collector.
+
+If you skip this step nothing else works. Most "I tried to monitor my Claude Code and got nothing" issues I've debugged are this variable not being set in the actual environment Claude Code launches under. `.zshrc` exports don't propagate into a launchd job, for example.
+
+## Step 2: Decide where the spans go
+
+This is where the choice has consequences. The same OTLP wire works for all of them, but the operational tax is very different:
+
+- **Hosted dashboards (LangSmith, Langfuse Cloud, Helicone).** Fastest setup. Point the endpoint at their URL with a bearer token and you're done. The tradeoffs are price (LangSmith Plus is [$39/seat/month before you log a single trace](https://dev.to/soufian_azzaoui_85ea1c030/i-tried-langsmith-langfuse-helicone-and-phoenix-heres-what-each-gets-wrong-2cjk)), where your data lives (somebody else's cloud), and that they're optimized for "what happened" review, not "what's happening" alerting.
+- **Self-hosted Langfuse or Phoenix.** Real OSS, free to run, full control. The cost is a weekend you spend on Docker Compose, a ClickHouse cluster, and a reverse proxy. Worth it for a 5-person team. Annoying for an indie running one laptop.
+- **Local CLI daemon.** The lightest option. Single `pip install`, single binary, spans land in a local DuckDB file. The tradeoff is that this category is new and there are fewer choices. `tj` (TokenJam) is the one we build, [`claude-usage`](https://github.com/ryoppippi/ccusage) is a reactive cost dashboard in the same shape, and that's roughly the field.
+
+The reason this branch matters is that the next two steps (alerts and drift detection) are the part the dashboards skip. Choose accordingly.
+
+## Step 3: Wire up real-time alerts (the missing piece)
+
+A pile of stored spans is forensics. It is not monitoring. Monitoring is *"I get pinged on Discord at 2:14am because something specific tripped."* So write rules against your span stream. There are four that earn their place from day one:
+
+1. **Retry loop.** N identical tool calls within M spans. The canonical version of this incident is on the [Claude Code issue tracker](https://github.com/anthropics/claude-code/issues/37686). A ralph loop that ran overnight and produced $1,700 in charges. Threshold I use: 4 identical tool calls in 6 spans.
+2. **Cost budget breach.** Running session cost crosses a threshold you set. This is the rule `/cost` doesn't enforce. Set it tighter than your `--max-budget-usd` cap so you hear about the burn before you hit the ceiling.
+3. **Sensitive action.** Any tool call that writes outside the project tree, touches `~/.ssh`, or invokes the shell with `rm`, `curl | sh`, or `chmod 777`. Most autonomous runs never need any of those. When one does, you want a notification, not a fait accompli.
+4. **Silent failure.** This one is the most underrated. From the [r/AI_Agents thread](https://www.reddit.com/r/AI_Agents/comments/1rzd5pn/my_ai_agents_burned_50day_doing_nothing_so_i/): *"Last week I woke up to find $50 gone on OpenRouter with zero output. The LLM was generating CLI commands as text and nobody was executing them. Logs said 'done.' Vault was empty."* The detection rule is something like: high token output combined with zero filesystem writes and zero exit-code-zero tool returns. Span-counting dashboards completely miss this.
+
+Each rule fires to a webhook. Discord is the right default for indie operators because the phone notification is loud and the message can include a link back to the trace. If you're using `tj`, these four rules are wired by default and you set thresholds in `~/.tj/config.toml`. If you're using a hosted dashboard, you build them as alert rules in their UI. If you're using self-hosted Langfuse, you write them as ClickHouse queries against a cron. Which is real work, and is the reason most people skip this step entirely.
+
+## Step 4: Set named safety guardrails, not just budget caps
+
+Anthropic added `--max-budget-usd` and Auto Mode in direct response to the overnight-bill incidents. Use them. They are a real safety net. They are also not sufficient on their own.
+
+A budget cap doesn't tell you about a retry loop burning $5 below the cap. It doesn't tell you about [Claude Code estimating a session at $300 and spending $1,700](https://github.com/anthropics/claude-code/issues/34972). The agent is not a reliable narrator about its own runtime. It doesn't tell you about [233 background agents you didn't ask for consuming 23% of your token spend](https://www.reddit.com/r/ClaudeAI/comments/1rwdahm/i_analyzed_77_claude_code_sessions_233_ghost.json). And it definitely doesn't tell you which of those things just happened.
+
+Layer cap and named alerts. The cap is the ceiling. The named alerts are the brake pedal, with the alert text telling you which failure mode tripped. `retry_loop`, `sensitive_action`, `schema_violation`, `drift_detected`, not just "anomaly."
+
+## Step 5: Track behavioral drift across sessions
+
+This one is what most of the existing toolchain skips and it's also where Claude Code specifically breaks in a predictable way. From [Claude Code GH #40801](https://github.com/anthropics/claude-code/issues/40801):
+
+> *"Compliance starts at 100% in the first 30 minutes → drops to 50–60% after first compaction → hits 20% after second compaction. Your rules were effectively gone."*
+
+That's not flakiness. That's deterministic degradation. The rules in your `CLAUDE.md` get followed when the context window is fresh and progressively ignored after compaction.
+
+You catch this by building a statistical baseline of what a "normal" session for a given agent looks like. Input tokens, output tokens, duration, tool call distribution, tool sequence similarity. And firing an alert when subsequent sessions wander off that baseline by some Z-score threshold. Three sigma is a reasonable default if you have no priors. Ten completed sessions is a reasonable point to start computing the baseline.
+
+This is one of the three things LangSmith and Langfuse genuinely don't ship out of the box. Their dashboards show you the data, but the drift detection is your job. `tj` ships it as the `drift_detected` alert type because the daily-stick pain ("why did this run cost 3x yesterday's?") shows up so consistently in the audience that it earned the slot.
+
+## Common things that go wrong
+
+A short list of things I've personally broken or watched other people break:
+
+- **`CLAUDE_CODE_ENABLE_TELEMETRY=1` not propagating to launchd / systemd.** Shell exports don't make it into a background service. Set the variable in the service's environment file, not your `.zshrc`. Confirm with `ps eww <pid>` on macOS or `cat /proc/<pid>/environ` on Linux.
+- **OTLP endpoint pointed at the wrong protocol.** Claude Code emits `http/protobuf` by default. If your collector only speaks `grpc` you'll see exactly zero spans and no error. Match protocols explicitly.
+- **Alerts firing into a Discord channel nobody has notifications on for.** Sounds dumb. It happens. Test the webhook by sending yourself a fake alert at 2am. If your phone doesn't buzz, the rest of this is theater.
+- **Treating `claude-usage` as monitoring.** [`claude-usage`](https://github.com/ryoppippi/ccusage) is great. It has [1,500 GitHub stars](https://github.com/ryoppippi/ccusage) for a reason. It solved half of this problem before anyone else. But it's reactive: you open the dashboard the next morning. It is not the same shape as alerting and the audience conflates them constantly.
+- **Forgetting that your laptop sleeps.** If the machine running Claude Code is asleep, nothing on the machine is running, including your monitor. Run unattended agents on a machine that stays awake (cloud VM, dedicated workstation, or laptop with `caffeinate`) and run the monitor on the same machine.
+
+## The shortest path
+
+If you want the shortest possible path to a working monitor on Claude Code on a single laptop, this is it:
+
+```bash
+pip install tokenjam
+tj onboard --claude-code
+tj demo run retry-loop   # see an alert fire in under 60 seconds
+```
+
+That writes a config with a random ingest secret, installs a launchd or systemd daemon, wires `CLAUDE_CODE_ENABLE_TELEMETRY=1` plus the OTLP endpoint into your Claude Code settings, registers the MCP server so Claude Code can query its own observability mid-run, and runs all five of the rules above as defaults. If you'd rather assemble it from parts, the parts are all linked above and the wire protocol is the same.
+
+The point isn't the tool. The point is that figuring out how to monitor Claude Code shouldn't take a weekend, and it shouldn't end with a dashboard you check the next morning.
+
+## Common questions
+
+<FAQBlock items={[
+  {
+    question: "What's the minimum I can do today to not wake up to a surprise Claude Code bill?",
+    answer: "Three things. Set --max-budget-usd to a number you can afford to lose. Set CLAUDE_CODE_ENABLE_TELEMETRY=1 and route spans to any OTLP collector. Add at least one alert rule for retry loops (4 identical tool calls in 6 spans) firing to a Discord webhook on a device that's not asleep. The third one is the part that catches the failure mode while it's still happening."
+  },
+  {
+    question: "Isn't /cost enough?",
+    answer: "No. /cost is per-session, read-only, and you have to type it. It does not persist across restarts, does not alert, and does not detect retry loops. It's a meter, not a brake. Use it for spot checks during a foreground session, and use real monitoring for anything autonomous."
+  },
+  {
+    question: "Do I need to use the same tool for forensics and alerts?",
+    answer: "No, but it helps. The same OTel spans drive both. If you want to inspect what happened in a run that fired an alert, you want the trace data already on disk. Running two systems (one for alerts, one for review) means two sets of credentials, two retention policies, and two places to grep. Pick one if you can."
+  },
+  {
+    question: "Does this work with Codex CLI, Cursor agent, or other coding agents?",
+    answer: "Anything that emits OTel spans works the same way. The OTLP endpoint and the alert rules don't care which agent the spans came from. Codex CLI emits OTel out of the box. Cursor's agent mode is patchier on the OTel side as of this writing; check current docs. For frameworks like LangGraph or CrewAI, the auto-instrumentation in the standard Python OTel libraries handles most of it."
+  },
+  {
+    question: "Where do the alerts actually fire by default?",
+    answer: "Whichever channel you configure. Discord webhook is the default I recommend because the mobile push is loud and the message can embed a link back to the trace. Ntfy is the most boring and works on every phone. Telegram is fine if you already live there. Email is the wrong default. You didn't open the bill alert in time either."
+  }
+]} />
+
+## About the author
+
+I'm Anil Murty, founder of Metabuilder Labs. I've been around the observability problem from a few sides. Firmware, networking, cloud automation. And the pattern with autonomous coding agents is the one I'd most like to fix before more people learn it the same expensive way. We built TokenJam because we kept dumping Claude Code session JSON files into another LLM to figure out what just happened, and that's not a debugging workflow, that's a coping strategy.
+
+## Sources
+
+- [Claude Code GH #37686](https://github.com/anthropics/claude-code/issues/37686). The canonical $1,700 overnight ralph loop incident.
+- [Claude Code GH #34972](https://github.com/anthropics/claude-code/issues/34972). Claude Code estimating sessions at $300 and spending $1,700.
+- [Claude Code GH #40801](https://github.com/anthropics/claude-code/issues/40801). Post-compaction rule-compliance degradation.
+- [r/nocode: my AI agent silently burned $800 in API calls](https://www.reddit.com/r/nocode/comments/1s8h1v5/my_ai_agent_silently_burned_800_in_api_calls/). The 6-hour overnight retry loop.
+- [r/AI_Agents: my AI agents burned $50/day doing nothing](https://www.reddit.com/r/AI_Agents/comments/1rzd5pn/my_ai_agents_burned_50day_doing_nothing_so_i/). The silent green-check failure mode.
+- [r/ClaudeAI: 233 ghost background agents](https://www.reddit.com/r/ClaudeAI/comments/1rwdahm/i_analyzed_77_claude_code_sessions_233_ghost.json). Spawned-subagent token spend.
+- [dev.to: I let my AI agent run overnight, it cost $437](https://dev.to/magicrails/i-let-my-ai-agent-run-overnight-it-cost-437-dd7). Origin of *"agents don't fail loudly, they fail expensively."*
+- [dev.to: I tried LangSmith, Langfuse, Helicone, and Phoenix](https://dev.to/soufian_azzaoui_85ea1c030/i-tried-langsmith-langfuse-helicone-and-phoenix-heres-what-each-gets-wrong-2cjk). Comparative pricing and latency notes.
+- [`claude-usage` (ryoppippi/ccusage)](https://github.com/ryoppippi/ccusage). The 1.5k-star local SQLite cost dashboard that proved the demand for this category.
+
+## Further reading
+
+- [I let Claude Code run overnight in --dangerously-skip-permissions](/blog/2026-05-15-overnight-claude-code-bill). The post-mortem narrative that pairs with this how-to.
+- [What is agent observability?](/blog/2026-05-09-agent-observability). The category context.
+- [OpenTelemetry for AI agents](/blog/2026-05-10-opentelemetry-for-ai-agents). Why OTel is the right substrate underneath all of this.
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "How to monitor Claude Code: a practical guide for indie devs running it unsupervised",
+      "description": "A step-by-step guide to monitoring Claude Code on your own laptop. Turn on Anthropic's OTel telemetry, route the spans somewhere useful, and wire up alerts that fire while the agent is still running.",
+      "datePublished": "2026-05-15",
+      "keywords": "how to monitor claude code",
+      "author": {"@id": "#author"},
+      "mainEntityOfPage": "https://tokenjam.dev/blog/2026-05-15-how-to-monitor-claude-code"
+    },
+    {
+      "@type": "Person",
+      "@id": "#author",
+      "name": "Anil Murty",
+      "description": "Founder, Metabuilder Labs. Builds TokenJam, an open-source local-first observability tool for autonomous AI agents.",
+      "url": "https://www.linkedin.com/in/anilmurty/",
+      "sameAs": ["https://www.linkedin.com/in/anilmurty/"]
+    }
+  ]
+}) } />

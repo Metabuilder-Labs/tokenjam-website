@@ -1,0 +1,200 @@
+---
+title: "I let Claude Code run overnight in --dangerously-skip-permissions. Here's what I built to never wake up to a surprise bill again."
+description: "A post-mortem on overnight Claude Code retry loops, why every existing observability tool tells you about it the next morning, and the local-first CLI we built to fire a Discord alert while it's still happening."
+author: "ansh-saxena"
+publishDate: 2026-05-15
+tags: ["claude-code", "agents", "observability", "safety", "tokenjam"]
+pillar: "observability"
+image: "/blog/agent-observability.jpg"
+draft: false
+---
+
+import TLDR from '@/components/TLDR.astro';
+import Callout from '@/components/Callout.astro';
+import FAQBlock from '@/components/FAQBlock.astro';
+
+<TLDR>
+- Autonomous coding agents don't fail loudly. They fail expensively. The canonical Claude Code overnight-ralph story is [$1,700 in one night](https://github.com/anthropics/claude-code/issues/37686).
+- Every existing agent observability tool (LangSmith, Langfuse, Helicone, AgentOps, Arize Phoenix) tells you what happened the next morning. None of them ping your phone while the retry loop is happening.
+- TokenJam (`tj`) is a local-first, OTel-native CLI that watches Claude Code and any OTLP-compliant agent in real time. One `pip install tokenjam`, one `tj onboard --claude-code`, one Discord alert when something goes wrong.
+- It runs on your laptop. No cloud account. No Docker Compose. No ClickHouse cluster. One DuckDB file.
+- It's day one. Zero users. The code is real. The 13-alert safety taxonomy is wired. The MCP server lets the agent query its own observability mid-session. `pip install tokenjam`.
+</TLDR>
+
+## The bill
+
+I'll get the embarrassing part out of the way first. The reason TokenJam exists is that I was tired of running another LLM over a 40MB session JSON file to figure out what my agent did while I was asleep.
+
+I'm not the worst case. The worst case is on the Claude Code issue tracker:
+
+> "I tried a ralph loop overnight for the first time and woke up to $1700 worth of charges. Reached out to Anthropic support several times and still waiting on a resolution."
+>. [Claude Code GH #37686](https://github.com/anthropics/claude-code/issues/37686)
+
+Or this one, written by someone who clearly had a worse week than I did:
+
+> "A LangChain agent running in a retry loop accumulated $47,000 in API charges over 11 days. The team had logging. They had monitoring. They did not have a hard limit."
+>. [dev.to](https://dev.to/dingdawg/how-an-ai-agent-ran-up-a-47000-bill-in-11-days-and-how-to-stop-it-1fk)
+
+Or this, which is the one I read most often because it's the most honest:
+
+> "I woke up to $800+ in charges and a very unhappy credit card. A retry loop got stuck... ~6 hours while I was asleep. No alerts. No circuit breaker. No cap."
+>. [r/nocode](https://www.reddit.com/r/nocode/comments/1s8h1v5/my_ai_agent_silently_burned_800_in_api_calls/)
+
+The pattern is consistent enough that there's now a verbatim phrase devs use for it: **"agents don't fail loudly, they fail expensively."** That line is from [a dev.to post-mortem of a $437 overnight run](https://dev.to/magicrails/i-let-my-ai-agent-run-overnight-it-cost-437-dd7), and once you've seen it you can't unsee it. It's the actual shape of the failure mode. A hung process at least stops responding. [A looping agent actively reports that everything is fine.](https://orchesis.ai/blog/what-happens-ai-agent-runs-overnight)
+
+## The four ways autonomous coding agents fail in production
+
+After staring at enough Claude Code session JSON files and reading enough GitHub threads, you start to see the same four failure modes:
+
+**1. The overnight bomb.** Retry loop, tool-call cycle, or a subagent that decided to spawn 233 more subagents. ["233 background agents I never asked for consumed 23% of my agent token spend... Close the terminal and that context is gone forever."](https://www.reddit.com/r/ClaudeAI/comments/1rwdahm/i_analyzed_77_claude_code_sessions_233_ghost.json) Your provider's billing alerts fire after the damage. Range observed in the wild: $84 → $47,000.
+
+**2. The silent green check.** The agent returns 200 OK. The trace says "completed." The side effect never happened. ["Last week I woke up to find $50 gone on OpenRouter with zero output. The LLM was generating CLI commands as text and nobody was executing them. Logs said 'done.' Vault was empty."](https://www.reddit.com/r/AI_Agents/comments/1rzd5pn/my_ai_agents_burned_50day_doing_nothing_so_i/) Span-counting dashboards have no idea what a no-op success looks like.
+
+**3. Context-window amnesia.** The rules in your `CLAUDE.md` work for the first 30 minutes. Then a compaction happens. Then the agent is a different agent. ["Compliance starts at 100% in the first 30 minutes → drops to 50–60% after first compaction → hits 20% after second compaction. Your rules were effectively gone."](https://github.com/anthropics/claude-code/issues/40801) Deterministic behavioral drift that looks like flakiness from the outside.
+
+**4. Cost estimates that are wrong by 5x.** Claude Code itself: ["repeatedly provided incorrect cost estimates… resulting in a spend of ~$1,700 against an estimate of ~$300."](https://github.com/anthropics/claude-code/issues/34972) The agent is not a reliable narrator about its own runtime.
+
+None of those four failure modes are caught by `/cost`. None of them are caught by a dashboard you open the next morning. They all need something watching in real time.
+
+## Why every existing tool tells you the next morning
+
+There are good tools in this space. I'm not going to pretend there aren't. But none of them are shaped for an indie running Claude Code on a laptop at 1am.
+
+- **LangSmith** is $39/seat/month before you log a single trace. A team of 5 starts at $195/month. It is excellent and it is cloud-only and it tells you, the next morning, how you spent the money. (["LangSmith pricing is punitive. $39/seat/month. Before you log a single trace."](https://dev.to/soufian_azzaoui_85ea1c030/i-tried-langsmith-langfuse-helicone-and-phoenix-heres-what-each-gets-wrong-2cjk))
+- **Langfuse** is the OSS dashboard most people end up with after LangSmith. We respect it. Self-hosting it means Docker Compose plus a ClickHouse cluster. That is a real weekend.
+- **Helicone** is a proxy. Proxies [add 50–80ms of latency](https://dev.to/soufian_azzaoui_85ea1c030/i-tried-langsmith-langfuse-helicone-and-phoenix-heres-what-each-gets-wrong-2cjk) per LLM call and they fall over when your agent fires 200 of them in a minute.
+- **AgentOps** is Python-only, cloud-primary, and has no opinionated safety taxonomy beyond error logging.
+- **Arize Phoenix** is genuinely great for post-hoc evaluation in a notebook. It is not what you reach for when an agent is misbehaving at 2:14am.
+
+The verbatim user complaint about all of them, from [the same dev.to post-mortem](https://dev.to/magicrails/i-let-my-ai-agent-run-overnight-it-cost-437-dd7):
+
+> "Langfuse, Arize Phoenix, AgentOps, LangSmith. Excellent at showing you what happened, after it happened. They tell you, in retrospect, how you spent $437."
+
+There's also [`claude-usage`](https://github.com/ryoppippi/ccusage). 1,500 GitHub stars for a local SQLite dashboard that shows your Claude Code costs. That project's existence is the clearest possible PMF signal: the community already built half of this thing because nothing in the dashboard market addresses the use case. But it's reactive. You open it in the morning to see what happened. No alerts. No drift. No MCP.
+
+The missing shape is: **CLI-native, local-first, OTel-native, fires while it's happening.** That's the gap.
+
+## What TokenJam actually is
+
+`tj` is a single `pip install` and a daemon. It listens on a local OTLP endpoint, ingests spans from Claude Code (Anthropic gives you the wire for free with `CLAUDE_CODE_ENABLE_TELEMETRY=1`), evaluates them against an opinionated safety taxonomy, and fires named alerts to Discord / ntfy / Telegram / webhook while the agent is still running.
+
+The full list of alert types it fires:
+
+```
+sensitive_action          retry_loop              cost_budget_session
+cost_budget_daily         schema_violation        drift_detected
+failure_rate              session_duration        network_egress_blocked
+filesystem_access_denied  syscall_denied          inference_rerouted
+token_anomaly
+```
+
+Notice what those names are doing. They aren't "anomaly detected." They aren't "high latency." They are vocabulary for autonomous-agent danger specifically. When the Discord ping fires, the message tells you which failure mode tripped. Not just that something happened.
+
+The onboarding flow is one command:
+
+```bash
+pip install tokenjam
+tj onboard --claude-code
+```
+
+That command writes a TOML config with a random ingest secret, installs a launchd/systemd daemon, wires `CLAUDE_CODE_ENABLE_TELEMETRY=1` and the OTLP endpoint into your Claude Code settings, and registers the MCP server so Claude Code itself can query its own observability mid-session.
+
+The data lives in a DuckDB file under `~/.tj/`. There is no cloud account. There is no Docker. There is no ClickHouse. If you want a dashboard, `tj serve` opens a local SPA at `127.0.0.1:7391`. If you don't, the CLI has everything.
+
+## What it looks like when something goes wrong
+
+This is from the `retry-loop` scenario in the bundled Agent Incident Library (`tj demo run retry-loop`). Three reproducible failure scenarios that ship with the tool. They run entirely in-memory, no API keys, so you can see the alert fire on your own machine in under 60 seconds:
+
+```
+$ tj demo run retry-loop
+[tj] booting in-memory demo backend on :7392
+[tj] injecting 47 spans across 6 minutes of simulated wall time...
+[tj] span 12: gen_ai.tool.call name=read_file path=/etc/hosts
+[tj] span 13: gen_ai.tool.call name=read_file path=/etc/hosts
+[tj] span 14: gen_ai.tool.call name=read_file path=/etc/hosts
+[tj] span 15: gen_ai.tool.call name=read_file path=/etc/hosts
+[tj] ALERT FIRED  type=retry_loop  severity=critical  session=demo-2026-05-15-0214
+              4 identical tool calls in last 6 spans (read_file /etc/hosts)
+              estimated burn rate if uncapped: $14.20/hr
+              dispatched: discord, ntfy
+              cooldown: 300s
+
+[tj] discord webhook 200 OK
+```
+
+The Discord side looks like this:
+
+> 🚨 **retry_loop**. Session `demo-2026-05-15-0214`
+> 4 identical tool calls in last 6 spans: `read_file /etc/hosts`
+> Burn rate if uncapped: ~$14.20/hr.
+> `tj trace demo-2026-05-15-0214` to inspect.
+
+That's the whole point. You're asleep. Your phone buzzes. You decide whether to kill the session or let it run. You don't find out from the invoice.
+
+Drift detection works the same way but at session granularity: after 10 completed sessions per agent, TokenJam builds a statistical baseline (Z-scores on input tokens, output tokens, duration, tool call count, plus Jaccard similarity on tool sequences) and fires `drift_detected` when subsequent sessions wander off it. This is one of the three things LangSmith and Langfuse genuinely don't have.
+
+The MCP server is the part I'm most fond of. It exposes 13 tools (status, budget headroom, cost summary, alerts, traces, drift report, ...) over stdio to Claude Code itself. The agent can ask, mid-session, _"how much have I spent this run?"_ and get a real answer from its own telemetry. The loop closes.
+
+## What this isn't
+
+Scope, fast, because the audience for this post has read enough launch posts to be tired of them.
+
+- **TokenJam is not a LangSmith replacement.** If you're a team of 30 with a prompt management workflow and a labeled eval dataset and an annotation queue, this is not the tool. Use LangSmith. We're not selling against that.
+- **TokenJam is not a hosted product.** There is no cloud version. There is no waitlist. There is no "request a demo." The day we ship a SaaS version is the day we've turned into a worse Langfuse.
+- **TokenJam is not a full eval framework.** It exports trajectories in the `openevals` format, but the depth of that export depends on whether you've opted into `capture.tool_outputs = true`. Schema validation is in the same boat. These are real features and they are correctly described as partial in our [`features.md`](https://github.com/Metabuilder-Labs/tokenjam). Leading with them would be dishonest.
+- **TokenJam is day one.** v0.2.0 is on PyPI. Zero users today. Two technical co-founders. The reason this post exists is that we'd rather get yelled at on Reddit on day one than discover the framing is wrong at month three.
+
+## Why this actually got built
+
+The reason this thing got built isn't the $1,700 horror story. That's the marketing-friendly version. The actual reason is that I had been running OpenClaw sessions and every time something went sideways I'd dump the session JSON file into another LLM and ask it _what just happened._ Running an AI over an AI's exhaust to understand an AI is not a viable debugging workflow. It is, however, a very specific kind of personal annoyance that turns into a product.
+
+I also don't fully know what TokenJam is yet. The Claude Code wedge is the thing we can reach. There are 89k people in [r/vibecoding](https://www.reddit.com/r/vibecoding/) and 4,200+ weekly contributors in [r/ClaudeCode](https://www.reddit.com/r/ClaudeCode/) and they all have the same problem. But the deeper pain is in long-running autonomous agents in general. LangGraph background workers, CrewAI eval crews, anything that runs for hours unsupervised. The Claude Code thing is the door. We'll see if it's the right door.
+
+If you've ever woken up to a number you didn't expect on your Anthropic bill, this is what we built. Try it. Tell us where it's wrong.
+
+```bash
+pip install tokenjam
+tj onboard --claude-code
+tj demo run retry-loop   # see an alert fire in under 60 seconds
+```
+
+- **GitHub:** [Metabuilder-Labs/tokenjam](https://github.com/Metabuilder-Labs/tokenjam)
+- **PyPI:** `pip install tokenjam`
+- **Discord:** community server going up alongside this post. Join link will be pinned on the repo README.
+
+If you have a Claude Code horror story, drop it as a GitHub issue or in the comments wherever you found this post. We'll wire up an alert type for it.
+
+## Common questions
+
+<FAQBlock items={[
+  {
+    question: "Does TokenJam send my prompts and completions anywhere?",
+    answer: "No. The whole tool runs locally. Data is stored in a DuckDB file under ~/.tj/. Discord/ntfy/Telegram dispatch fires from your machine to your channel. There is no TokenJam server. Also, by default capture.prompts and capture.tool_outputs are both false, so prompt and tool-output bodies aren't even stored locally. You opt in to that. The tradeoff is that schema validation and the openevals export need them on to be useful."
+  },
+  {
+    question: "How is this different from claude-usage?",
+    answer: "claude-usage is great, and the fact that it has 1,500 stars is the strongest possible signal that this problem is real. The differences: claude-usage is reactive. You open the dashboard in the morning. TokenJam fires alerts while the agent is still running, supports any OTLP-compliant agent (not just Claude Code), detects behavioral drift across sessions with a real statistical baseline, and exposes an MCP server so the agent can query its own observability mid-run."
+  },
+  {
+    question: "Will TokenJam catch a runaway agent if my laptop is asleep?",
+    answer: "The daemon runs as a background service (launchd on macOS, systemd on Linux). If your machine itself is asleep, no. Nothing on the machine is running. If you're running an unattended agent overnight on the same machine that's asleep, you have a bigger problem than observability. The realistic deployment is: agent runs on a machine that stays awake (cloud VM, dedicated workstation, or laptop with caffeinate), tj runs on the same machine, alerts dispatch to a phone-reachable channel."
+  },
+  {
+    question: "Does this work with anything other than Claude Code?",
+    answer: "Yes. Anything that speaks OTLP works out of the box. Point your OTEL_EXPORTER_OTLP_ENDPOINT at the local tj endpoint. The Python SDK has automatic instrumentation for Anthropic, OpenAI, Gemini, Bedrock, LiteLLM (which covers 100+ providers), LangChain, LangGraph, CrewAI, AutoGen, LlamaIndex, and the OpenAI Agents SDK. The TypeScript SDK is minimal right now. Manual span construction only. TS framework auto-patches are roadmap, not shipped."
+  },
+  {
+    question: "Why not just use --max-budget-usd?",
+    answer: "Use it. It's a real safety net and Anthropic added it specifically because of these horror stories. It's also not sufficient. A budget cap doesn't tell you about retry loops below the budget, silent green-check no-ops, behavioral drift after compaction, or sensitive-file actions. A budget is a hard ceiling. TokenJam is the brake pedal that fires before you hit the ceiling, with named reasons."
+  },
+  {
+    question: "What does --dangerously-skip-permissions have to do with this?",
+    answer: "The flag tells Claude Code to stop asking permission for every tool call. People use it because the prompts get annoying, especially in long autonomous runs. The tradeoff is that you no longer have a human-in-the-loop circuit breaker. The first thing you do after enabling that flag should be wiring up something that watches the run. That's the gap TokenJam is built for."
+  }
+]} />
+
+## Further reading
+
+- [What is agent observability?](/blog/2026-05-09-agent-observability). The broader category background.
+- [OpenTelemetry for AI agents](/blog/2026-05-10-opentelemetry-for-ai-agents). Why OTel is the right substrate for this.
+- [Agents 101](/blog/2026-05-08-agents-101). If any of the vocabulary in this post was new.
