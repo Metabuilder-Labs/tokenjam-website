@@ -60,6 +60,15 @@ const installJoined = installLines.join('\n');
 
         <p class="cc-trust">Open source. No sign up needed. Runs 100% locally.</p>
       </div>
+
+      <section class="cc-what">
+        <h2 class="cc-what-title">What does this do?</h2>
+        <ol class="cc-what-list">
+          <li>Backfills up to 30 days of your existing Claude Code session logs into a local DuckDB.</li>
+          <li>Flags sessions that match the structural shape of a smaller model's workload — short inputs, short outputs, few tool calls — and shows projected savings if you switched.</li>
+          <li>Projects your monthly spend against a budget you set, per provider, and tells you when you'll run out.</li>
+        </ol>
+      </section>
     </div>
   </section>
 
@@ -219,6 +228,31 @@ const installJoined = installLines.join('\n');
       color: var(--white-dim);
       text-align: center;
     }
+
+    .cc-what {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(var(--accent-rgb), 0.12);
+    }
+    .cc-what-title {
+      margin: 0 0 12px;
+      font-family: 'Geist', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.01em;
+    }
+    .cc-what-list {
+      margin: 0;
+      padding-left: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      color: var(--white-dim);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .cc-what-list li::marker { color: var(--white-dim); }
 
     @media (max-width: 640px) {
       .cc-page { padding: 20px 14px; min-height: auto; }
