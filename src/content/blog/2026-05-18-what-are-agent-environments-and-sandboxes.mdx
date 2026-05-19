@@ -1,0 +1,104 @@
+---
+title: "What are agent environments and sandboxes?"
+description: "Where AI agents safely act on code, browsers, and machines: the isolation tradeoffs, the major tools, and the link to evaluation."
+author: "anil-murty"
+publishDate: 2026-05-18
+tags: ["environments", "sandboxes", "infrastructure", "agents"]
+pillar: "environments"
+image: "/blog/agent-environments-and-sandboxes.jpg"
+---
+
+import TLDR from '@/components/TLDR.astro';
+import DefinitionBox from '@/components/DefinitionBox.astro';
+import FAQBlock from '@/components/FAQBlock.astro';
+
+<TLDR>
+- An agent environment is the isolated runtime where an agent acts: a sandbox with tools, files, code execution, browsers, or desktop access, walled off from your machine.
+- Isolation makes mistakes survivable. A code-writing agent could run `rm -rf /`, a browser agent could drain your API credits, a desktop agent could send the wrong email.
+- Four useful categories: code sandboxes (E2B, Modal), browser sandboxes (Browserbase, Anthropic Computer Use), dev workspaces (Daytona), and simulation environments for evaluation.
+- The microVM trend (AWS Firecracker) boots a real Linux VM in 125ms. That makes per-agent-step isolation practical, not theoretical.
+- The same sandbox you use in production is usually the same one you use to evaluate the agent. Environments and evaluation share infrastructure.
+</TLDR>
+
+<DefinitionBox term="Agent environment">
+An agent environment is the isolated runtime context in which an AI agent acts. It is a sandbox with bounded tools, resources, and permissions, giving the agent access to code execution, browser automation, file systems, or a desktop without putting your own machine at risk. The environment defines what the agent can touch and what happens if it makes a mistake.
+</DefinitionBox>
+
+## Why it matters
+
+Agents make decisions, and some of those decisions are destructive.
+
+A code-writing agent asked to "refactor my project" might misread a path and run `rm -rf /tmp/important_backup` instead of `rm -rf /tmp/build_cache`. A scraping agent running in your real browser context could harvest cookies and auth tokens. An email agent could send a message to the wrong recipient at the wrong moment. A financial agent could place orders or initiate transfers if you give it the keys.
+
+These are not failures of intent. They are failures of grounding. Agents operate over text, patterns, and learned associations, and they do so without the kind of common-sense check that a human would apply. They hallucinate paths. They misread context. They pursue goals in ways you did not anticipate.
+
+Isolation is what makes those failures recoverable. If a sandboxed agent deletes a file, it deletes a file inside the sandbox, not on your laptop. If it spins on an expensive API call, you capped that quota beforehand. If it loops, you kill the process. Without isolation, every mistake is permanent.
+
+## Categories of environments
+
+### Code execution sandboxes
+
+These let agents write and run code (Python, Node.js, Go, whatever) without touching your machine.
+
+[E2B](https://e2b.dev/) builds on AWS Firecracker microVMs. Each agent gets its own tiny Linux VM with filesystem, processes, and networking. E2B handles session management, code execution, file I/O, and teardown. Firecracker handles kernel-level isolation underneath.
+
+[Modal](https://modal.com/) provides serverless code execution in the cloud. Agents define functions in Python and run them on Modal's infrastructure. Useful for long-running tasks, heavy computation, and workflows where you want execution to persist across agent steps without managing servers.
+
+### Browser sandboxes
+
+Agents that need to click buttons, fill forms, or extract data from the web need a browser they do not share with you.
+
+[Browserbase](https://www.browserbase.com/) pairs managed Chrome or Firefox instances with automation tools like Stagehand. Each agent session gets its own browser profile, cookie jar, and storage. Good for navigating dashboards, scraping dynamic sites, or running web tasks without polluting your own browser history.
+
+[Anthropic Computer Use](https://docs.anthropic.com/en/docs/agents-and-tools/computer-use) is a more general version of the same idea. The agent sees a virtual desktop screenshot, decides where to click, and the action executes on a remote screen. It generalizes past browsers to any application: a spreadsheet, a CRM, a design tool. The agent works with any UI, at the cost of slower per-step latency and a wider surface for visual reasoning errors.
+
+### Dev workspaces
+
+Some agents need a full development environment: shell, git, editor, compiler, package manager.
+
+[Daytona](https://www.daytona.io/) provisions ephemeral dev workspaces in the cloud. An agent spawns a workspace, clones a repo, edits files, runs tests, and commits changes, all in a temporary environment that shuts down when the task is done. The setup cost of standing up a VM and configuring a toolchain is abstracted away.
+
+### Simulation environments for evaluation
+
+Evaluating agents needs a controlled, repeatable environment where outcomes can be measured and replayed.
+
+[HUD](https://www.hud.so/) provides web and desktop task environments for agent testing: simulated sites, forms, and application interfaces where agents practice without touching real services.
+
+[Inspect AI Sandboxing Toolkit](https://inspect.ai-safety-institute.org.uk/) (from UK AISI) bundles evaluation environment setup with the broader Inspect assessment framework. You define sandboxed tasks, run agents against them, and collect structured results.
+
+These are not separate from production environments. They use the same infrastructure with deterministic data, controlled time, and instrumentation that captures every action.
+
+## The microVM trend
+
+The shift toward microVMs is what makes per-agent-step isolation practical.
+
+Traditional VMs boot in seconds, allocate hundreds of megabytes, and carry the overhead of a full OS startup. Firecracker flipped that tradeoff: it boots a Linux environment in around 125ms, uses 3–10MB of memory, and still provides real kernel-level isolation. You can spawn a fresh, isolated environment for every agent step without paying a meaningful performance cost.
+
+That removes the temptation to reuse environments across agents or requests. Each agent run gets its own fresh VM. No shared state, no cross-contamination, no lingering processes from a prior task. E2B is built on Firecracker. Other newer sandbox services use it too.
+
+This is AWS Lambda's security model applied to agents: isolation as the default, not the exception.
+
+## Computer-use agents
+
+Computer Use (Anthropic) and Operator (OpenAI) represent a different environment class: the virtual desktop.
+
+Instead of exposing specific APIs (run code, fetch a URL), these environments give the agent a screenshot and accept mouse and keyboard input. The agent reasons about what is visible and decides where to click or what to type. The generalization is the appeal. Any application becomes accessible without a custom integration.
+
+The tradeoffs are real. Screenshot reasoning is slower than API calls. Visual reasoning hallucinates more often than text reasoning. And UI changes between runs make deterministic evaluation harder than for API-driven agents. Computer Use is the right tool when no API exists. It is the wrong tool when one does.
+
+## Environments and evaluation share infrastructure
+
+The sandbox that runs your agent in production is the same environment you use to evaluate it. The only differences are the data and the instrumentation.
+
+An evaluation is an agent run in a sandbox with deterministic inputs (fixed test cases, snapshots of websites, pre-recorded data), measured outputs (did the agent click the right button, write the right code, extract the right field), and reset state between runs. The feedback loop is tight: same sandbox, different data, full instrumentation.
+
+Some platforms (Inspect AI, HUD) are built around this pattern. Others (Browserbase, E2B) just expose the infrastructure in a way that makes evaluation natural to layer on top.
+
+## Common questions
+
+<FAQBlock items={[
+  { question: "Why not just run agents on my laptop?", answer: "For read-only or trivially safe tasks, you can. But the moment an agent has write access or network access, local execution gets risky. A misbehaving agent can delete files, consume bandwidth, or rack up cloud bills on your behalf. Sandboxes let you set explicit boundaries: this agent can read and write to /tmp/task_data, can call this API endpoint, has 5 minutes of CPU time. On your laptop, the only boundary is your own discipline, and discipline fails." },
+  { question: "What's a microVM?", answer: "A lightweight virtual machine that boots and allocates resources much faster than traditional VMs. Firecracker (AWS) boots a Linux environment in around 125ms and uses 3–10MB of memory. For agents, that means you can safely spawn a new isolated environment for every task without performance overhead." },
+  { question: "Are sandboxes secure enough for production?", answer: "Isolation is a spectrum, not a binary. Firecracker provides kernel-level isolation, which is strong. But no sandbox is perfect. Kernel exploits exist, side-channel attacks are possible, and network boundaries can be misconfigured. For most production agent use, current sandboxes are sufficient. They stop accidental harm and raise the bar for intentional attacks. For high-security workloads (financial data, PII, anything regulated), you layer on strict network filtering, signed code, and cryptographic verification." },
+  { question: "Do I need a sandbox for read-only agents?", answer: "Yes, even though the risk is lower. A read-only agent confined to a sandbox with no outbound network access (except to approved sources) cannot exfiltrate data to an attacker. It also cannot get stuck in expensive loops, since you cap its CPU and request budget. Sandbox constraints are cheap insurance against failure modes you have not thought of yet." }
+]} />
