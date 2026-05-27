@@ -96,6 +96,57 @@ nav.tj-nav {
 .nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--white); }
 .nav-actions { display: flex; align-items: center; gap: 12px; }
 
+/* Products dropdown */
+.nav-products { position: relative; }
+.nav-products-toggle {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: transparent; border: none; padding: 0;
+  font-family: inherit; font-size: 14px;
+  color: var(--white-dim); cursor: pointer;
+  transition: color .15s;
+}
+.nav-products-toggle:hover,
+.nav-products-toggle[aria-current="page"],
+.nav-products.open .nav-products-toggle { color: var(--white); }
+.nav-products-toggle svg { transition: transform .15s; opacity: .7; }
+.nav-products.open .nav-products-toggle svg { transform: rotate(180deg); }
+.nav-products-menu {
+  position: absolute; top: calc(100% + 10px); left: -12px;
+  min-width: 260px;
+  background: var(--navy-2);
+  border: 1px solid rgba(var(--accent-rgb), 0.12);
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  display: none;
+  z-index: 200;
+}
+/* Invisible bridge that fills the 10px gap between the toggle button and the menu,
+   so the mouse stays inside .nav-products' hover region while crossing into the menu. */
+.nav-products-menu::before {
+  content: '';
+  position: absolute;
+  top: -10px; left: 0; right: 0; height: 10px;
+}
+.nav-products.open .nav-products-menu { display: block; }
+.nav-products-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background .12s;
+}
+.nav-products-item:hover { background: rgba(var(--accent-rgb), 0.06); }
+.nav-products-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.nav-products-text { display: flex; flex-direction: column; gap: 2px; }
+.nav-products-name { font-size: 13px; font-weight: 500; }
+.nav-products-tag { font-size: 12px; color: var(--white-faint); }
+
 .theme-picker { position: relative; }
 .theme-toggle {
   display: inline-flex; align-items: center; justify-content: center;
@@ -217,6 +268,19 @@ nav.tj-nav {
 }
 .nav-mobile-menu a:hover,
 .nav-mobile-menu a[aria-current="page"] { background: var(--navy-3); color: var(--white); }
+.nav-mobile-section {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--white-faint);
+  padding: 8px 12px 4px;
+}
+.nav-mobile-sep {
+  height: 1px;
+  background: var(--blue-line);
+  margin: 6px 4px;
+}
 
 @media (max-width: 640px) {
   nav.tj-nav { padding: 0 16px; }
@@ -241,8 +305,16 @@ main.tj-main {
   max-width: 820px;
   margin: 0 auto;
 }
+/* Full-width pages (homepage, marketing) opt into this so they can manage their own padding/width.
+   The nav still pins to the top via `position: fixed`, so we just clear the container constraints. */
+main.tj-main.tj-main--wide {
+  padding: 0;
+  max-width: none;
+  min-height: calc(100vh - 60px);
+}
 @media (max-width: 640px) {
   main.tj-main { padding: 96px 20px 56px; }
+  main.tj-main.tj-main--wide { padding: 0; }
 }
 
 /* Docs pages use a wider container to fit the sidebar */
@@ -550,6 +622,55 @@ footer.tj-footer .footer-right {
   color: var(--green);
   border-color: rgba(var(--green-rgb), 0.4);
 }
+
+/* ── Terminal blocks (used by homepage, product pages, /claude-code) ── */
+.terminal {
+  background: var(--navy-3);
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 100%;
+  box-shadow:
+    0 0 0 1px rgba(var(--accent-rgb), 0.08),
+    0 24px 60px rgba(0, 0, 0, 0.45),
+    0 0 80px rgba(var(--accent-rgb), 0.08);
+  font-family: 'Geist Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.terminal-titlebar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  background: rgba(var(--accent-rgb), 0.05);
+  border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
+}
+.terminal .dot { width: 11px; height: 11px; border-radius: 50%; }
+.terminal .dot-r { background: #ff5f57; }
+.terminal .dot-y { background: #ffbd2e; }
+.terminal .dot-g { background: #28c840; }
+.terminal-title {
+  flex: 1; text-align: center;
+  font-size: 12px;
+  color: rgba(var(--accent-rgb), 0.35);
+}
+.terminal-body {
+  padding: 18px 22px;
+  overflow: hidden;
+  text-align: left;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.tline { display: block; white-space: pre-wrap; }
+.t-prompt  { color: rgba(var(--accent-rgb), 0.7); }
+.t-cmd     { color: var(--white); }
+.t-success { color: var(--green); }
+.t-warn    { color: var(--amber); }
+.t-dim     { color: rgba(var(--accent-rgb), 0.45); }
+.t-blue    { color: var(--accent-blue); }
+.t-val     { color: var(--white-dim); }
+.t-label   { color: var(--accent-blue); font-weight: 500; }
+.t-blank   { display: block; height: 1.2em; }
 
 /* Related posts */
 .related-posts { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--blue-line); }

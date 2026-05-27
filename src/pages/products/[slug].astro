@@ -1,0 +1,419 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { products } from '@/data/products';
+import type { ProductData } from '@/data/products';
+
+export function getStaticPaths() {
+  return products.map((p) => ({
+    params: { slug: p.slug },
+    props: { product: p },
+  }));
+}
+
+interface Props { product: ProductData; }
+const { product } = Astro.props;
+---
+<BaseLayout
+  title={`TokenJam ${product.name} — ${product.heroClaim}`}
+  description={product.heroClaim}
+  wide
+>
+  <article
+    class="pp"
+    style={`--product-accent: ${product.accent}; --product-accent-rgb: ${product.accentRgb};`}
+  >
+    <!-- HERO -->
+    <header class="pp-hero">
+      <h1 class="pp-name">
+        <span class="pp-name-brand">TokenJam</span>
+        <span class="pp-name-product">{product.name}</span>
+      </h1>
+      <p class="pp-claim">{product.heroClaim}</p>
+      <p class="pp-sub">{product.shortBlurb}</p>
+      <div class="pp-hero-ctas">
+        <a href="/#install" class="btn-primary">Get started</a>
+        <a href="https://github.com/metabuilder-labs/tokenjam" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </header>
+
+    <!-- PROBLEM -->
+    <section class="pp-section">
+      <h2 class="pp-h2">The problem</h2>
+      <div class="pp-prose">
+        {product.problem.map((p) => <p>{p}</p>)}
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="pp-section">
+      <h2 class="pp-h2">How it works</h2>
+      <div class="pp-prose">
+        {product.mechanism.map((p) => <p>{p}</p>)}
+      </div>
+      {product.privacyNote && (
+        <aside class="pp-callout">
+          <span class="pp-callout-label">Privacy</span>
+          <p>{product.privacyNote}</p>
+        </aside>
+      )}
+    </section>
+
+    <!-- CONFIDENCE LEVELS -->
+    <section class="pp-section">
+      <h2 class="pp-h2">Confidence levels</h2>
+      <p class="pp-section-lede">
+        Every finding carries an explicit confidence level. TokenJam never claims a smaller model
+        would have produced an identical answer; it shows the candidates with evidence, and you
+        decide what to apply.
+      </p>
+      <div class="pp-confidence-grid" data-count={product.confidence.length}>
+        {product.confidence.map((c) => (
+          <article class="pp-confidence-card" data-tier={c.tier.toLowerCase()}>
+            <header class="pp-confidence-head">
+              <span class="pp-confidence-level">Level {c.level}</span>
+              <span class="pp-confidence-tier">{c.tier}</span>
+            </header>
+            <h3 class="pp-confidence-name">{c.name}</h3>
+            <p>{c.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <!-- EXAMPLE OUTPUT -->
+    <section class="pp-section">
+      <h2 class="pp-h2">Example output</h2>
+      <p class="pp-section-lede">Verbatim from a real run against a real Claude Code project. No screenshots, no cherry-picks.</p>
+      <div class="terminal pp-terminal">
+        <div class="terminal-titlebar">
+          <span class="dot dot-r"></span>
+          <span class="dot dot-y"></span>
+          <span class="dot dot-g"></span>
+          <span class="terminal-title">{product.exampleCaption}</span>
+        </div>
+        <pre class="terminal-body pp-terminal-body">{product.exampleOutput.map((line) => (
+          <span class={`tline t-${line.c}`}>{line.t || ' '}</span>
+        ))}</pre>
+      </div>
+    </section>
+
+    <!-- USAGE -->
+    <section class="pp-section">
+      <h2 class="pp-h2">What you do with it</h2>
+      <p class="pp-section-lede">Recommendations land in your existing tools — terminal, MCP-capable agent, or as an exportable config.</p>
+      <ul class="pp-usage-list">
+        {product.usage.map((u) => (
+          <li class="pp-usage-row">
+            <span class="pp-usage-label">{u.label}</span>
+            <div class="pp-usage-body">
+              <code class="pp-usage-code">{u.detail}</code>
+              {u.note && <p class="pp-usage-note">{u.note}</p>}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- RESEARCH -->
+    <section class="pp-section">
+      <h2 class="pp-h2">The research behind it</h2>
+      <ul class="pp-research-list">
+        {product.research.map((r) => (
+          <li class="pp-research-card">
+            <h3 class="pp-research-paper">{r.paper}</h3>
+            <p class="pp-research-attr">{r.attribution}</p>
+            <p class="pp-research-contrib">{r.contribution}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- CTA -->
+    <section class="pp-cta">
+      <h2 class="pp-cta-title">{product.name} is in the open-source CLI. Install once, analyze everything.</h2>
+      <div class="pp-cta-buttons">
+        <a href="/#install" class="btn-primary btn-lg">Get started</a>
+        <a href="https://github.com/metabuilder-labs/tokenjam" target="_blank" rel="noopener noreferrer" class="btn-secondary btn-lg">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </section>
+  </article>
+
+  <style>
+    .pp {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 100px 32px 64px;
+    }
+
+    /* HERO — "TokenJam {Product}". Brand prefix in white, product name in the per-product accent. */
+    .pp-hero { margin-bottom: 56px; }
+    .pp-name {
+      font-family: 'Geist', sans-serif;
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1;
+      font-size: clamp(48px, 7vw, 96px);
+      margin: 0 0 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.22em;
+    }
+    .pp-name-brand   { color: var(--white); }
+    .pp-name-product { color: var(--product-accent); }
+    .pp-claim {
+      font-family: 'Geist', sans-serif;
+      font-weight: 500;
+      letter-spacing: -.015em;
+      line-height: 1.2;
+      font-size: clamp(20px, 2.4vw, 30px);
+      color: var(--white);
+      margin: 0 0 14px;
+      max-width: 720px;
+    }
+    .pp-sub {
+      color: var(--white-dim);
+      font-size: clamp(15px, 1.3vw, 17px);
+      line-height: 1.55;
+      margin: 0 0 28px;
+      max-width: 720px;
+    }
+    .pp-hero-ctas {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* SECTIONS */
+    .pp-section {
+      padding-top: 56px;
+      border-top: 1px solid var(--blue-line);
+      margin-top: 56px;
+    }
+    .pp-h2 {
+      font-family: 'Geist', sans-serif;
+      font-weight: 600;
+      letter-spacing: -.015em;
+      font-size: clamp(24px, 2.6vw, 30px);
+      color: var(--white);
+      margin: 0 0 16px;
+    }
+    .pp-section-lede {
+      color: var(--white-dim);
+      font-size: 15px;
+      line-height: 1.55;
+      margin: 0 0 24px;
+      max-width: 720px;
+    }
+    .pp-prose p {
+      color: var(--white);
+      font-size: 17px;
+      line-height: 1.65;
+      margin: 0 0 18px;
+      max-width: 720px;
+    }
+    .pp-prose p:last-child { margin-bottom: 0; }
+
+    /* CALLOUT */
+    .pp-callout {
+      margin-top: 28px;
+      padding: 18px 22px;
+      background: var(--navy-2);
+      border: 1px solid var(--blue-line);
+      border-left: 3px solid var(--amber);
+      border-radius: 8px;
+    }
+    .pp-callout-label {
+      display: inline-block;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 8px;
+    }
+    .pp-callout p {
+      color: var(--white-dim);
+      font-size: 15px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* CONFIDENCE LEVELS */
+    .pp-confidence-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .pp-confidence-grid[data-count="3"] { grid-template-columns: repeat(3, 1fr); }
+    .pp-confidence-grid[data-count="1"] { grid-template-columns: 1fr; max-width: 560px; }
+    .pp-confidence-card {
+      padding: 22px;
+      background: var(--navy-2);
+      border: 1px solid var(--blue-line);
+      border-radius: 12px;
+    }
+    .pp-confidence-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .pp-confidence-level {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--white-faint);
+    }
+    .pp-confidence-tier {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .pp-confidence-card[data-tier="oss"] .pp-confidence-tier {
+      background: rgba(var(--green-rgb), 0.12);
+      color: var(--green);
+    }
+    .pp-confidence-card[data-tier="pro"] .pp-confidence-tier {
+      background: rgba(var(--product-accent-rgb), 0.16);
+      color: var(--product-accent);
+    }
+    .pp-confidence-name {
+      font-family: 'Geist', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--white);
+      margin: 0 0 8px;
+    }
+    .pp-confidence-card p {
+      color: var(--white-dim);
+      font-size: 14px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    @media (max-width: 720px) {
+      .pp-confidence-grid[data-count="3"] { grid-template-columns: 1fr; }
+    }
+
+    /* TERMINAL */
+    .pp-terminal { font-size: 12.5px; line-height: 1.6; }
+    .pp-terminal-body { padding: 18px 22px; }
+
+    /* USAGE */
+    .pp-usage-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .pp-usage-row {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 16px;
+      padding: 16px 18px;
+      background: var(--navy-2);
+      border: 1px solid var(--blue-line);
+      border-radius: 10px;
+      align-items: start;
+    }
+    .pp-usage-label {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--product-accent);
+      padding-top: 2px;
+    }
+    .pp-usage-body { display: flex; flex-direction: column; gap: 4px; }
+    .pp-usage-code {
+      font-family: 'Geist Mono', monospace;
+      font-size: 13px;
+      color: var(--white);
+      background: transparent;
+      padding: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .pp-usage-note {
+      color: var(--white-faint);
+      font-size: 13px;
+      margin: 0;
+    }
+    @media (max-width: 640px) {
+      .pp-usage-row { grid-template-columns: 1fr; gap: 6px; }
+      .pp-usage-label { padding-top: 0; }
+    }
+
+    /* RESEARCH */
+    .pp-research-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .pp-research-card {
+      padding: 18px 20px;
+      background: var(--navy-2);
+      border: 1px solid var(--blue-line);
+      border-radius: 10px;
+    }
+    .pp-research-paper {
+      font-family: 'Geist', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--white);
+      margin: 0 0 4px;
+    }
+    .pp-research-attr {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      color: var(--product-accent);
+      margin: 0 0 8px;
+    }
+    .pp-research-contrib {
+      color: var(--white-dim);
+      font-size: 14px;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* CTA */
+    .pp-cta {
+      margin-top: 72px;
+      padding: 40px 32px;
+      background:
+        radial-gradient(ellipse 80% 70% at 50% 0%, rgba(var(--product-accent-rgb), 0.12), transparent 60%),
+        var(--navy-2);
+      border: 1px solid var(--blue-line);
+      border-radius: 14px;
+      text-align: center;
+    }
+    .pp-cta-title {
+      font-family: 'Geist', sans-serif;
+      font-size: clamp(20px, 2.2vw, 26px);
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--white);
+      margin: 0 0 20px;
+    }
+    .pp-cta-buttons {
+      display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+    }
+
+    @media (max-width: 640px) {
+      .pp { padding: 88px 16px 48px; }
+      .pp-cta { padding: 32px 20px; }
+    }
+  </style>
+</BaseLayout>

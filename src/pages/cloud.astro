@@ -1,0 +1,63 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="TokenJam Cloud — early access"
+  description="TokenJam Cloud: hosted, multi-user, governed. Same four products, run across your team's agents. Request early access."
+>
+  <main class="tj-main">
+    <div class="cloud-stub">
+      <span class="cloud-stub-eyebrow">TokenJam Cloud</span>
+      <h1>Hosted optimization for your whole team.</h1>
+      <p class="cloud-stub-lede">
+        Cloud aggregates the four analyzers across every agent your team runs. Recommendations land in a shared dashboard, policies apply across the fleet, and replay validation runs against a team-pooled budget.
+      </p>
+      <p class="cloud-stub-note">
+        Request-access form coming online soon. For now, email <a href="mailto:partner@metabuilder.dev">partner@metabuilder.dev</a> and we'll get back to you directly.
+      </p>
+      <p><a href="/" class="back-home">← Back to home</a></p>
+    </div>
+  </main>
+
+  <style>
+    .cloud-stub {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .cloud-stub-eyebrow {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(var(--accent-blue-rgb), 0.12);
+      color: var(--accent-blue);
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .cloud-stub h1 {
+      font-size: clamp(36px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      line-height: 1.1;
+      margin: 0 0 20px;
+    }
+    .cloud-stub-lede {
+      color: var(--white-dim);
+      font-size: 18px;
+      line-height: 1.55;
+      margin: 0 0 32px;
+    }
+    .cloud-stub-note {
+      color: var(--white-faint);
+      font-size: 15px;
+      margin: 0 0 40px;
+    }
+    .cloud-stub-note a { color: var(--accent-blue); text-decoration: underline; text-underline-offset: 3px; }
+    .back-home { color: var(--white-dim); text-decoration: none; font-family: 'Geist Mono', monospace; font-size: 13px; }
+    .back-home:hover { color: var(--white); }
+  </style>
+</BaseLayout>

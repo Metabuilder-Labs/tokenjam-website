@@ -10,6 +10,7 @@ interface Props {
   canonical?: string;
   type?: 'website' | 'article';
   noindex?: boolean;
+  wide?: boolean;
 }
 
 const {
@@ -19,6 +20,7 @@ const {
   canonical,
   type = 'website',
   noindex = false,
+  wide = false,
 } = Astro.props;
 
 const siteUrl = Astro.site ?? new URL('https://tokenjam.dev');
@@ -91,7 +93,7 @@ const imageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).toSt
 </head>
 <body>
 <Nav />
-<main class="tj-main">
+<main class:list={["tj-main", wide && "tj-main--wide"]}>
   <slot />
 </main>
 <Footer />
