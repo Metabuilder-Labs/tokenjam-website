@@ -12,6 +12,7 @@ import TLDR from '@/components/TLDR.astro';
 import FAQBlock from '@/components/FAQBlock.astro';
 
 <TLDR>
+- Microsoft is cancelling Claude Code licenses inside its Experiences and Devices group (Windows, M365, Outlook, Teams, Surface) and migrating engineers to GitHub Copilot CLI by June 30. The company most able to absorb the token bill chose not to.
 - Uber gave 5,000 engineers Claude Code in December 2025 and burned its full annual AI budget by April 2026.
 - A three-person team running about 100 Codex instances ran up $1.3M in OpenAI charges in 30 days. The screenshot went viral this month.
 - GitHub Copilot moves to usage-based billing on June 1. Anthropic's programmatic credit cap takes effect June 15. The implicit subsidy that made coding agents feel free is ending this quarter.
@@ -24,6 +25,10 @@ import FAQBlock from '@/components/FAQBlock.astro';
 This post collects the data.
 
 ## The numbers that are no longer hypothetical
+
+**Microsoft.** In December 2025, Microsoft rolled Claude Code out to engineers, product managers, and designers across the company. By spring, the tool had spread well beyond engineering. In late May 2026, [Microsoft began quietly cancelling those Claude Code licenses](https://thenextweb.com/news/microsoft-claude-code-retreat-ai-cost) inside its Experiences and Devices group, the division that builds Windows, Microsoft 365, Outlook, Teams, and Surface. Affected engineers must migrate to [GitHub Copilot CLI by June 30](https://www.windowscentral.com/microsoft/microsoft-cancels-claude-code-licenses-shifting-developers-to-github-copilot-cli-a-move-likely-driven-by-financial-motives), the last day of Microsoft's fiscal year. The Verge had the original scoop; Windows Central, [Fortune](https://fortune.com/2026/05/22/microsoft-ai-cost-problem-tokens-agents/), and [The Next Web](https://thenextweb.com/news/microsoft-claude-code-retreat-ai-cost) followed. The official reason is toolchain unification. The timing is at fiscal-year-end. Microsoft, of any company, is best positioned to know what enterprise-scale Claude Code usage actually costs; its engineers were among the heaviest users outside Anthropic's direct customer base. If the unit economics had improved with scale, this would have been the quarter Microsoft locked in a multi-year deal at favourable terms. Instead, it is unwinding the experiment on a deadline that closes the books on FY26. When the company with the most leverage in the room walks away from a vendor whose product its own staff prefer, the signal is not about preference.
+
+![Microsoft is cancelling Claude Code licenses inside its Windows, M365, and Surface engineering org](/blog/images/microsoft-claude-code-retreat.png)
 
 **Uber.** In December 2025, Uber gave roughly 5,000 engineers access to Claude Code. [By April 2026, four months later, the company had burned through its entire annual AI budget](https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/). Not half, not three-quarters; the full year's allocation, gone before the second quarter ended. Adoption hit 84% of engineers by March and 95% by spring; individual costs ran $500-$2,000 per engineer per month, well above projections. This is Uber's CTO talking about it publicly, not a leaked memo. [Vantage's analysis](https://www.vantage.sh/blog/uber-ai-costs) and [Deloitte's April 2026 CFO guide](https://www.deloitte.com/us/en/insights/topics/emerging-technologies/ai-tokens-how-to-navigate-spend-dynamics.html) both reference the same numbers.
 
@@ -39,7 +44,7 @@ This post collects the data.
 
 ![leanopstech audit finding: 62% of agent bills are re-sent context](/blog/images/leanopstech-62-percent.png)
 
-These four stories are not isolated. They are the visible tip of a conversation now happening inside every engineering organization above 200 people. The pattern across them is consistent. Agents are doing more work without supervision. Costs scale with autonomy. The existing tooling for tracking spend lags behind the spend itself, which means the discovery of a cost problem happens after the cost has already accrued, not before.
+These five stories are not isolated. They are the visible tip of a conversation now happening inside every engineering organization above 200 people. The pattern across them is consistent. Agents are doing more work without supervision. Costs scale with autonomy. The existing tooling for tracking spend lags behind the spend itself, which means the discovery of a cost problem happens after the cost has already accrued, not before.
 
 ## The structural pivot happening this quarter
 
@@ -63,7 +68,7 @@ There is also a regulatory dimension worth flagging. Articles 9, 15, and 72 of t
 
 A few things follow from this shift.
 
-The category of cost discipline for agents (measuring it, attributing it, predicting it, reducing it) has become a real product space. It is not a checkbox feature inside an observability dashboard. The buyer is real: engineering leadership, FinOps, platform teams, AI program owners. The pain is now public: Uber, OpenClaw, the healthcare enterprise. The timeline is hard: June 1 and June 15. The regulatory pressure is real: Articles 9, 15, 72.
+The category of cost discipline for agents (measuring it, attributing it, predicting it, reducing it) has become a real product space. It is not a checkbox feature inside an observability dashboard. The buyer is real: engineering leadership, FinOps, platform teams, AI program owners. The pain is now public: Microsoft, Uber, OpenClaw, the healthcare enterprise. The timeline is hard: June 1 and June 15 for usage-billing changes, June 30 for the Microsoft migration deadline. The regulatory pressure is real: Articles 9, 15, 72.
 
 The companies that solve this problem own a layer of the agent operations stack that did not have an obvious owner six months ago. The [9-layer map](/blog/2026-05-26-the-9-layer-agent-ecosystem-map) called this out as the most underbuilt of the nine layers. The news of the past quarter just locked the timeline. Cost dashboards report what happened. Cost-optimization recommendations validated against a team's own data tell that team what to change. The gap between those two things is most of the actual value to be captured.
 
@@ -72,6 +77,10 @@ The shift from "interesting research category" to "live, urgent, regulated categ
 ## Common questions
 
 <FAQBlock items={[
+  {
+    question: "Why is the Microsoft retreat such a big signal?",
+    answer: "Two reasons. First, scale: Microsoft's Experiences and Devices org runs Windows, M365, Outlook, Teams, and Surface. Their engineers were among the heaviest Claude Code users on the planet outside Anthropic's direct customer base, which means Microsoft had better data on enterprise-scale Claude Code economics than almost anyone. Second, incentives: GitHub (Microsoft-owned) is the direct competitor to Claude Code through Copilot CLI. If the unit economics had improved with usage, this would have been the quarter Microsoft locked in a multi-year deal at favorable terms. They had the leverage. Instead they unwound the experiment on a deadline that closes the books on fiscal year. The Verge had the original scoop; Windows Central, Fortune, and The Next Web followed. The official line is toolchain unification; the unofficial reason is in the calendar."
+  },
   {
     question: "Are these numbers verifiable?",
     answer: "Mostly yes, with one caveat. The Uber, leanopstech, and Deloitte figures are from named public sources (Fortune, elvex.com case studies, the Deloitte CFO guide). The OpenClaw screenshot is verifiable in that the screenshot exists and circulated widely; Steinberger published it himself and several outlets covered it (note the Fast Mode caveat above). The healthcare-enterprise figure is anonymized in elvex's case study, so it cannot be checked against an identifiable account, but their reporting in this category is well-sourced. Any specific number is a snapshot of one team's setup, and the same team running the same agents next quarter would produce different figures."
