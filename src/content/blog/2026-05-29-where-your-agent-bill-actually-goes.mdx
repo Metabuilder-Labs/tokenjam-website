@@ -1,5 +1,5 @@
 ---
-title: "Where your agent bill actually goes (and the 62% that isn't doing anything useful)"
+title: "Where your agent bill actually goes (and why most of it isn't buying useful work)"
 description: "The five categories of agent token waste, what causes each, and the research that addresses them. From context bloat to runaway loops to model overspending."
 author: "anil-murty"
 publishDate: 2026-05-29
@@ -12,13 +12,13 @@ import TLDR from '@/components/TLDR.astro';
 import FAQBlock from '@/components/FAQBlock.astro';
 
 <TLDR>
-- leanopstech audited 30 engineering teams running agentic AI in production. Re-sent context accounted for 62% of the average team's token bill. Most of the spend was not doing useful work.
-- Agent waste falls into five recurring patterns: model overspending, context bloat, redundant calls, runaway loops, and poor caching.
+- Agent token spend has five recurring failure patterns: model overspending, context bloat, redundant calls, runaway loops, and poor caching.
 - Each pattern has a known technique in published research that addresses it: model cascading, prompt compression, semantic caching, budget-aware tool use, plan caching.
+- In practice, most teams are leaving 30-70% of their input-token cost on the table because the same stable context (system prompts, tool definitions, project docs) is being re-sent uncached on every call.
 - The techniques work. The gap is product surface: software that runs them against a real team's workload and tells the team specifically what to change.
 </TLDR>
 
-**Why this matters today.** [GitHub Copilot moved to usage-based billing this morning](https://github.blog/news-insights/company-news/github-copilot-is-moving-to-usage-based-billing/). Anthropic's programmatic credit cap takes effect in two weeks. The [previous post](/blog/2026-05-28-agent-cost-story-no-longer-hypothetical) laid out the headline cost shocks. This one is the forensic follow-up: where exactly does the money go in a typical agent workload, and why is most of it not buying useful work?
+**Why this matters today.** [GitHub Copilot moved to usage-based billing this morning](https://github.blog/news-insights/company-news/github-copilot-is-moving-to-usage-based-billing/). Anthropic's programmatic credit cap takes effect in two weeks. Microsoft is cancelling Claude Code licenses across its Windows, M365, and Surface engineering org, Uber burned its entire 2026 AI budget in four months, and OpenClaw produced the now-famous $1.3M screenshot. [The previous post laid out those headline cost shocks in detail](/blog/2026-05-28-agent-cost-story-no-longer-hypothetical). This one is the forensic follow-up: where exactly does the money go in a typical agent workload, and why is most of it not buying useful work?
 
 The honest summary is that agent token spend has a small number of recurring failure modes. The same patterns show up in coding-agent workloads, research-agent workloads, customer-support pilots, autonomous data-pipeline runs. Knowing the patterns is the difference between staring at a $1.3M bill and being able to point at the specific lines that should not exist.
 
@@ -26,7 +26,7 @@ The honest summary is that agent token spend has a small number of recurring fai
 
 Using a model that is larger and more expensive than the task requires. A team standardizes on Claude Opus or GPT-5 for everything, including small classification calls, simple routing decisions, and short reformulations that Claude Haiku or GPT-5-Nano would handle equivalently. The factor is 5-10× on price-per-token, applied to the share of the workload that didn't need the bigger model.
 
-This pattern is universal. The [20× cost spread leanopstech found](https://leanopstech.com/blog/agentic-ai-cost-runaway-token-budget-2026/) between p10 and p90 developers on the same agent and same access isn't entirely model overspending, but a chunk of it is: heavy users tend to default to the strongest model on every call.
+This pattern is universal. Cost spreads between the lightest and heaviest users of the same coding agent routinely run an order of magnitude or more: same access, same tool, 10-20× the bill. Some of that gap is workload volume, but a meaningful chunk is model choice: heavy users tend to default to the strongest model on every call, including for tasks where a cheaper model would handle the work equivalently.
 
 **The technique that addresses it.** Model cascading. Try the cheap model first; escalate to the expensive model only when the cheap model fails or returns low-confidence output. Stanford's [*FrugalGPT* framework](https://arxiv.org/abs/2305.05176) (Chen, Zaharia, Zou, 2023) showed this approach can match GPT-4 quality at up to 98% cost reduction on some workloads. [RouteLLM](https://arxiv.org/abs/2406.18665) (LMSys, ICLR 2025) extended the idea with a matrix-factorization router that learns from preference data and transfers across model pairs without retraining; it achieves 95% of GPT-4 performance with 26% GPT-4 calls. [BudgetMLAgent](https://arxiv.org/abs/2411.07464) (2024) showed 94% cost reduction on agent tasks using cascaded orchestration: cheap model for most calls, escalate only on failure.
 
@@ -36,9 +36,9 @@ The hard part is not the technique. The hard part is knowing *which* of your wor
 
 System prompts, tool definitions, and project context that grow over time without governance. A CLAUDE.md file that started at 500 tokens balloons to 4,000 as teams add safety guidelines, edge-case handling, and "don't forget to do X" reminders. Every single call in every session of every day pays the full cost of the bloated prompt.
 
-This is the largest single pattern in production. **The [leanopstech audit found that re-sent context accounted for 62% of the average team's token bill](https://leanopstech.com/blog/agentic-ai-cost-runaway-token-budget-2026/).** Not retries, not reasoning chains, not output tokens. The project context, system prompt, and tool definitions being retransmitted on every call. Most of the workload's tokens were never doing useful work; they were transmitting the same text repeatedly.
+This is often the largest single pattern in production. A typical agent session sends thousands of tokens of project context, system prompt, and tool definitions on every single turn: not retries, not reasoning chains, not output tokens. Most of those tokens are not doing useful work; they are retransmitting the same text repeatedly across calls. Anthropic's prompt-caching pricing makes the cost gap explicit: [cache reads are 10% of normal input-token cost](https://docs.claude.com/en/docs/build-with-claude/prompt-caching), and a stable prefix that's reused dozens of times in a session pays roughly an order of magnitude more than it should if no `cache_control` breakpoint is configured. Most production users haven't configured one.
 
-![leanopstech finding: 62% of the average agent bill is re-sent context](/blog/images/leanopstech-62-percent-detail.png)
+![Where the input tokens go in a typical agent call: stable prefix dominates (illustrative)](/blog/images/input-token-breakdown.png)
 
 **The technique that addresses it.** [LLMLingua-2](https://arxiv.org/abs/2403.12968) (Microsoft, ACL 2024). The technique reframes prompt compression as a token classification problem: train a BERT-class model, distilled from GPT-4, that scores each token's contribution to the response. Tokens scoring low can be removed without measurable quality loss. The [model is MIT-licensed](https://github.com/microsoft/LLMLingua) and runs on CPU. Microsoft's published benchmarks showed up to 20× compression on GSM8K and BBH while preserving in-context-learning quality, with 3-6× faster inference than the original LLMLingua.
 
@@ -56,7 +56,7 @@ The pattern is harder to see than model overspending or context bloat because it
 
 The agent fails to complete a task, retries, fails again, retries again, and continues until a budget cap or timeout interrupts it. A flaky external dependency, a malformed tool response, a session that wandered off its objective and is now thrashing in a corner. Without a budget signal that the agent can actually see, the agent has no reason to stop.
 
-The [leanopstech audit's $4,200-weekend story](https://leanopstech.com/blog/agentic-ai-cost-runaway-token-budget-2026/) is this pattern. A single developer kicked off an autonomous refactoring session on a Friday afternoon. By Monday morning, the agent had run continuously for the better part of the weekend, retrying through bad states, and racked up four months of normal usage in 60 hours. Without a real-time budget signal, the agent had no way to know it had gone wrong.
+The [Steinberger / OpenClaw $1.3M screenshot](https://www.tomshardware.com/tech-industry/artificial-intelligence/openclaw-creator-burns-through-1-3-million-in-openai-api-tokens-in-a-single-month) is the public face of this pattern at scale: a small fleet of Codex instances ran near saturation for 30 days, much of that consumption produced by sessions that should have terminated sooner. The same shape, at smaller scale, is the single developer who kicks off an autonomous refactoring session on a Friday afternoon and wakes up Monday morning to a four-figure weekend bill from an agent that spent 60 hours retrying through a bad state. Without a real-time budget signal that the agent itself can see, the agent has no way to know it has gone wrong.
 
 **The technique that addresses it.** [Budget-Aware Tool-Use](https://arxiv.org/abs/2511.17006) (Google + UCSB, November 2025). The paper introduces a "Budget Tracker," a lightweight plug-in that surfaces the agent's current cycle budget back to the agent itself as a numerical signal it can reason over. On the BrowseComp benchmark, the budget-aware approach achieved comparable accuracy with 40.4% fewer search calls, 19.9% fewer browse calls, and a 31.3% overall cost reduction. The agent that knows it is at 68% of its budget can decide to terminate early; the agent that doesn't know, can't.
 
@@ -76,20 +76,22 @@ For Claude Code specifically, the data is right there in every JSONL session log
 
 The same shape applies to every category above. The technique exists in published research, often for two or three years. The technique works on test workloads in the lab. The technique is implemented as a library or a research artifact. And no product runs the technique against a real user's actual workload data and tells the user, specifically, where to apply it.
 
-Each of the five patterns is a place where the gap between "what we know" and "what teams have shipped" is wider than it looks. Combined, the patterns are why a coding-agent bill ends up 3-5× what the team budgeted, why [Uber burned its annual budget in four months](https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/), and why the leanopstech median team is paying for two-thirds of its tokens to retransmit the same project context.
+Each of the five patterns is a place where the gap between "what we know" and "what teams have shipped" is wider than it looks. Combined, the patterns are why a coding-agent bill ends up 3-5× what the team budgeted, why [Uber burned its annual budget in four months](https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/), and why most production teams are paying full input-token rates on context that should have been cached after the first call.
 
 What's missing isn't theoretical capability. The papers are public, the code is on GitHub, the techniques compose. What's missing is the operational surface: a tool that ingests a team's actual telemetry, runs the analyses, and produces a ranked list of specific, evidence-backed changes that team should make this week.
+
+![Cost-per-session distribution showing a fat tail of expensive sessions (illustrative)](/blog/images/cost-per-session-distribution.png)
 
 ## Common questions
 
 <FAQBlock items={[
   {
     question: "How do I check my own usage for these patterns?",
-    answer: "The cheapest first pass is to look at three numbers. Total token count by model, across your last 30 days. Cache-read ratio (cache_read_input_tokens divided by total input tokens) if your provider exposes it. And cost-per-session distribution, where a fat tail of expensive sessions is a strong indicator of runaway loops. Claude Code users can read these directly from ~/.claude/projects/<project>/<session>.jsonl; OpenAI users can pull them from the Usage console."
+    answer: "The cheapest first pass is to look at three numbers. Total token count by model across your last 30 days. Cache-read ratio (cache_read_input_tokens divided by total input tokens) if your provider exposes it. And cost-per-session distribution, where a fat tail of expensive sessions is a strong indicator of runaway loops. Claude Code users can read these directly from ~/.claude/projects/<project>/<session>.jsonl; OpenAI users can pull them from the Usage console."
   },
   {
     question: "What's a realistic savings range from addressing these?",
-    answer: "It depends heavily on the team's current discipline. Teams with severe context bloat and frequent redundant calls can save 50-70% on token cost without changing models. Teams that have already optimized carefully might recover 10-20%. Model cascading is often the largest single lever when a team is using a flagship model for everything: 3-10× cost reduction on the share of work that doesn't need the flagship."
+    answer: "It depends heavily on the team's current discipline. Teams with severe context bloat and frequent redundant calls can save 50-70% on token cost without changing models. Teams that have already optimized carefully might recover 10-20%. Model cascading is often the largest single lever when a team is using a flagship model for everything: 3-10x cost reduction on the share of work that doesn't need the flagship."
   },
   {
     question: "Doesn't observability already tell me this?",
@@ -97,10 +99,10 @@ What's missing isn't theoretical capability. The papers are public, the code is 
   },
   {
     question: "Why do all the techniques cited come from research papers, not shipping products?",
-    answer: "The techniques themselves are not commercial moats; they are known and the code is mostly published. The commercial work is in the operational layer: capturing the telemetry, normalizing across multiple agent runtimes, running the analyses against real workloads, validating recommendations on the user's own data before recommending them, and surfacing the findings as specific actionable changes rather than abstract metrics. That layer is what is missing in production."
+    answer: "The techniques themselves are not commercial moats; they're known and the code is mostly published. The commercial work is in the operational layer: capturing the telemetry, normalizing across multiple agent runtimes, running the analyses against real workloads, validating recommendations on the user's own data before recommending them, and surfacing the findings as specific actionable changes rather than abstract metrics. That layer is what's missing in production."
   },
   {
     question: "What about subscription users on Claude Code or Codex who pay a flat rate?",
-    answer: "The token consumption is the same; the bill structure is different. A user on Anthropic's Max 20x plan does not see '$1,632 saved per month' because they are on a flat rate. They see '1.6M tokens of cycle headroom freed.' The cap structure starting June 15 turns those tokens into real cost once the credit pool is exhausted. The patterns are the same; the way the savings show up depends on the plan."
+    answer: "The token consumption is the same; the bill structure is different. A user on Anthropic's Max 20x plan does not see a dollar figure saved per month because they're on a flat rate. They see cycle headroom freed. The cap structure starting June 15 turns those tokens into real cost once the credit pool is exhausted. The patterns are the same; the way the savings show up depends on the plan."
   }
 ]} />
