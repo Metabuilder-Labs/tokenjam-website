@@ -6,7 +6,6 @@
   "trailingSlash": false,
   "rewrites": [
     { "source": "/api/waitlist", "destination": "/api/waitlist.js" },
-    { "source": "/api/contact",  "destination": "/api/contact.js"  },
-    { "source": "/sitemap.xml",  "destination": "/sitemap-index.xml" }
+    { "source": "/sitemap.xml", "destination": "/sitemap-index.xml" }
   ]
 }
