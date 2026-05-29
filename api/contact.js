@@ -1,9 +1,9 @@
 // Contact form handler. Receives { name, email, message, hp } and sends an
-// email via Resend's /emails API to CONTACT_TO_EMAIL (default anil@metabldr.com).
+// email via Resend's /emails API to CONTACT_TO_EMAIL (default hello@metabldr.com).
 //
 // Env vars (set in Vercel project settings):
 //   RESEND_API_KEY        — required
-//   CONTACT_TO_EMAIL      — optional, default 'anil@metabldr.com'
+//   CONTACT_TO_EMAIL      — optional, default 'hello@metabldr.com'
 //   CONTACT_FROM_EMAIL    — optional, default 'TokenJam Contact <contact@tokenjam.dev>'
 //                           Must be on a Resend-verified domain.
 
@@ -34,12 +34,12 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  const toEmail = process.env.CONTACT_TO_EMAIL || 'anil@metabldr.com';
+  const toEmail = process.env.CONTACT_TO_EMAIL || 'hello@metabldr.com';
   const fromEmail = process.env.CONTACT_FROM_EMAIL || 'TokenJam Contact <contact@tokenjam.dev>';
 
   if (!apiKey) {
     console.error('RESEND_API_KEY is not configured');
-    return res.status(500).json({ error: 'Contact form is not configured yet. Please email anil@metabldr.com directly.' });
+    return res.status(500).json({ error: 'Contact form is not configured yet. Please email hello@metabldr.com directly.' });
   }
 
   try {
@@ -64,7 +64,7 @@ export default async function handler(req, res) {
     if (!r.ok) {
       const data = await r.json().catch(() => ({}));
       console.error('Resend send failed:', r.status, data);
-      return res.status(502).json({ error: 'Failed to send. Please try again or email anil@metabldr.com directly.' });
+      return res.status(502).json({ error: 'Failed to send. Please try again or email hello@metabldr.com directly.' });
     }
 
     return res.status(200).json({ ok: true });
