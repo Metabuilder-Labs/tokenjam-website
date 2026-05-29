@@ -1,0 +1,209 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Contact — TokenJam"
+  description="Get in touch with the TokenJam team. We read every message."
+>
+  <main class="tj-main">
+    <div class="contact">
+      <header class="contact-head">
+        <h1>Get in touch</h1>
+        <p>Questions, feedback, partnerships, or hello. We read every message and reply directly.</p>
+      </header>
+
+      <form class="contact-form" id="contact-form" novalidate>
+        <label class="contact-field">
+          <span>Name</span>
+          <input type="text" name="name" id="contact-name" autocomplete="name" required maxlength="200" />
+        </label>
+
+        <label class="contact-field">
+          <span>Email</span>
+          <input type="email" name="email" id="contact-email" autocomplete="email" required maxlength="320" />
+        </label>
+
+        <label class="contact-field">
+          <span>Message</span>
+          <textarea name="message" id="contact-message" rows="6" required maxlength="5000"></textarea>
+        </label>
+
+        {/* Honeypot — hidden from real users; bots fill it. */}
+        <label class="contact-hp" aria-hidden="true">
+          Don't fill this out: <input type="text" name="hp" id="contact-hp" tabindex="-1" autocomplete="off" />
+        </label>
+
+        <div class="contact-actions">
+          <button type="submit" class="btn-primary btn-lg" id="contact-submit">Send message</button>
+          <span class="contact-status" id="contact-status" role="status" aria-live="polite"></span>
+        </div>
+      </form>
+
+      <p class="contact-fallback">
+        Prefer email? Reach us at <a href="mailto:anil@metabldr.com">anil@metabldr.com</a>.
+      </p>
+    </div>
+  </main>
+
+  <style>
+    .contact {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 20px 0 40px;
+    }
+    .contact-head { margin-bottom: 36px; text-align: center; }
+    .contact-head h1 {
+      font-family: 'Geist', sans-serif;
+      font-size: clamp(36px, 4.4vw, 52px);
+      font-weight: 700;
+      letter-spacing: -.025em;
+      line-height: 1.1;
+      color: var(--white);
+      margin: 0 0 14px;
+    }
+    .contact-head p {
+      color: var(--white-dim);
+      font-size: 17px;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding: 28px;
+      background: var(--navy-2);
+      border: 1px solid var(--blue-line);
+      border-radius: 14px;
+    }
+    .contact-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .contact-field span {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--white-faint);
+    }
+    .contact-field input,
+    .contact-field textarea {
+      font-family: 'Geist', sans-serif;
+      font-size: 15px;
+      color: var(--white);
+      background: var(--navy);
+      border: 1px solid var(--blue-line);
+      border-radius: 8px;
+      padding: 10px 14px;
+      transition: border-color .15s, background .15s;
+      resize: vertical;
+    }
+    .contact-field input:focus,
+    .contact-field textarea:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      background: var(--navy-3);
+    }
+    .contact-field input:invalid:not(:placeholder-shown),
+    .contact-field textarea:invalid:not(:placeholder-shown) {
+      border-color: rgba(var(--accent-rgb), 0.25);
+    }
+    .contact-field input::placeholder,
+    .contact-field textarea::placeholder { color: var(--white-faint); }
+
+    /* Honeypot — visually hidden but reachable to scripted bots. */
+    .contact-hp {
+      position: absolute;
+      left: -10000px;
+      width: 1px; height: 1px;
+      overflow: hidden;
+    }
+
+    .contact-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .contact-actions .btn-primary[disabled] {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+    .contact-status {
+      font-family: 'Geist Mono', monospace;
+      font-size: 13px;
+      color: var(--white-dim);
+    }
+    .contact-status[data-state="error"]   { color: var(--red); }
+    .contact-status[data-state="success"] { color: var(--green); }
+
+    .contact-fallback {
+      margin: 28px 0 0;
+      text-align: center;
+      color: var(--white-faint);
+      font-size: 14px;
+    }
+    .contact-fallback a {
+      color: var(--accent-blue);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  </style>
+
+  <script is:inline>
+    (function () {
+      const form = document.getElementById('contact-form');
+      const submit = document.getElementById('contact-submit');
+      const status = document.getElementById('contact-status');
+      if (!form || !submit || !status) return;
+
+      function setStatus(text, state) {
+        status.textContent = text;
+        if (state) status.setAttribute('data-state', state);
+        else status.removeAttribute('data-state');
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        setStatus('', null);
+
+        const name = document.getElementById('contact-name').value.trim();
+        const email = document.getElementById('contact-email').value.trim();
+        const message = document.getElementById('contact-message').value.trim();
+        const hp = document.getElementById('contact-hp').value;
+
+        if (!name)    { setStatus('Please enter your name.', 'error'); return; }
+        if (!email)   { setStatus('Please enter your email.', 'error'); return; }
+        if (!message) { setStatus('Please include a message.', 'error'); return; }
+
+        submit.disabled = true;
+        setStatus('Sending…', null);
+
+        try {
+          const r = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, message, hp }),
+          });
+          const data = await r.json().catch(function () { return {}; });
+          if (r.ok && data.ok) {
+            form.reset();
+            setStatus('Thanks — message sent. We will reply within a couple of days.', 'success');
+            if (window.trackEvent) window.trackEvent('contact_submit', 'conversion', 'success');
+          } else {
+            setStatus(data.error || 'Something went wrong. Please try again.', 'error');
+            if (window.trackEvent) window.trackEvent('contact_submit', 'conversion', 'error');
+          }
+        } catch (err) {
+          setStatus('Network error. Please try again.', 'error');
+        } finally {
+          submit.disabled = false;
+        }
+      });
+    })();
+  </script>
+</BaseLayout>
