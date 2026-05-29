@@ -1,6 +1,5 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import CopyForAI from '@/components/CopyForAI.astro';
 import Schema from '@/components/Schema.astro';
 import { getAuthor } from '@/lib/authors';
 import { articleSchema } from '@/lib/schema';
@@ -61,8 +60,6 @@ const imageUrl = post.data.image ?? '/og-image.png';
         loading="eager"
       />
     )}
-
-    <CopyForAI />
 
     <div class="prose">
       <slot />
