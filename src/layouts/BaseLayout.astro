@@ -47,7 +47,7 @@ const imageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).toSt
 
 <title>{title}</title>
 <meta name="description" content={description} />
-{noindex && <meta name="robots" content="noindex,nofollow" />}
+{noindex && <meta name="robots" content="noindex, follow" />}
 <link rel="canonical" href={canonicalUrl} />
 
 <meta property="og:title" content={title} />
