@@ -1,0 +1,134 @@
+---
+title: "Reddit is 40% of your agent's retrieval surface"
+description: "What 150K LLM citations tell builders about prompt-time grounding, eval coverage, and the source biases their agents inherit by default."
+author: "anil-murty"
+publishDate: 2026-06-01
+tags: ["retrieval", "agents", "observability", "evaluation"]
+pillar: "observability"
+image: "/blog/reddit-is-40-percent-of-your-agents-retrieval-surface.jpg"
+---
+
+import TLDR from '@/components/TLDR.astro';
+import FAQBlock from '@/components/FAQBlock.astro';
+
+<TLDR>
+- A Semrush study of ~150,000 LLM citations (June 2025) put Reddit at 40.1%, Wikipedia at 26.3%, YouTube at 23.5% across ChatGPT, Perplexity, Gemini, and Google AI Overviews. Together those three account for more cited weight than the next twenty domains combined.
+- The dominance is structural. Google licenses Reddit for ~$60M/year, OpenAI signed its own deal in May 2024, and Perplexity manually boosts Reddit as a trusted domain alongside GitHub, Amazon, and LinkedIn.
+- Per-engine numbers are volatile in ways the cross-engine average hides. ChatGPT cut its Reddit citation rate from ~60% to ~10% over six weeks in fall 2025 after an OpenAI retrieval change.
+- Most coverage of this data treats it as a marketing problem. The interesting question for an agent builder is upstream: which retrieval backend is your agent calling, and what source distribution did it just inherit?
+- Action items live in eval, observability, and prompt-time grounding. A retrieval surface this UGC-heavy demands eval sets that include adversarial Reddit-consensus prompts, traces that surface which domains made it into the answer, and explicit choices about backend mix.
+</TLDR>
+
+**Retrieval surface** is the set of domains an AI system actually pulls from at query time when grounding a response, measured as citation share across answered prompts. It is not the same as training data weight. Training weight is fixed at checkpoint time; the retrieval surface is the live mix served by whatever search backend the model is calling right now.
+
+## Why it matters
+
+If you ship an agent that calls a hosted retrieval tool, you have inherited that tool's source biases without ever choosing them. A Perplexity API call routes through a backend that gives Reddit, LinkedIn, NIH, Microsoft, and Google disproportionate weight. A Google-grounded call leans on Google-owned properties and YouTube. A Tavily or Exa call distributes differently again. The composition of your agent's "facts" depends on the backend it touches, and the answer is rarely visible from the prompt or the model card.
+
+The citation data has been treated mostly as a GEO (Generative Engine Optimization) story for marketers. That framing is correct but incomplete. The same numbers tell builders something more directly useful: what the runtime grounding mix looks like for the models their agents use, and where the per-engine biases sit. That's an eval problem, an observability problem, and a governance problem before it is a marketing one.
+
+## The data, briefly
+
+Semrush analyzed roughly 150,000 LLM citations in June 2025 across ChatGPT, Perplexity, Gemini, and Google AI Overviews. The top ten by citation share:
+
+1. Reddit, 40.1%
+2. Wikipedia, 26.3%
+3. YouTube, 23.5%
+4. Google, 23.3%
+5. Yelp, 21.0%
+6. Facebook, 20.0%
+7. Amazon, 18.7%
+8. Tripadvisor, 12.5%
+9. Mapbox, 11.3%
+10. OpenStreetMap, 11.3%
+
+A follow-up Semrush study of ~100M citations across thirteen weeks (July to October 2025) confirmed the cross-engine ranking even after a sharp drop in ChatGPT's specific Reddit use in September. Tinuiti's Q1 2026 tracking reported that Reddit's citation share grew 73% year-over-year in tech and electronics queries specifically. The trend line is up, the rank order is stable across the four major engines, and the absolute numbers move quarter to quarter.
+
+## Why these domains and not others
+
+Three structural properties make Reddit unusually valuable as a retrieval source.
+
+1. **Long-form human reasoning:** Reddit threads run hundreds of comments and tens of thousands of words. They contain arguments, corrections, and counter-arguments in natural language, which is exactly the shape a model needs to ground a non-trivial answer.
+2. **Upvote-based quality signal:** Voting gives the retrieval pipeline a near-free relevance filter. Top-voted comments correlate well with accuracy in most subreddits, so a backend can weight by score and discard noise without running an extra ranker.
+3. **Topic diversity:** There is no Wikipedia article on the right tire pressure for a Rivian R1T in a Wisconsin winter. There is a Reddit thread. The long tail of niche coverage is where Reddit pulls away from every alternative public corpus.
+
+The commercial backbone matters separately. Google paid ~$60M/year for the Reddit license in February 2024. OpenAI signed in May 2024 (terms undisclosed; the widely cited ~$70M/year figure is derived from Reddit's S-1, not OpenAI). Reddit's S-1 disclosed $203M in 2024 AI licensing contract value. Then Perplexity made a product choice: manual boost of Reddit as a trusted domain alongside GitHub, Amazon, and LinkedIn, as documented by DataStudios. Three different mechanisms (training license, training license, runtime boost) converged on the same outcome.
+
+Reddit then sued Anthropic (June 2025) and Perplexity (October 2025) for alleged unlicensed use. The litigation confirms two things. The corpus is structurally valuable enough to defend in court. And the engines are not going to drop it; they will license it on formal terms.
+
+## The platforms diverge more than the headline number suggests
+
+While the 40.1% cross-engine number is a useful headline, it may not tell the full story.
+
+**ChatGPT leans editorial.** After September 2025 its top-five citation mix was Reddit, Wikipedia, Medium, Forbes, LinkedIn. Before September it was Reddit and Wikipedia about five times more than the rest. The drop tracks closely with Google removing the `num=100` SERP parameter on September 11, 2025. Semrush's own analyst attributes it more to an OpenAI rebalancing decision than the SERP change alone. The cause is debated. The volatility is not.
+
+**Perplexity leans B2B and academic.** Its top five are Reddit, LinkedIn, NIH, Microsoft, Google. Academic and government sources hit roughly 23% representation on Perplexity, the highest of any engine.
+
+**Google AI Mode leans on Google-owned and UGC properties.** Its top five are LinkedIn, YouTube, Reddit, Google, Google Blog. Wikipedia falls to ~2% on AI Mode, much lower than its share on ChatGPT.
+
+**Two implications follow:**
+
+1. If you're choosing between retrieval backends, you're also choosing source distribution, and the distributions aren't close.
+2. "Engine A's behavior in October 2025" is not a planning input. Pin to cross-engine structural weight where you can; treat per-engine numbers as tactical.
+
+## What this means for agent builders
+
+Four places to act.
+
+### 1. Eval coverage
+
+If your agent uses any web search tool, your eval set probably under-represents prompts where Reddit consensus is wrong. The canonical failure mode: "what's the best [niche product] for [use case]" answered confidently from r/AskReddit upvotes that reflect community vibes rather than technical merit. Add adversarial prompts where the popular answer is the wrong answer, and grade your agent on whether it caveats appropriately.
+
+The same pattern shows up in medical and legal queries answered from Reddit subjective-experience threads, and in software recommendations where the highest-upvoted answer is two years out of date. None of this is hypothetical. It's where the retrieval surface and the actual ground truth diverge, and your eval is the place you find out before a user does.
+
+To learn more about evals, see: [What is Agent Evaluation?](/blog/2026-05-12-agent-evaluation)
+
+### 2. Prompt-time grounding choices
+
+You usually have a choice of retrieval backend. Tavily, Exa, Linkup, Brave Search API, Kagi, raw Google, raw Bing, Perplexity's Sonar, and direct domain-restricted calls all produce different source distributions for the same query. If your domain is medical, NIH-heavy backends will outperform Reddit-heavy ones on accuracy and underperform on patient-experience nuance. If your domain is developer tools, Reddit and GitHub coverage matter more than Wikipedia coverage. Pick deliberately. Don't accept whatever your agent framework defaults to.
+
+### 3. Trace-level observability
+
+A working agent observability stack should answer two questions for any given response. Which domains appeared in the retrieval results? Which of those domains' content actually made it into the answer? Without those two views over a sample of recent traces, you do not know what your agent currently believes. With them, you can spot when an agent is over-weighting Reddit consensus for technical questions, or under-weighting authoritative sources for compliance-sensitive ones.
+
+Unsure about what observability is? check [What is Agent Observability?](/blog/2026-05-09-agent-observability)
+
+OpenTelemetry's GenAI semantic conventions cover the model and tool-call shape. They don't yet standardize a "cited source domains" attribute on a span. Most teams roll this manually. The investment pays back the first time an agent makes a defensible recommendation that turns out to trace back to one upvoted comment on r/whatever.
+
+Hearing about OpenTelemetry for the first time? here's a primer: [OpenTelemetry for AI Agents](/blog/2026-05-10-opentelemetry-for-ai-agents)
+
+### 4. Governance
+
+The Reddit lawsuits make it clear the source isn't going anywhere. Build assuming the public-web retrieval surface stays UGC-heavy through 2027. If your application is compliance-sensitive, that pushes you toward either domain-restricted retrieval (medical: NIH, FDA, peer-reviewed journals only) or human-in-the-loop checkpoints on responses derived from web search. The cheapest version of this is a guardrail that detects when a generated answer's primary sources are UGC and routes the response through a different path. Whether you build that as a control-plane policy, a guardrail, or a post-hoc audit depends on how much latency you can absorb.
+
+## Common questions
+
+<FAQBlock items={[
+  {
+    question: "Does Reddit's citation share match its training data weight?",
+    answer: "Not directly. Citation share is a runtime retrieval measurement. Training weight is fixed at checkpoint time. They overlap because the same licensing deals that drove Reddit into training corpora also positioned it favorably in retrieval, but they're not the same number."
+  },
+  {
+    question: "If I switch retrieval backends, does the source distribution actually change?",
+    answer: "Yes, and the gap is usually bigger than people expect. Perplexity vs. Tavily vs. Exa vs. raw Google produce visibly different domain mixes for the same query. The fastest way to see this is to run twenty representative prompts through each backend and compare the top-domain histograms."
+  },
+  {
+    question: "How do I tell what my Claude Code agent actually retrieved during a session?",
+    answer: "Set CLAUDE_CODE_ENABLE_TELEMETRY=1. The runtime emits OTLP spans that include tool-call payloads. From there you can extract the URLs returned by any search tool the agent invoked."
+  },
+  {
+    question: "Why does my agent confidently recommend products no one in my industry uses?",
+    answer: "Most likely retrieval bias toward the consumer-facing UGC corpus. Reddit's recommendations skew toward whatever has high engagement on r/[broad topic], which is often consumer-popular but enterprise-uncommon. Either restrict the retrieval domain set, or add a verification step that checks recommendations against an authoritative source for your vertical."
+  },
+  {
+    question: "Is the 40.1% number stable enough to plan a strategy around?",
+    answer: "The cross-engine number is durable on the 12-24 month horizon. The per-engine numbers are not. Treat the cross-engine weight as strategic and the per-engine slice as tactical; re-baseline quarterly."
+  }
+]} />
+
+## Sources
+
+- Semrush, [The Most-Cited Domains in AI: A 3-Month Study](https://www.semrush.com/blog/most-cited-domains-ai/)
+- Soar Agency, [How Reddit became the biggest source of LLM citations](https://www.soar.sh/blog/how-reddit-became-the-biggest-llm-citation-source)
+- Statista, [Top web domains cited by LLMs (June 2025)](https://www.statista.com/statistics/1620335/top-web-domains-cited-by-llms/)
+- DataStudios, [How Perplexity chooses and ranks information sources](https://www.datastudios.org/post/how-does-perplexity-choose-and-rank-its-information-sources-algorithm-and-transparency)
