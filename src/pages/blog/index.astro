@@ -22,14 +22,24 @@ const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month:
       {posts.map((post) => (
         <li>
           <a href={`/blog/${post.id}`} class="post-card">
-            <div class="post-meta">
-              <time datetime={post.data.publishDate.toISOString()}>{fmt(post.data.publishDate)}</time>
-              <span>·</span>
-              <span>{readingTimeMinutes(post.body)} min read</span>
-              {post.data.pillar && <><span>·</span><span class="post-pillar">{post.data.pillar}</span></>}
+            {post.data.image && (
+              <img
+                src={post.data.image}
+                alt={post.data.title}
+                class="post-card-cover"
+                loading="lazy"
+              />
+            )}
+            <div class="post-card-body">
+              <div class="post-meta">
+                <time datetime={post.data.publishDate.toISOString()}>{fmt(post.data.publishDate)}</time>
+                <span>·</span>
+                <span>{readingTimeMinutes(post.body)} min read</span>
+                {post.data.pillar && <><span>·</span><span class="post-pillar">{post.data.pillar}</span></>}
+              </div>
+              <h2>{post.data.title}</h2>
+              <p>{post.data.description}</p>
             </div>
-            <h2>{post.data.title}</h2>
-            <p>{post.data.description}</p>
           </a>
         </li>
       ))}

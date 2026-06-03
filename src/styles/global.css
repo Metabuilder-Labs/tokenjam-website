@@ -440,31 +440,45 @@ footer.tj-footer .footer-right {
 .blog-hero h1 { font-size: 40px; font-weight: 600; letter-spacing: -.02em; margin-bottom: 12px; }
 .blog-hero p { color: var(--white-dim); font-size: 17px; }
 
-.post-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.post-list { list-style: none; display: flex; flex-direction: column; gap: 0; margin: 0; padding: 0; }
+.post-list > li { margin: 0; padding: 0; }
 .post-card {
   display: block;
-  padding: 24px 0;
+  padding: 40px 0;
   border-bottom: 1px solid var(--blue-line);
   text-decoration: none;
   color: inherit;
   transition: opacity .15s;
 }
-.post-card:hover { opacity: .8; }
+.post-card:hover { opacity: .85; }
+.post-card:hover .post-card-cover { transform: translateY(-2px); }
+.post-card-cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--blue-line);
+  margin-bottom: 20px;
+  transition: transform .2s;
+}
+.post-card-body { display: block; }
 .post-card .post-meta {
   display: flex; gap: 12px; align-items: center;
   font-family: 'Geist Mono', monospace;
   font-size: 12px; color: var(--white-faint);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .post-card .post-pillar {
   text-transform: uppercase; letter-spacing: .05em;
   color: var(--accent-blue);
 }
 .post-card h2 {
-  font-size: 22px; font-weight: 600; letter-spacing: -.01em;
-  margin-bottom: 6px;
+  font-size: 28px; font-weight: 600; letter-spacing: -.02em; line-height: 1.2;
+  margin: 0 0 10px;
 }
-.post-card p { color: var(--white-dim); font-size: 15px; }
+.post-card p { color: var(--white-dim); font-size: 16px; line-height: 1.55; margin: 0; }
 
 /* ── Tag/author chips ─────────────────────────────── */
 .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
