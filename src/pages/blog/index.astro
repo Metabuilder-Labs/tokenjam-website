@@ -6,45 +6,123 @@ import { organizationSchema } from '@/lib/schema';
 
 const posts = await getPublishedPosts();
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+// Unique tag list for the filter row, ordered by frequency.
+const tagCounts = new Map<string, number>();
+for (const p of posts) {
+  for (const t of p.data.tags ?? []) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
+}
+const allTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).map(([t]) => t);
+
+const featured = posts[0];
+const rest = posts.slice(1);
 ---
 <BaseLayout
   title="Blog — TokenJam"
   description="Notes from TokenJam on token economics for AI agents: cost optimization, observability, evaluation, behavioral control, and the agentic ecosystem around them."
+  wide
 >
-  <header class="blog-hero">
-    <h1>Blog</h1>
-  </header>
+  <div class="blog-wrap">
+    <header class="blog-hero">
+      <h1>Blog</h1>
+    </header>
 
-  {posts.length === 0 ? (
-    <p style="color: var(--white-dim);">No posts yet. Check back soon.</p>
-  ) : (
-    <ul class="post-list">
-      {posts.map((post) => (
-        <li>
-          <a href={`/blog/${post.id}`} class="post-card">
-            {post.data.image && (
-              <img
-                src={post.data.image}
-                alt={post.data.title}
-                class="post-card-cover"
-                loading="lazy"
-              />
-            )}
-            <div class="post-card-body">
-              <div class="post-meta">
-                <time datetime={post.data.publishDate.toISOString()}>{fmt(post.data.publishDate)}</time>
-                <span>·</span>
-                <span>{readingTimeMinutes(post.body)} min read</span>
-                {post.data.pillar && <><span>·</span><span class="post-pillar">{post.data.pillar}</span></>}
+    {allTags.length > 0 && (
+      <div class="blog-filter" role="tablist" aria-label="Filter posts by tag">
+        <button type="button" class="blog-filter-pill is-active" data-tag="all" role="tab" aria-selected="true">All</button>
+        {allTags.map((t) => (
+          <button type="button" class="blog-filter-pill" data-tag={t} role="tab" aria-selected="false">{t}</button>
+        ))}
+      </div>
+    )}
+
+    {posts.length === 0 ? (
+      <p style="color: var(--white-dim);">No posts yet. Check back soon.</p>
+    ) : (
+      <>
+        {featured && (
+          <a
+            href={`/blog/${featured.id}`}
+            class="blog-featured"
+            data-tags={(featured.data.tags ?? []).join(',')}
+          >
+            {featured.data.image && (
+              <div class="blog-featured-media">
+                <img src={featured.data.image} alt={featured.data.title} loading="eager" />
               </div>
-              <h2>{post.data.title}</h2>
-              <p>{post.data.description}</p>
+            )}
+            <div class="blog-featured-body">
+              {featured.data.tags?.length > 0 && (
+                <div class="blog-card-tags">
+                  {featured.data.tags.map((t) => <span class="blog-card-tag">{t}</span>)}
+                </div>
+              )}
+              <h2 class="blog-featured-title">{featured.data.title}</h2>
+              <p class="blog-featured-desc">{featured.data.description}</p>
+              <div class="blog-card-meta">
+                <time datetime={featured.data.publishDate.toISOString()}>{fmt(featured.data.publishDate)}</time>
+                <span>·</span>
+                <span>{readingTimeMinutes(featured.body)} min read</span>
+              </div>
             </div>
           </a>
-        </li>
-      ))}
-    </ul>
-  )}
+        )}
+
+        {rest.length > 0 && (
+          <ul class="blog-grid">
+            {rest.map((post) => (
+              <li data-tags={(post.data.tags ?? []).join(',')}>
+                <a href={`/blog/${post.id}`} class="blog-card">
+                  {post.data.image && (
+                    <div class="blog-card-media">
+                      <img src={post.data.image} alt={post.data.title} loading="lazy" />
+                    </div>
+                  )}
+                  <div class="blog-card-body">
+                    {post.data.tags?.length > 0 && (
+                      <div class="blog-card-tags">
+                        {post.data.tags.map((t) => <span class="blog-card-tag">{t}</span>)}
+                      </div>
+                    )}
+                    <h3 class="blog-card-title">{post.data.title}</h3>
+                    <p class="blog-card-desc">{post.data.description}</p>
+                    <div class="blog-card-meta">
+                      <time datetime={post.data.publishDate.toISOString()}>{fmt(post.data.publishDate)}</time>
+                      <span>·</span>
+                      <span>{readingTimeMinutes(post.body)} min read</span>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </>
+    )}
+  </div>
 
   <Schema data={organizationSchema()} />
+
+  <script is:inline>
+    (function () {
+      var pills = document.querySelectorAll('.blog-filter-pill');
+      if (!pills.length) return;
+      var items = Array.prototype.slice.call(document.querySelectorAll('[data-tags]'));
+      pills.forEach(function (pill) {
+        pill.addEventListener('click', function () {
+          var tag = pill.dataset.tag;
+          pills.forEach(function (p) {
+            var active = p === pill;
+            p.classList.toggle('is-active', active);
+            p.setAttribute('aria-selected', active ? 'true' : 'false');
+          });
+          items.forEach(function (item) {
+            if (tag === 'all') { item.style.display = ''; return; }
+            var tags = (item.dataset.tags || '').split(',');
+            item.style.display = tags.indexOf(tag) !== -1 ? '' : 'none';
+          });
+        });
+      });
+    })();
+  </script>
 </BaseLayout>
