@@ -468,16 +468,7 @@ const installJoined = installLines.join('\n');
       flex-direction: column;
       gap: 48px;
     }
-    /* width: fit-content lets the column collapse to the H1's natural (nowrap) width,
-       so the subhead inherits the same L/R bounds instead of stretching wider. */
-    .hero-copy {
-      text-align: center;
-      width: fit-content;
-      max-width: 100%;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-    }
+    .hero-copy { text-align: center; max-width: none; margin: 0 auto; }
     /* Size the headline so the ~31-char string ("Token Efficiency For AI Agents.")
        fits on one line across the viewport. The calc() solves for max-font that fits;
        clamp() floors small screens (where it wraps gracefully) and caps very wide screens. */
@@ -493,12 +484,14 @@ const installJoined = installLines.join('\n');
     }
     /* Subhead is ~175 chars — won't fit on one line until ~1700px viewport, but at that point
        we let it stretch. Below that it wraps cleanly inside a generous max-width. */
+    /* max-width is synced to the rendered .hero-h1 width by JS below, so the subhead
+       always lives within the headline's L/R bounds regardless of viewport size. */
     .hero-sub {
       color: var(--white-dim);
       font-size: clamp(16px, 1.3vw, 19px);
       line-height: 1.55;
-      max-width: none;
-      margin: 0;
+      max-width: var(--hero-h1-width, 100%);
+      margin: 0 auto;
       white-space: normal;
     }
     @media (max-width: 720px) {
@@ -1056,6 +1049,18 @@ const installJoined = installLines.join('\n');
 
   <script is:inline define:vars={{ installJoined }}>
     (function () {
+      // ── Sync hero subhead width to the rendered H1 ──
+      var heroCopy = document.querySelector('.hero-copy');
+      var heroH1 = document.querySelector('.hero-h1');
+      function syncHeroSub() {
+        if (!heroCopy || !heroH1) return;
+        var w = heroH1.getBoundingClientRect().width;
+        heroCopy.style.setProperty('--hero-h1-width', w + 'px');
+      }
+      syncHeroSub();
+      window.addEventListener('resize', syncHeroSub);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncHeroSub);
+
       // ── Copy install ────────────────────────────────
       var btn = document.getElementById('install-copy-btn');
       var label = document.getElementById('install-copy-label');
