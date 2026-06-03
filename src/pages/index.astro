@@ -129,7 +129,7 @@ const installJoined = installLines.join('\n');
   <section class="hero">
     <div class="hero-inner">
       <div class="hero-copy">
-        <h1 class="hero-h1">Driving Token Efficiency<br />For AI Agents</h1>
+        <h1 class="hero-h1">Driving Token Efficiency For AI Agents</h1>
         <p class="hero-sub">
           TokenJam reads your agent's telemetry and tells you when to downsize,
           when to trim prompts, what to cache, and what to script. The result is a lower AI bill.
@@ -469,17 +469,22 @@ const installJoined = installLines.join('\n');
       gap: 48px;
     }
     .hero-copy { text-align: center; max-width: none; margin: 0 auto; }
-    /* Headline is two lines: "Driving Token Efficiency" / "For AI Agents".
-       Sized so the wider first line drives the H1's bounding-rect width, which JS
-       below copies onto --hero-h1-width so the subhead inherits the same L/R bounds. */
+    /* Single-line headline (Vercel-style hero). The calc() picks the largest font
+       that fits the ~38-char string in (viewport - 96px); clamp() floors small
+       screens and caps very wide ones. JS below mirrors the rendered width onto
+       --hero-h1-width so .hero-sub stays within the same L/R bounds. */
     .hero-h1 {
       font-family: 'Geist', sans-serif;
-      font-weight: 500;
+      font-weight: 600;
       letter-spacing: -.03em;
       line-height: 1.08;
-      font-size: clamp(36px, 6.4vw, 88px);
+      font-size: clamp(34px, calc((100vw - 96px) / 19), 84px);
       color: var(--white);
       margin: 0 0 24px;
+      white-space: nowrap;
+    }
+    @media (max-width: 720px) {
+      .hero-h1 { white-space: normal; }
     }
     /* Subhead is ~175 chars — won't fit on one line until ~1700px viewport, but at that point
        we let it stretch. Below that it wraps cleanly inside a generous max-width. */
