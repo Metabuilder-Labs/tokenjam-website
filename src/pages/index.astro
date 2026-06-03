@@ -129,7 +129,7 @@ const installJoined = installLines.join('\n');
   <section class="hero">
     <div class="hero-inner">
       <div class="hero-copy">
-        <h1 class="hero-h1">Driving Token efficiency for AI agents.</h1>
+        <h1 class="hero-h1">Token Efficiency For AI Agents.</h1>
         <p class="hero-sub">
           TokenJam reads your agent's telemetry and tells you when to downsize,
           when to trim prompts, what to cache, and what to script. The result is a lower AI bill.
@@ -468,8 +468,17 @@ const installJoined = installLines.join('\n');
       flex-direction: column;
       gap: 48px;
     }
-    .hero-copy { text-align: center; max-width: none; margin: 0 auto; }
-    /* Size the headline so the ~39-char string ("Driving Token efficiency for AI agents.")
+    /* width: fit-content lets the column collapse to the H1's natural (nowrap) width,
+       so the subhead inherits the same L/R bounds instead of stretching wider. */
+    .hero-copy {
+      text-align: center;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Size the headline so the ~31-char string ("Token Efficiency For AI Agents.")
        fits on one line across the viewport. The calc() solves for max-font that fits;
        clamp() floors small screens (where it wraps gracefully) and caps very wide screens. */
     .hero-h1 {
@@ -477,7 +486,7 @@ const installJoined = installLines.join('\n');
       font-weight: 700;
       letter-spacing: -.035em;
       line-height: 1;
-      font-size: clamp(40px, calc((100vw - 96px) / 19.5), 96px);
+      font-size: clamp(40px, calc((100vw - 96px) / 15.5), 110px);
       color: var(--white);
       margin: 0 0 24px;
       white-space: nowrap;
@@ -488,12 +497,9 @@ const installJoined = installLines.join('\n');
       color: var(--white-dim);
       font-size: clamp(16px, 1.3vw, 19px);
       line-height: 1.55;
-      max-width: 1280px;
-      margin: 0 auto;
+      max-width: none;
+      margin: 0;
       white-space: normal;
-    }
-    @media (min-width: 1700px) {
-      .hero-sub { max-width: none; white-space: nowrap; }
     }
     @media (max-width: 720px) {
       .hero-h1 { white-space: normal; }
