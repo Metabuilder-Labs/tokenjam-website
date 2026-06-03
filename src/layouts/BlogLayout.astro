@@ -29,6 +29,23 @@ const imageUrl = post.data.image ?? '/og-image.png';
   canonical={canonical}
 >
   <article>
+    {post.data.tags.length > 0 && (
+      <div class="chip-row article-tags-top">
+        {post.data.tags.map((tag) => (
+          <a href={`/blog/tags/${tag}`} class="chip">#{tag}</a>
+        ))}
+      </div>
+    )}
+
+    {post.data.image && (
+      <img
+        src={post.data.image}
+        alt={post.data.title}
+        class="article-cover"
+        loading="eager"
+      />
+    )}
+
     <header class="article-header">
       <h1>{post.data.title}</h1>
       <div class="article-byline">
@@ -52,26 +69,9 @@ const imageUrl = post.data.image ?? '/og-image.png';
       </div>
     </header>
 
-    {post.data.image && (
-      <img
-        src={post.data.image}
-        alt={post.data.title}
-        class="article-cover"
-        loading="eager"
-      />
-    )}
-
     <div class="prose">
       <slot />
     </div>
-
-    {post.data.tags.length > 0 && (
-      <div class="chip-row" style="margin-top: 32px;">
-        {post.data.tags.map((tag) => (
-          <a href={`/blog/tags/${tag}`} class="chip">#{tag}</a>
-        ))}
-      </div>
-    )}
 
     {related.length > 0 && (
       <section class="related-posts">

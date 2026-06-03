@@ -537,10 +537,19 @@ footer.tj-footer .footer-right {
 .prose th { background: var(--white-ghost); font-weight: 600; }
 
 /* ── Article header ───────────────────────────────── */
-.article-header { margin-bottom: 32px; }
+.article-tags-top { margin: 0 0 20px; }
+.article-cover {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--blue-line);
+  margin: 0 0 28px;
+}
+.article-header { margin-bottom: 40px; }
 .article-header h1 {
-  font-size: 40px; font-weight: 600; letter-spacing: -.02em;
-  margin-bottom: 12px; line-height: 1.2;
+  font-size: 44px; font-weight: 600; letter-spacing: -.025em;
+  margin: 0 0 14px; line-height: 1.15;
 }
 .article-byline {
   display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
@@ -549,15 +558,6 @@ footer.tj-footer .footer-right {
 }
 .article-byline a { color: var(--white-dim); text-decoration: none; }
 .article-byline a:hover { color: var(--white); }
-
-.article-cover {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  border: 1px solid var(--blue-line);
-  margin-bottom: 32px;
-}
 
 /* ── AEO helper components ────────────────────────── */
 .tj-tldr {
