@@ -7,12 +7,23 @@ import { organizationSchema } from '@/lib/schema';
 const posts = await getPublishedPosts();
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-// Unique tag list for the filter row, ordered by frequency.
-const tagCounts = new Map<string, number>();
-for (const p of posts) {
-  for (const t of p.data.tags ?? []) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
-}
-const allTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).map(([t]) => t);
+// Curated top-level filter groups. Each group maps a display label to a set of
+// underlying post tags. Keeps the filter row from ballooning as the long-tail
+// tag set grows. Only groups that actually match at least one post are rendered.
+const tagGroups: { label: string; tags: string[] }[] = [
+  { label: 'Agents',        tags: ['agents', 'claude-code', 'cursor', 'agent-failure'] },
+  { label: 'Cost',          tags: ['cost', 'tokens', 'pricing', 'optimization'] },
+  { label: 'Observability', tags: ['observability', 'telemetry', 'opentelemetry', 'monitoring', 'drift', 'alerts'] },
+  { label: 'Evaluation',    tags: ['evaluation', 'testing', 'benchmarks'] },
+  { label: 'Retrieval',     tags: ['retrieval'] },
+  { label: 'Gateways',      tags: ['gateways', 'infrastructure', 'control-plane'] },
+  { label: 'Governance',    tags: ['governance', 'guardrails', 'safety', 'hitl', 'approval'] },
+  { label: 'Memory',        tags: ['memory'] },
+  { label: 'Thesis',        tags: ['thesis', 'industry'] },
+];
+const usedTags = new Set<string>();
+for (const p of posts) for (const t of p.data.tags ?? []) usedTags.add(t);
+const visibleGroups = tagGroups.filter((g) => g.tags.some((t) => usedTags.has(t)));
 
 const featured = posts[0];
 const rest = posts.slice(1);
@@ -27,11 +38,17 @@ const rest = posts.slice(1);
       <h1>Blog</h1>
     </header>
 
-    {allTags.length > 0 && (
-      <div class="blog-filter" role="tablist" aria-label="Filter posts by tag">
-        <button type="button" class="blog-filter-pill is-active" data-tag="all" role="tab" aria-selected="true">All</button>
-        {allTags.map((t) => (
-          <button type="button" class="blog-filter-pill" data-tag={t} role="tab" aria-selected="false">{t}</button>
+    {visibleGroups.length > 0 && (
+      <div class="blog-filter" role="tablist" aria-label="Filter posts by topic">
+        <button type="button" class="blog-filter-pill is-active" data-tags="" role="tab" aria-selected="true">All</button>
+        {visibleGroups.map((g) => (
+          <button
+            type="button"
+            class="blog-filter-pill"
+            data-tags={g.tags.join(',')}
+            role="tab"
+            aria-selected="false"
+          >{g.label}</button>
         ))}
       </div>
     )}
@@ -110,16 +127,17 @@ const rest = posts.slice(1);
       var items = Array.prototype.slice.call(document.querySelectorAll('[data-tags]'));
       pills.forEach(function (pill) {
         pill.addEventListener('click', function () {
-          var tag = pill.dataset.tag;
+          var groupTags = (pill.dataset.tags || '').split(',').filter(Boolean);
           pills.forEach(function (p) {
             var active = p === pill;
             p.classList.toggle('is-active', active);
             p.setAttribute('aria-selected', active ? 'true' : 'false');
           });
           items.forEach(function (item) {
-            if (tag === 'all') { item.style.display = ''; return; }
-            var tags = (item.dataset.tags || '').split(',');
-            item.style.display = tags.indexOf(tag) !== -1 ? '' : 'none';
+            if (groupTags.length === 0) { item.style.display = ''; return; }
+            var postTags = (item.dataset.tags || '').split(',');
+            var match = groupTags.some(function (gt) { return postTags.indexOf(gt) !== -1; });
+            item.style.display = match ? '' : 'none';
           });
         });
       });
