@@ -1,0 +1,166 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="About — TokenJam"
+  description="TokenJam is the cost-optimization layer for AI agents. It reads your agent's telemetry and surfaces insights that reduce your AI bill across four sub-products: Downsize, Trim, Cache, and Script."
+>
+  <main class="tj-main">
+    <article class="about">
+      <header class="about-header">
+        <h1>About TokenJam</h1>
+      </header>
+
+      <section class="about-section">
+        <h2>What is TokenJam?</h2>
+        <p>
+          TokenJam is the cost-optimization layer for your AI agents. It reads your agent's
+          telemetry and surfaces insights that reduce your AI bill. It does this through four
+          sub-products, each implementing a well-researched cost-optimization technique. It
+          also bundles a full observability stack: traces, drift detection, budgets,
+          sensitive-action alerts, and more.
+        </p>
+
+        <p class="about-lede">More specifically:</p>
+
+        <ol class="about-list">
+          <li>
+            <strong>TokenJam "Downsize":</strong> Walks every LLM call in your agent's trace
+            history, classifies each session by structural shape, identifies candidates for
+            cheaper models in the same family, and shows you the candidates with potential
+            savings and example sessions to spot-check. Downsize never claims quality
+            equivalence; it just surfaces the candidates, you make the call.
+          </li>
+          <li>
+            <strong>TokenJam "Trim":</strong> Runs every captured prompt through a local
+            classifier (LLMLingua-2, ~280 MB, runs on your machine) that predicts which
+            regions of the prompt the model likely ignores. Flags those low-significance
+            regions as bloat candidates and shows you exactly which sections of your prompt
+            template are safe to cut. No API calls, no per-run cost.
+          </li>
+          <li>
+            <strong>TokenJam "Cache":</strong> Two parts to this one. First, it shows your
+            current caching ratio per (provider, model) so you can see how much of your spend
+            is already cached. Second, it scans your real prompt history for stable prefixes
+            that appear across many calls and suggests where to place <code>cache_control</code>
+            breakpoints.
+          </li>
+          <li>
+            <strong>TokenJam "Script":</strong> Clusters your sessions by their
+            (<code>tool_name</code>, <code>argument_shape</code>) signature. When the same
+            sequence runs N+ times with zero branching, it flags those sessions as candidates
+            for replacing an agent loop with a plain Python script. Deterministic work is way
+            cheaper than re-deriving the same plan from an LLM every time.
+          </li>
+        </ol>
+      </section>
+
+      <hr class="about-divider" />
+
+      <section class="about-section">
+        <h2>Where does TokenJam get its data from?</h2>
+        <p>
+          From anywhere agent telemetry is already being collected. Today, that's 20+
+          integration surfaces across 15+ companies:
+        </p>
+        <ul class="about-list">
+          <li><strong>2 coding agents:</strong> Claude Code and Codex, zero-code (<code>tj onboard --claude-code</code> / <code>--codex</code>)</li>
+          <li><strong>5 LLM provider SDKs:</strong> Anthropic, OpenAI, Gemini, Bedrock, and LiteLLM (which itself fans out to 100+ providers)</li>
+          <li><strong>7 agent frameworks:</strong> LangChain, LangGraph, CrewAI, AutoGen, LlamaIndex, OpenAI Agents SDK, NemoClaw</li>
+          <li><strong>5+ OpenTelemetry-native runtimes:</strong> Google ADK, AWS Strands, Microsoft Semantic Kernel, deepset Haystack, Pydantic AI (plus any other OTLP-compatible source)</li>
+          <li><strong>2 observability platforms:</strong> backfill from Langfuse and Helicone (offline ingest of your historical data)</li>
+        </ul>
+
+        <h3>No telemetry? No problem.</h3>
+        <p>
+          TokenJam ships with its own observability stack, so you can drop in one of our SDK
+          patches and start optimizing today. Everything runs on your machine: no cloud,
+          no signup, no data egress.
+        </p>
+      </section>
+
+      <hr class="about-divider" />
+
+      <section class="about-section">
+        <h2>Contact</h2>
+        <p>
+          TokenJam is founded and maintained by Anil Murty along with contributions from other
+          open source developers. Anil can be reached via
+          <a href="https://www.linkedin.com/in/anilmurty/" target="_blank" rel="noopener noreferrer">LinkedIn</a>,
+          <a href="https://x.com/anilmurty_ai" target="_blank" rel="noopener noreferrer">X</a>
+          (formerly Twitter), or email at
+          <a href="mailto:anil@metabldr.com">anil@metabldr.com</a>.
+        </p>
+      </section>
+    </article>
+  </main>
+
+  <style>
+    .about { max-width: 760px; margin: 0 auto; padding: 24px 0 32px; }
+    .about-header { margin-bottom: 32px; }
+    .about-header h1 {
+      font-family: 'Geist', sans-serif;
+      font-size: clamp(36px, 4.4vw, 52px);
+      font-weight: 700;
+      letter-spacing: -.025em;
+      line-height: 1.1;
+      color: var(--white);
+      margin: 0;
+    }
+    .about-section { margin-bottom: 8px; }
+    .about-section h2 {
+      font-family: 'Geist', sans-serif;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: -.015em;
+      color: var(--white);
+      margin: 28px 0 14px;
+    }
+    .about-section h3 {
+      font-family: 'Geist', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--white);
+      margin: 28px 0 10px;
+    }
+    .about-section p {
+      color: var(--white-dim);
+      font-size: 17px;
+      line-height: 1.7;
+      margin: 0 0 16px;
+    }
+    .about-lede { margin-top: 22px !important; }
+    .about-list {
+      margin: 0 0 16px 0;
+      padding-left: 22px;
+    }
+    .about-list li {
+      color: var(--white-dim);
+      font-size: 16px;
+      line-height: 1.7;
+      margin: 0 0 14px;
+    }
+    .about-list li strong { color: var(--white); font-weight: 600; }
+    .about-section code {
+      font-family: 'Geist Mono', monospace;
+      font-size: .9em;
+      padding: 1px 6px;
+      background: var(--white-ghost);
+      border-radius: 4px;
+      color: var(--white);
+    }
+    .about-section a {
+      color: var(--accent-blue);
+      text-decoration: underline;
+      text-decoration-color: rgba(var(--accent-blue-rgb), 0.4);
+      text-underline-offset: 3px;
+    }
+    .about-section a:hover { color: var(--white); text-decoration-color: var(--white); }
+    .about-divider {
+      border: 0;
+      border-top: 1px solid var(--blue-line);
+      margin: 40px 0;
+    }
+  </style>
+</BaseLayout>

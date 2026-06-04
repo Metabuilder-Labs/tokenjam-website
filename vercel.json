@@ -4,6 +4,9 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    { "source": "/contact", "destination": "/about", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/api/waitlist", "destination": "/api/waitlist.js" },
     { "source": "/sitemap.xml", "destination": "/sitemap-index.xml" }
