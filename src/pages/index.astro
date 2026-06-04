@@ -17,30 +17,36 @@ const accentBySlug = Object.fromEntries(
 // using currentColor unless the vendor uses multi-color brand fills — see Microsoft).
 const heroSources = [
   {
+    // Anthropic — official asterisk-wedge mark (simple-icons path).
     id: 'anthropic', name: 'Anthropic', group: 'agent',
     brand: '#D97757', brandRgb: '217, 119, 87',
     products: ['Claude Code', 'Anthropic API'],
-    svgInner: `<path d="M8.5 4L4 20h2.6l1-3h7.8l1 3H19L14.5 4h-6zm-.3 11l2.8-8 2.8 8H8.2z" fill="currentColor"/>`,
+    svgInner: `<path fill="currentColor" d="M17.3041 3.541h-3.6718l6.696 16.918H24L17.3041 3.541ZM6.6959 3.541 0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5527h3.7442L10.5363 3.541H6.6959Zm-.215 10.2232 2.2727-5.8867 2.2728 5.8867H6.481Z"/>`,
   },
   {
+    // OpenAI — official hex-knot mark (simple-icons path).
     id: 'openai', name: 'OpenAI', group: 'agent',
     brand: '#10A37F', brandRgb: '16, 163, 127',
     products: ['Codex CLI', 'OpenAI API', 'OpenAI Agents SDK'],
-    svgInner: `<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/>`,
+    svgInner: `<path fill="currentColor" d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.073zM13.2599 22.4751a4.4751 4.4751 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4944 4.4944zM3.6052 18.2949a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.7404 19.8967a4.4992 4.4992 0 0 1-6.1353-1.6017zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.02 1.1685a.0757.0757 0 0 1-.071 0L4.83 13.7977a4.504 4.504 0 0 1-1.65-6.15zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654 2.602-1.4998 2.6068 1.4998v2.9994l-2.5973 1.4997-2.6067-1.4997Z"/>`,
   },
   {
+    // Google — official 4-color G.
     id: 'google', name: 'Google', group: 'provider',
     brand: '#4285F4', brandRgb: '66, 133, 244',
     products: ['Gemini', 'Google ADK'],
-    svgInner: `<path d="M21 12.3c0 5.1-3.5 8.7-8.7 8.7-5.1 0-9.3-4.1-9.3-9.3S7.2 2.4 12.3 2.4c2.5 0 4.6.9 6.2 2.4l-2.5 2.4c-1.1-1-2.4-1.5-3.7-1.5-3.2 0-5.8 2.6-5.8 5.9s2.6 5.9 5.8 5.9c3.6 0 5-2.6 5.2-3.9h-5.2v-3.2H21c.1.5.1 1 .1 1.9z" fill="currentColor"/>`,
+    multiColor: true,
+    svgInner: `<path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.45c-.28 1.49-1.13 2.75-2.4 3.6v3h3.87c2.27-2.09 3.57-5.17 3.57-8.84z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.87-3c-1.08.72-2.45 1.16-4.06 1.16-3.13 0-5.78-2.11-6.73-4.96H1.27v3.09C3.25 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.27C.47 8.24 0 10.06 0 12s.47 3.76 1.27 5.38l4-3.09z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.25 2.7 1.27 6.62l4 3.09C6.22 6.86 8.87 4.75 12 4.75z"/>`,
   },
   {
+    // AWS — orange smile arrow under "aws" wordmark.
     id: 'aws', name: 'AWS', group: 'provider',
     brand: '#FF9900', brandRgb: '255, 153, 0',
     products: ['Bedrock', 'Strands Agent SDK'],
-    svgInner: `<path d="M12 3L21 7v10l-9 4-9-4V7l9-4zm0 2.2L4.6 8 12 11l7.4-3L12 5.2zM4 9.5v7l7 3.1V12.5L4 9.5zm9 3v7.1l7-3.1v-7l-7 3z" fill="currentColor"/>`,
+    svgInner: `<text x="12" y="11" text-anchor="middle" fill="currentColor" font-family="system-ui, sans-serif" font-size="7" font-weight="800" letter-spacing="-.02em">aws</text><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M3.5 16.8c4.5 3 12.5 3 17 0"/><path fill="currentColor" d="M18.5 14.5 21 17l-2.5 2.2Z"/>`,
   },
   {
+    // Microsoft — 4 colored squares (brand-faithful multi-color).
     id: 'microsoft', name: 'Microsoft', group: 'provider',
     brand: '#A6A6A6', brandRgb: '166, 166, 166',
     products: ['Semantic Kernel', 'Azure OpenAI', 'AutoGen'],
@@ -48,34 +54,46 @@ const heroSources = [
     svgInner: `<rect x="3" y="3" width="8" height="8" fill="#F25022"/><rect x="13" y="3" width="8" height="8" fill="#7FBA00"/><rect x="3" y="13" width="8" height="8" fill="#00A4EF"/><rect x="13" y="13" width="8" height="8" fill="#FFB900"/>`,
   },
   {
+    // NVIDIA — stylized eye-shape evoking the NVIDIA mark.
     id: 'nvidia', name: 'NVIDIA', group: 'provider',
     brand: '#76B900', brandRgb: '118, 185, 0',
     products: ['NemoClaw'],
-    svgInner: `<path d="M5 4v16h3v-8.7L16 20h3V4h-3v8.7L8 4H5z" fill="currentColor"/>`,
+    svgInner: `<path fill="currentColor" d="M9.5 7.2v-.95c.17-.02.35-.03.52-.03 4.81-.15 7.96 4.13 7.96 4.13s-3.4 4.72-7.05 4.72c-.5 0-.96-.08-1.43-.24V12.4c1.86.22 2.23.96 3.36 2.78l2.49-2.1S13.5 9.66 9.6 9.06c-.04 0-.06-.01-.1-.01v.05c1.13.6 2.36 2.05 3.34 4.07-1.07-.45-2.04-.71-3.34-.71-.95 0-1.91.12-2.43.26V7.2zm0-1.95v1.83c.13-.01.25-.03.38-.04 5.04-.17 8.34 4.13 8.34 4.13s-3.78 4.59-7.7 4.59c-.36 0-.7-.04-1.02-.1v1.13c.27.03.55.05.84.05 3.65 0 6.28-1.86 8.83-4.07 1.55 1.24 2.21 1.32 2.21 1.32-.65.41-2.13 1.34-3.39 1.65 0 0-.41 1.31-2.69 1.79-2.96.6-5.83-.92-7.95-2.42 0 0-.21.15-.39.27v1.45h13.4V5.25H9.5z"/>`,
   },
   {
+    // LangChain — interlocking chain links (the brand glyph alongside the parrot).
     id: 'langchain', name: 'LangChain', group: 'agent',
-    brand: '#00A99D', brandRgb: '0, 169, 157',
+    brand: '#1C898D', brandRgb: '28, 137, 141',
     products: ['LangChain', 'LangGraph'],
-    svgInner: `<path d="M10 7H7a5 5 0 0 0 0 10h3v-2.5H7.5a2.5 2.5 0 1 1 0-5H10V7zm4 0v2.5h2.5a2.5 2.5 0 1 1 0 5H14V17h3a5 5 0 0 0 0-10h-3zM9 11h6v2H9v-2z" fill="currentColor"/>`,
+    svgInner: `<path fill="currentColor" d="M9.5 7H7a4.5 4.5 0 0 0 0 9h2.5v-2.5H7a2 2 0 1 1 0-4h2.5V7zm5 0v2.5H17a2 2 0 1 1 0 4h-2.5V16H17a4.5 4.5 0 0 0 0-9h-2.5zM8.5 11h7v1.6h-7V11z"/>`,
   },
   {
+    // LiteLLM — "LL" monogram (BerriAI's fan-out router across 100+ providers).
     id: 'litellm', name: 'LiteLLM', group: 'agent',
-    brand: '#A78BFA', brandRgb: '167, 139, 250',
+    brand: '#8B5CF6', brandRgb: '139, 92, 246',
     products: ['LiteLLM', 'CrewAI', 'AutoGen', 'LlamaIndex', 'Pydantic AI', 'Haystack'],
-    svgInner: `<path d="M13 2L4 14h6l-2 8 11-13h-6l2-7h-2z" fill="currentColor"/>`,
+    svgInner: `<path fill="currentColor" d="M4 5v14h6.5v-2.6H6.7V5H4Zm9 0v14h6.5v-2.6h-3.8V5H13Z"/>`,
   },
   {
+    // Langfuse — bold serif "L" (their primary glyph).
     id: 'langfuse', name: 'Langfuse', group: 'obs',
-    brand: '#F59E0B', brandRgb: '245, 158, 11',
+    brand: '#22D3EE', brandRgb: '34, 211, 238',
     products: ['Langfuse', 'Helicone'],
-    svgInner: `<path d="M5 4h4l2.2 6L7 20h3l3.3-7L17 20h3L10 4H5z" fill="currentColor"/>`,
+    svgInner: `<path fill="currentColor" d="M7 4v16h11v-3.2h-7.5V4H7z"/>`,
   },
   {
-    id: 'otlp', name: 'OTLP', group: 'obs',
-    brand: '#60A5FA', brandRgb: '96, 165, 250',
+    // OpenTelemetry — hexagon outline with center dot (matches their hex mark).
+    id: 'opentelemetry', name: 'OpenTelemetry', group: 'obs',
+    brand: '#F5A800', brandRgb: '245, 168, 0',
     products: ['Any OTLP source', 'Custom spans'],
-    svgInner: `<circle cx="12" cy="12" r="2.5" fill="currentColor"/><circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>`,
+    svgInner: `<path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 2.5l8.4 4.85v9.7L12 21.9l-8.4-4.85v-9.7L12 2.5z"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/>`,
+  },
+  {
+    // TokenJam — the jar mark (self-reference; TokenJam emits its own telemetry).
+    id: 'tokenjam', name: 'TokenJam', group: 'obs',
+    brand: '#EDEDED', brandRgb: '237, 237, 237',
+    products: ['TokenJam observability stack'],
+    svgInner: `<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="3" rx="1"/><path d="M9 6.5H5v14h4M15 6.5h4v14h-4"/></g>`,
   },
 ];
 
