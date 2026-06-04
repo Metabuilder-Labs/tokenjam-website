@@ -7,17 +7,76 @@ const accentBySlug = Object.fromEntries(
   productCatalog.map((p) => [p.slug, { accent: p.accent, accentRgb: p.accentRgb }])
 );
 
-// Source integrations shown in the hero beam (compact set — the works-with strip below covers the full list).
-// `mark` is a short letter monogram used as a placeholder logo chip until official brand SVGs land.
+// Hero ingest sources, grouped by vendor (10 cards total). Each card carries the
+// brand color (for the chip mark) and a list of underlying products surfaced via
+// a hover tooltip. The works-with strip below this section still covers the long
+// tail of supported integrations.
+//
+// `group` controls beam-particle color: agent=blue, provider=green, obs=amber.
+// `svgInner` is the inner SVG markup for the chip mark (drawn at viewBox 0 0 24 24,
+// using currentColor unless the vendor uses multi-color brand fills — see Microsoft).
 const heroSources = [
-  { id: 'claude-code',   name: 'Claude Code',   group: 'agent',    mark: 'CC' },
-  { id: 'codex-cli',     name: 'Codex CLI',     group: 'agent',    mark: '>_' },
-  { id: 'openai-agents', name: 'OpenAI Agents', group: 'agent',    mark: 'OA' },
-  { id: 'langgraph',     name: 'LangGraph',     group: 'agent',    mark: 'LG' },
-  { id: 'anthropic',     name: 'Anthropic',     group: 'provider', mark: 'A'  },
-  { id: 'openai',        name: 'OpenAI',        group: 'provider', mark: 'O'  },
-  { id: 'langfuse',      name: 'Langfuse',      group: 'obs',      mark: 'λ'  },
-  { id: 'otlp',          name: 'OTLP',          group: 'obs',      mark: '◉'  },
+  {
+    id: 'anthropic', name: 'Anthropic', group: 'agent',
+    brand: '#D97757', brandRgb: '217, 119, 87',
+    products: ['Claude Code', 'Anthropic API'],
+    svgInner: `<path d="M8.5 4L4 20h2.6l1-3h7.8l1 3H19L14.5 4h-6zm-.3 11l2.8-8 2.8 8H8.2z" fill="currentColor"/>`,
+  },
+  {
+    id: 'openai', name: 'OpenAI', group: 'agent',
+    brand: '#10A37F', brandRgb: '16, 163, 127',
+    products: ['Codex CLI', 'OpenAI API', 'OpenAI Agents SDK'],
+    svgInner: `<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/>`,
+  },
+  {
+    id: 'google', name: 'Google', group: 'provider',
+    brand: '#4285F4', brandRgb: '66, 133, 244',
+    products: ['Gemini', 'Google ADK'],
+    svgInner: `<path d="M21 12.3c0 5.1-3.5 8.7-8.7 8.7-5.1 0-9.3-4.1-9.3-9.3S7.2 2.4 12.3 2.4c2.5 0 4.6.9 6.2 2.4l-2.5 2.4c-1.1-1-2.4-1.5-3.7-1.5-3.2 0-5.8 2.6-5.8 5.9s2.6 5.9 5.8 5.9c3.6 0 5-2.6 5.2-3.9h-5.2v-3.2H21c.1.5.1 1 .1 1.9z" fill="currentColor"/>`,
+  },
+  {
+    id: 'aws', name: 'AWS', group: 'provider',
+    brand: '#FF9900', brandRgb: '255, 153, 0',
+    products: ['Bedrock', 'Strands Agent SDK'],
+    svgInner: `<path d="M12 3L21 7v10l-9 4-9-4V7l9-4zm0 2.2L4.6 8 12 11l7.4-3L12 5.2zM4 9.5v7l7 3.1V12.5L4 9.5zm9 3v7.1l7-3.1v-7l-7 3z" fill="currentColor"/>`,
+  },
+  {
+    id: 'microsoft', name: 'Microsoft', group: 'provider',
+    brand: '#A6A6A6', brandRgb: '166, 166, 166',
+    products: ['Semantic Kernel', 'Azure OpenAI', 'AutoGen'],
+    multiColor: true,
+    svgInner: `<rect x="3" y="3" width="8" height="8" fill="#F25022"/><rect x="13" y="3" width="8" height="8" fill="#7FBA00"/><rect x="3" y="13" width="8" height="8" fill="#00A4EF"/><rect x="13" y="13" width="8" height="8" fill="#FFB900"/>`,
+  },
+  {
+    id: 'nvidia', name: 'NVIDIA', group: 'provider',
+    brand: '#76B900', brandRgb: '118, 185, 0',
+    products: ['NemoClaw'],
+    svgInner: `<path d="M5 4v16h3v-8.7L16 20h3V4h-3v8.7L8 4H5z" fill="currentColor"/>`,
+  },
+  {
+    id: 'langchain', name: 'LangChain', group: 'agent',
+    brand: '#00A99D', brandRgb: '0, 169, 157',
+    products: ['LangChain', 'LangGraph'],
+    svgInner: `<path d="M10 7H7a5 5 0 0 0 0 10h3v-2.5H7.5a2.5 2.5 0 1 1 0-5H10V7zm4 0v2.5h2.5a2.5 2.5 0 1 1 0 5H14V17h3a5 5 0 0 0 0-10h-3zM9 11h6v2H9v-2z" fill="currentColor"/>`,
+  },
+  {
+    id: 'litellm', name: 'LiteLLM', group: 'agent',
+    brand: '#A78BFA', brandRgb: '167, 139, 250',
+    products: ['LiteLLM', 'CrewAI', 'AutoGen', 'LlamaIndex', 'Pydantic AI', 'Haystack'],
+    svgInner: `<path d="M13 2L4 14h6l-2 8 11-13h-6l2-7h-2z" fill="currentColor"/>`,
+  },
+  {
+    id: 'langfuse', name: 'Langfuse', group: 'obs',
+    brand: '#F59E0B', brandRgb: '245, 158, 11',
+    products: ['Langfuse', 'Helicone'],
+    svgInner: `<path d="M5 4h4l2.2 6L7 20h3l3.3-7L17 20h3L10 4H5z" fill="currentColor"/>`,
+  },
+  {
+    id: 'otlp', name: 'OTLP', group: 'obs',
+    brand: '#60A5FA', brandRgb: '96, 165, 250',
+    products: ['Any OTLP source', 'Custom spans'],
+    svgInner: `<circle cx="12" cy="12" r="2.5" fill="currentColor"/><circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>`,
+  },
 ];
 
 // Full integration list shown in the works-with strip.
@@ -153,9 +212,24 @@ const installJoined = installLines.join('\n');
           <!-- Sources column -->
           <ul class="flow-sources" id="flow-sources">
             {heroSources.map((s) => (
-              <li class="flow-node flow-source" data-id={s.id} data-group={s.group}>
-                <span class="flow-source-mark" aria-hidden="true">{s.mark}</span>
+              <li
+                class="flow-node flow-source"
+                data-id={s.id}
+                data-group={s.group}
+                style={`--brand: ${s.brand}; --brand-rgb: ${s.brandRgb};`}
+              >
+                <span class={`flow-source-mark${s.multiColor ? ' is-multicolor' : ''}`} aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" set:html={s.svgInner}></svg>
+                </span>
                 <span class="flow-source-name">{s.name}</span>
+                <div class="flow-source-tooltip" role="tooltip">
+                  {s.products.map((p) => (
+                    <div class="flow-source-tooltip-row">
+                      <span class="flow-source-tooltip-dot" aria-hidden="true"></span>
+                      <span>{p}</span>
+                    </div>
+                  ))}
+                </div>
               </li>
             ))}
           </ul>
@@ -543,14 +617,14 @@ const installJoined = installLines.join('\n');
     }
     .flow-source {
       display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px;
+      padding: 8px 12px;
       font-family: 'Geist Mono', monospace;
       font-size: 12px;
       color: var(--white-dim);
     }
     .flow-source:hover {
-      border-color: rgba(var(--accent-blue-rgb), 0.5);
-      background: rgba(var(--accent-blue-rgb), 0.05);
+      border-color: rgba(var(--brand-rgb), 0.55);
+      background: rgba(var(--brand-rgb), 0.06);
       color: var(--white);
     }
     .flow-source-mark {
@@ -558,20 +632,54 @@ const installJoined = installLines.join('\n');
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 26px; height: 26px;
+      width: 28px; height: 28px;
       border-radius: 6px;
       background: var(--navy-3);
-      border: 1px solid var(--blue-line);
+      border: 1px solid rgba(var(--brand-rgb), 0.4);
+      color: var(--brand);
+    }
+    .flow-source-mark.is-multicolor { background: rgba(255, 255, 255, 0.04); }
+    .flow-source-mark svg { display: block; }
+    .flow-source-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Tooltip showing the underlying products for a vendor. Positioned to the right
+       of the chip (over the diagram beam area). Hidden on small screens. */
+    .flow-source-tooltip {
+      position: absolute;
+      top: 50%;
+      left: calc(100% + 12px);
+      transform: translateY(-50%);
+      background: var(--navy);
+      border: 1px solid rgba(var(--brand-rgb), 0.4);
+      border-radius: 8px;
+      padding: 10px 14px;
       font-family: 'Geist Mono', monospace;
       font-size: 11px;
-      font-weight: 600;
-      color: var(--white);
-      letter-spacing: -.02em;
+      line-height: 1.55;
+      color: var(--white-dim);
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s;
+      z-index: 5;
     }
-    .flow-source[data-group="agent"]    .flow-source-mark { color: var(--accent-blue); border-color: rgba(var(--accent-blue-rgb), 0.4); }
-    .flow-source[data-group="provider"] .flow-source-mark { color: var(--green);       border-color: rgba(var(--green-rgb), 0.4); }
-    .flow-source[data-group="obs"]      .flow-source-mark { color: var(--amber);       border-color: rgba(245, 166, 35, 0.4); }
-    .flow-source-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .flow-source:hover .flow-source-tooltip,
+    .flow-source:focus-within .flow-source-tooltip {
+      opacity: 1;
+    }
+    .flow-source-tooltip-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .flow-source-tooltip-dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--brand);
+      flex-shrink: 0;
+    }
+    @media (max-width: 820px) {
+      .flow-source-tooltip { display: none; }
+    }
 
     .flow-center {
       position: relative;
