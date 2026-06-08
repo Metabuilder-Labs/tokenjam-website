@@ -298,6 +298,21 @@ const installJoined = installLines.join('\n');
                 </a>
               </li>
             ))}
+            {/* Observe sits with the analyzers but is visually neutral (no analyzer
+                accent color), matching the Nav dropdown treatment. */}
+            <li
+              class="flow-node flow-product flow-product--observe"
+              data-id="observe"
+              style="--product-accent: var(--white); --product-accent-rgb: 237, 237, 237;"
+            >
+              <a href="/observe" class="flow-product-link">
+                <span class="flow-product-icon" aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
+                <span class="flow-product-name">Observe</span>
+                <span class="flow-product-arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -816,6 +831,17 @@ const installJoined = installLines.join('\n');
       flex-shrink: 0;
       box-shadow: 0 0 8px rgba(var(--product-accent-rgb, 255, 255, 255), 0.6);
     }
+    /* Observe gets an icon instead of a colored dot — neutral treatment matches
+       the Nav dropdown so Observe reads as "infrastructure" not "5th analyzer". */
+    .flow-product-icon {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px; height: 18px;
+      color: var(--white-faint);
+    }
+    .flow-product--observe:hover .flow-product-icon { color: var(--white); }
     .flow-product-name {
       font-family: 'Geist', sans-serif;
       font-size: 14px;
