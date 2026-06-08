@@ -1,11 +1,22 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { products as productCatalog } from '@/data/products';
+import { products as productCatalog, productIcons } from '@/data/products';
 
 // Per-analyzer accent (single source of truth in src/data/products.ts).
 const accentBySlug = Object.fromEntries(
   productCatalog.map((p) => [p.slug, { accent: p.accent, accentRgb: p.accentRgb }])
 );
+
+// Inline SVGs for the six observability features. Same metaphors as the
+// homepage strip; tones applied via `data-tone` attribute (see CSS).
+const featureIcons: Record<string, string> = {
+  cost:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+  trace:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="14" height="3" rx="1"/><rect x="6" y="10" width="14" height="3" rx="1"/><rect x="3" y="16" width="11" height="3" rx="1"/></svg>`,
+  alert:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+  drift:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
+  schema: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 14l2 2 4-4"/></svg>`,
+  ui:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3M7 9h2M7 12h4"/></svg>`,
+};
 
 // Six observability features. Each is a real shipped capability backed by
 // the OSS CLI today. Keep the copy honest — no claims about features that
@@ -15,31 +26,43 @@ const features = [
     name: 'Real-time cost tracking',
     body: "Every LLM call is priced as it happens using TokenJam's local pricing table. Spend breaks down by agent, model, session, and tool. Budget alerts fire before you hit the limit, not after.",
     cmd: 'tj cost --since 7d',
+    icon: featureIcons.cost,
+    tone: 'green',
   },
   {
     name: 'Trace waterfalls',
-    body: 'Every session is captured as a full OpenTelemetry span tree. See which tools ran, in what order, with what arguments, and how long each step took — in the local web UI or the CLI.',
+    body: "Every session is captured as a full OpenTelemetry span tree. See which tools ran, in what order, with what arguments, and how long each step took, in the local web UI or the CLI.",
     cmd: 'tj traces',
+    icon: featureIcons.trace,
+    tone: 'blue',
   },
   {
     name: 'Sensitive-action alerts',
-    body: "Configure any tool call as a sensitive action (send_email, delete_file, submit_form) and get notified instantly. 13 alert types · 6 channels: ntfy push (free, phone-friendly), Discord, Telegram, webhook, file, stdout.",
+    body: "Configure any tool call as a sensitive action (send_email, delete_file, submit_form) and get notified instantly. 13 alert types, 6 channels: ntfy push (free, phone-friendly), Discord, Telegram, webhook, file, stdout.",
     cmd: 'tj alerts',
+    icon: featureIcons.alert,
+    tone: 'red',
   },
   {
     name: 'Behavioral drift detection',
-    body: "TokenJam builds a Z-score baseline from your agent's real behavior — token counts, tool sequences, output shapes. When something drifts (a prompt tweak, a model update, a dep bump), you get a drift_detected alert at session end. No LLM-on-LLM evaluation required.",
+    body: "TokenJam builds a Z-score baseline from your agent's real behavior (token counts, tool sequences, output shapes). When something drifts (a prompt tweak, a model update, a dep bump), you get a drift_detected alert at session end. No LLM-on-LLM evaluation required.",
     cmd: 'tj drift',
+    icon: featureIcons.drift,
+    tone: 'amber',
   },
   {
     name: 'Schema validation',
     body: "Declare a JSON Schema for any tool's output or let TokenJam infer one from a few sessions. Schema violations are caught at ingest and surface as schema_violation alerts.",
     cmd: 'tj tools',
+    icon: featureIcons.schema,
+    tone: 'invert-light',
   },
   {
     name: 'Local web UI + REST API',
-    body: "`tj serve` runs a local dashboard at 127.0.0.1:7391 with status, traces, cost breakdown, alerts, budget, and drift. Prometheus metrics at /metrics. No cloud, no signup — runs entirely on your machine.",
+    body: "`tj serve` runs a local dashboard at 127.0.0.1:7391 with status, traces, cost breakdown, alerts, budget, and drift. Prometheus metrics at /metrics. No cloud, no signup, runs entirely on your machine.",
     cmd: 'tj serve',
+    icon: featureIcons.ui,
+    tone: 'invert-dark',
   },
 ];
 
@@ -86,7 +109,8 @@ const analyzerLinks = [
         </header>
         <ul class="observe-features-list">
           {features.map((f) => (
-            <li class="observe-feature">
+            <li class="observe-feature" data-tone={f.tone}>
+              <span class="observe-feature-icon" aria-hidden="true" set:html={f.icon}></span>
               <div class="observe-feature-body">
                 <h3>{f.name}</h3>
                 <p>{f.body}</p>
@@ -110,13 +134,14 @@ const analyzerLinks = [
         <div class="observe-bridge-grid">
           {analyzerLinks.map((a) => {
             const c = accentBySlug[a.slug] ?? { accent: '#94A3B8', accentRgb: '148, 163, 184' };
+            const icon = productIcons[a.slug as keyof typeof productIcons] ?? '';
             return (
               <a
                 href={`/products/${a.slug}`}
                 class="observe-bridge-card"
                 style={`--product-accent: ${c.accent}; --product-accent-rgb: ${c.accentRgb};`}
               >
-                <span class="observe-bridge-dot" aria-hidden="true"></span>
+                <span class="observe-bridge-icon" aria-hidden="true" set:html={icon}></span>
                 <h3>{a.name}</h3>
                 <p>Needs {a.needs}.</p>
                 <span class="observe-bridge-arrow" aria-hidden="true">→</span>
@@ -210,6 +235,25 @@ const analyzerLinks = [
       flex-direction: column;
       gap: 14px;
     }
+    .observe-feature-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--white-ghost);
+      color: var(--white);
+      flex-shrink: 0;
+    }
+    .observe-feature-icon svg { width: 22px; height: 22px; }
+    /* Match the homepage strip tones so feature identity is consistent across surfaces. */
+    .observe-feature[data-tone="green"] .observe-feature-icon { background: rgba(34, 197, 94, 0.14); color: #22C55E; }
+    .observe-feature[data-tone="blue"]  .observe-feature-icon { background: rgba(59, 130, 246, 0.14); color: #3B82F6; }
+    .observe-feature[data-tone="red"]   .observe-feature-icon { background: rgba(239, 68, 68, 0.14); color: #EF4444; }
+    .observe-feature[data-tone="amber"] .observe-feature-icon { background: rgba(245, 158, 11, 0.16); color: #F59E0B; }
+    .observe-feature[data-tone="invert-light"] .observe-feature-icon { background: var(--white); color: var(--navy); }
+    .observe-feature[data-tone="invert-dark"]  .observe-feature-icon { background: var(--navy); color: var(--white); border: 1px solid var(--blue-line); }
     .observe-feature h3 {
       font-family: 'Geist', sans-serif;
       font-size: 17px;
@@ -250,7 +294,7 @@ const analyzerLinks = [
     .observe-bridge-card {
       position: relative;
       display: block;
-      padding: 22px 26px 22px 38px;
+      padding: 22px 26px;
       background: var(--navy-2);
       border: 1px solid var(--blue-line);
       border-top: 2px solid var(--product-accent, var(--blue-line));
@@ -264,16 +308,18 @@ const analyzerLinks = [
       border-top-color: var(--product-accent);
       box-shadow: 0 10px 24px rgba(var(--product-accent-rgb), 0.10);
     }
-    .observe-bridge-dot {
-      position: absolute;
-      top: 28px;
-      left: 22px;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--product-accent);
-      box-shadow: 0 0 8px rgba(var(--product-accent-rgb), 0.6);
+    .observe-bridge-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(var(--product-accent-rgb), 0.12);
+      color: var(--product-accent);
+      margin-bottom: 12px;
     }
+    .observe-bridge-icon svg { width: 18px; height: 18px; }
     .observe-bridge-card h3 {
       font-family: 'Geist', sans-serif;
       font-size: 17px;
