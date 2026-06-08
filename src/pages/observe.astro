@@ -1,5 +1,11 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { products as productCatalog } from '@/data/products';
+
+// Per-analyzer accent (single source of truth in src/data/products.ts).
+const accentBySlug = Object.fromEntries(
+  productCatalog.map((p) => [p.slug, { accent: p.accent, accentRgb: p.accentRgb }])
+);
 
 // Six observability features. Each is a real shipped capability backed by
 // the OSS CLI today. Keep the copy honest — no claims about features that
@@ -102,13 +108,21 @@ const analyzerLinks = [
           </p>
         </header>
         <div class="observe-bridge-grid">
-          {analyzerLinks.map((a) => (
-            <a href={`/products/${a.slug}`} class="observe-bridge-card">
-              <h3>{a.name}</h3>
-              <p>Needs {a.needs}.</p>
-              <span class="observe-bridge-arrow" aria-hidden="true">→</span>
-            </a>
-          ))}
+          {analyzerLinks.map((a) => {
+            const c = accentBySlug[a.slug] ?? { accent: '#94A3B8', accentRgb: '148, 163, 184' };
+            return (
+              <a
+                href={`/products/${a.slug}`}
+                class="observe-bridge-card"
+                style={`--product-accent: ${c.accent}; --product-accent-rgb: ${c.accentRgb};`}
+              >
+                <span class="observe-bridge-dot" aria-hidden="true"></span>
+                <h3>{a.name}</h3>
+                <p>Needs {a.needs}.</p>
+                <span class="observe-bridge-arrow" aria-hidden="true">→</span>
+              </a>
+            );
+          })}
         </div>
       </section>
 
@@ -236,23 +250,36 @@ const analyzerLinks = [
     .observe-bridge-card {
       position: relative;
       display: block;
-      padding: 22px 26px;
+      padding: 22px 26px 22px 38px;
       background: var(--navy-2);
       border: 1px solid var(--blue-line);
+      border-top: 2px solid var(--product-accent, var(--blue-line));
       border-radius: 12px;
       text-decoration: none;
-      transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+      transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
     }
     .observe-bridge-card:hover {
-      background: rgba(var(--accent-blue-rgb), 0.06);
-      border-color: rgba(var(--accent-blue-rgb), 0.4);
+      transform: translateY(-2px);
+      border-color: rgba(var(--product-accent-rgb), 0.35);
+      border-top-color: var(--product-accent);
+      box-shadow: 0 10px 24px rgba(var(--product-accent-rgb), 0.10);
+    }
+    .observe-bridge-dot {
+      position: absolute;
+      top: 28px;
+      left: 22px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--product-accent);
+      box-shadow: 0 0 8px rgba(var(--product-accent-rgb), 0.6);
     }
     .observe-bridge-card h3 {
       font-family: 'Geist', sans-serif;
       font-size: 17px;
       font-weight: 600;
       margin: 0 0 6px;
-      color: var(--accent-blue);
+      color: var(--product-accent, var(--white));
     }
     .observe-bridge-card p {
       font-family: 'Geist', sans-serif;
@@ -265,10 +292,12 @@ const analyzerLinks = [
       position: absolute;
       top: 24px;
       right: 26px;
-      color: var(--accent-blue);
+      color: var(--product-accent, var(--white-faint));
       font-family: 'Geist Mono', monospace;
       font-size: 16px;
+      transition: transform .15s;
     }
+    .observe-bridge-card:hover .observe-bridge-arrow { transform: translateX(3px); }
     @media (max-width: 820px) {
       .observe-bridge-grid { grid-template-columns: 1fr; }
     }

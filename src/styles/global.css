@@ -151,6 +151,17 @@ nav.tj-nav {
   margin: 6px 8px;
   background: rgba(var(--accent-rgb), 0.10);
 }
+.nav-products-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--white-faint);
+}
+.nav-products-item--observe .nav-products-name { color: var(--white); }
+.nav-products-item--observe:hover .nav-products-icon { color: var(--white); }
 
 .theme-picker { position: relative; }
 .theme-toggle {

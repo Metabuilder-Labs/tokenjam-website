@@ -1151,30 +1151,25 @@ const installJoined = installLines.join('\n');
     }
 
     /* ── OBSERVABILITY STRIP ─────────────────────────
-       Sits AFTER "How it works" (the cost-optimization story) so the analyzer
-       narrative leads. Distinct TokenJam-blue treatment with a top-anchored
-       radial glow + accent-bordered cards that lift on hover. */
+       Site-standard neutral treatment: navy-2 surface, hairline border, no
+       colored glow. Accent color used only where appropriate (small icon
+       chip, link), matching the rest of the site. */
     .observe-strip {
       position: relative;
-      margin: 0 48px 80px;
+      margin: 0 auto 80px;
       padding: 64px 48px;
-      background:
-        radial-gradient(ellipse 100% 70% at 50% 0%, rgba(var(--accent-blue-rgb), 0.16), transparent 65%),
-        var(--navy-2);
-      border: 1px solid rgba(var(--accent-blue-rgb), 0.18);
-      border-radius: 18px;
+      background: var(--navy-2);
+      border: 1px solid var(--blue-line);
+      border-radius: 14px;
       max-width: 1440px;
-      margin-left: auto;
-      margin-right: auto;
-      overflow: hidden;
     }
     .observe-head { margin-bottom: 40px; }
     .observe-eyebrow {
       display: inline-block;
       padding: 4px 12px;
       border-radius: 999px;
-      background: rgba(var(--accent-blue-rgb), 0.14);
-      color: var(--accent-blue);
+      background: var(--white-ghost);
+      color: var(--white-faint);
       font-family: 'Geist Mono', monospace;
       font-size: 11px;
       letter-spacing: .1em;
@@ -1193,26 +1188,22 @@ const installJoined = installLines.join('\n');
       padding: 24px 26px;
       background: var(--navy);
       border: 1px solid var(--blue-line);
-      border-top: 2px solid rgba(var(--accent-blue-rgb), 0.45);
       border-radius: 12px;
-      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+      transition: transform 180ms ease, border-color 180ms ease;
     }
     .observe-card:hover {
-      transform: translateY(-3px);
-      border-top-color: var(--accent-blue);
-      box-shadow: 0 14px 32px rgba(var(--accent-blue-rgb), 0.12),
-                  0 2px 0 rgba(var(--accent-blue-rgb), 0.06) inset;
+      transform: translateY(-2px);
+      border-color: rgba(var(--accent-rgb), 0.22);
     }
     .observe-icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: rgba(var(--accent-blue-rgb), 0.14);
-      border: 1px solid rgba(var(--accent-blue-rgb), 0.22);
-      color: var(--accent-blue);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--white-ghost);
+      color: var(--white);
       margin-bottom: 14px;
     }
     .observe-h3 {
@@ -1234,7 +1225,7 @@ const installJoined = installLines.join('\n');
       font-family: 'Geist Mono', monospace;
       font-size: .9em;
       padding: 1px 5px;
-      background: rgba(var(--accent-blue-rgb), 0.10);
+      background: var(--white-ghost);
       border-radius: 4px;
       color: var(--white);
     }
@@ -1249,13 +1240,13 @@ const installJoined = installLines.join('\n');
       color: var(--accent-blue);
       text-decoration: none;
       padding: 8px 16px;
-      border: 1px solid rgba(var(--accent-blue-rgb), 0.4);
+      border: 1px solid rgba(var(--accent-rgb), 0.18);
       border-radius: 999px;
       transition: background-color .15s, border-color .15s;
     }
     .observe-cta-link:hover {
-      background: rgba(var(--accent-blue-rgb), 0.10);
-      border-color: var(--accent-blue);
+      background: var(--white-ghost);
+      border-color: rgba(var(--accent-rgb), 0.35);
     }
     .observe-cta-link span { display: inline-block; transition: transform .15s; }
     .observe-cta-link:hover span { transform: translateX(3px); }
