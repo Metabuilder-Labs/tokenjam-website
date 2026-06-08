@@ -50,9 +50,9 @@ const productsActive = isActive('/products');
         ))}
         <div class="nav-products-sep" aria-hidden="true"></div>
         <a href="/observe" role="menuitem" class="nav-products-item" aria-current={isActive('/observe') ? 'page' : undefined}>
-          <span class="nav-products-dot" aria-hidden="true" style="background:#94A3B8; box-shadow:0 0 8px #94A3B888;"></span>
+          <span class="nav-products-dot" aria-hidden="true" style="background:var(--accent-blue); box-shadow:0 0 8px rgba(var(--accent-blue-rgb), 0.55);"></span>
           <div class="nav-products-text">
-            <span class="nav-products-name" style="color:#94A3B8">Observe</span>
+            <span class="nav-products-name" style="color:var(--accent-blue)">Observe</span>
             <span class="nav-products-tag">Traces, drift, alerts, schema</span>
           </div>
         </a>
