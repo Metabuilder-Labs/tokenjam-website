@@ -453,42 +453,42 @@ const installJoined = installLines.join('\n');
       </p>
     </header>
     <div class="observe-grid">
-      <div class="observe-card">
+      <div class="observe-card" data-tone="green">
         <div class="observe-icon" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         </div>
         <h3 class="observe-h3">Real-time cost tracking</h3>
         <p>Every LLM call priced as it happens. Spend per agent, model, session, and tool, visible the moment it occurs.</p>
       </div>
-      <div class="observe-card">
+      <div class="observe-card" data-tone="blue">
         <div class="observe-icon" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="14" height="3" rx="1"/><rect x="6" y="10" width="14" height="3" rx="1"/><rect x="3" y="16" width="11" height="3" rx="1"/></svg>
         </div>
         <h3 class="observe-h3">Trace waterfalls</h3>
         <p>Full span tree per session. See exactly which tools ran, in what order, and how long each step took.</p>
       </div>
-      <div class="observe-card">
+      <div class="observe-card" data-tone="red">
         <div class="observe-icon" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         </div>
         <h3 class="observe-h3">Sensitive-action alerts</h3>
         <p>13 alert types, 6 channels (ntfy, Discord, Telegram, webhook, file, stdout). Get pinged before damage is done.</p>
       </div>
-      <div class="observe-card">
+      <div class="observe-card" data-tone="amber">
         <div class="observe-icon" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         </div>
         <h3 class="observe-h3">Drift detection</h3>
         <p>Z-score baselines flag when your agent starts behaving differently. No LLM-on-LLM evaluation required.</p>
       </div>
-      <div class="observe-card">
+      <div class="observe-card" data-tone="invert-light">
         <div class="observe-icon" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 14l2 2 4-4"/></svg>
         </div>
         <h3 class="observe-h3">Schema validation</h3>
         <p>Declare a JSON Schema for your tools or let TokenJam infer one. Violations are caught the instant they occur.</p>
       </div>
-      <div class="observe-card">
+      <div class="observe-card" data-tone="invert-dark">
         <div class="observe-icon" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3M7 9h2M7 12h4"/></svg>
         </div>
@@ -1249,6 +1249,16 @@ const installJoined = installLines.join('\n');
       color: var(--white);
       margin-bottom: 14px;
     }
+    /* Per-card icon tones. Colored variants share the analyzer accents
+       (matches Trim/Downsize/Cache/Script for visual coherence). The two
+       neutral inverts use the theme tokens so they flip correctly between
+       light and dark mode. */
+    .observe-card[data-tone="green"] .observe-icon { background: rgba(34, 197, 94, 0.14); color: #22C55E; }
+    .observe-card[data-tone="blue"]  .observe-icon { background: rgba(59, 130, 246, 0.14); color: #3B82F6; }
+    .observe-card[data-tone="red"]   .observe-icon { background: rgba(239, 68, 68, 0.14); color: #EF4444; }
+    .observe-card[data-tone="amber"] .observe-icon { background: rgba(245, 158, 11, 0.16); color: #F59E0B; }
+    .observe-card[data-tone="invert-light"] .observe-icon { background: var(--white); color: var(--navy); }
+    .observe-card[data-tone="invert-dark"]  .observe-icon { background: var(--navy); color: var(--white); border: 1px solid var(--blue-line); }
     .observe-h3 {
       font-family: 'Geist', sans-serif;
       font-size: 16px;
