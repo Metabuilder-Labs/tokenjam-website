@@ -1,6 +1,6 @@
 ---
 import Logo from './Logo.astro';
-import { products as productCatalog } from '@/data/products';
+import { products as productCatalog, productIcons } from '@/data/products';
 
 const path = Astro.url.pathname;
 function isActive(prefix: string) {
@@ -17,6 +17,7 @@ const products = productCatalog.map((p) => ({
   name: p.name,
   tagline: taglines[p.slug] ?? '',
   accent: p.accent,
+  icon: productIcons[p.slug] ?? '',
 }));
 const productsActive = isActive('/products');
 ---
@@ -41,7 +42,7 @@ const productsActive = isActive('/products');
       <div class="nav-products-menu" role="menu" aria-labelledby="nav-products-toggle">
         {products.map((p) => (
           <a href={`/products/${p.slug}`} role="menuitem" class="nav-products-item">
-            <span class="nav-products-dot" aria-hidden="true" style={`background:${p.accent}; box-shadow:0 0 8px ${p.accent}88;`}></span>
+            <span class="nav-products-icon" aria-hidden="true" style={`color:${p.accent}`} set:html={p.icon}></span>
             <div class="nav-products-text">
               <span class="nav-products-name" style={`color:${p.accent}`}>{p.name}</span>
               <span class="nav-products-tag">{p.tagline}</span>

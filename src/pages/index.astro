@@ -1,20 +1,12 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { products as productCatalog } from '@/data/products';
+import { products as productCatalog, productIcons } from '@/data/products';
 
 // Per-product accents (single source of truth lives in src/data/products.ts).
 const accentBySlug = Object.fromEntries(
   productCatalog.map((p) => [p.slug, { accent: p.accent, accentRgb: p.accentRgb }])
 );
 
-// Per-analyzer icons used in the hero right column. Each metaphor communicates
-// what the analyzer does (shrink, cut, store, run).
-const productIcons: Record<string, string> = {
-  downsize: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/><path d="M3 21l7-7"/></svg>`,
-  trim:     `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>`,
-  cache:    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>`,
-  script:   `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
-};
 
 // Hero ingest sources, grouped by vendor (10 cards total). Each card carries the
 // brand color (for the chip mark) and a list of underlying products surfaced via
@@ -388,7 +380,10 @@ const installJoined = installLines.join('\n');
             aria-label={`Read more about ${p.name}`}
           ></a>
           <header class="product-card-head">
-            <h3 class="product-card-name">{p.name}</h3>
+            <h3 class="product-card-name">
+              <span class="product-card-icon" aria-hidden="true" set:html={productIcons[p.slug as keyof typeof productIcons] ?? ''}></span>
+              <span>{p.name}</span>
+            </h3>
             <p class="product-card-blurb">{p.blurb}</p>
           </header>
           <div class="terminal product-card-term">
@@ -844,6 +839,7 @@ const installJoined = installLines.join('\n');
       color: var(--product-accent, var(--white-faint));
       filter: drop-shadow(0 0 4px rgba(var(--product-accent-rgb, 255, 255, 255), 0.45));
     }
+    .flow-product-icon svg { width: 14px; height: 14px; }
     .flow-product--observe .flow-product-icon {
       color: var(--white-faint);
       filter: none;
@@ -1069,6 +1065,9 @@ const installJoined = installLines.join('\n');
     }
     .product-card-head { display: flex; flex-direction: column; gap: 6px; }
     .product-card-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       font-family: 'Geist', sans-serif;
       font-size: 22px;
       font-weight: 600;
@@ -1076,6 +1075,17 @@ const installJoined = installLines.join('\n');
       color: var(--product-accent, var(--white));
       margin: 0;
     }
+    .product-card-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: rgba(var(--product-accent-rgb, 255, 255, 255), 0.10);
+      color: var(--product-accent, var(--white));
+    }
+    .product-card-icon svg { width: 16px; height: 16px; }
     .product-card-blurb {
       color: var(--white-dim);
       font-size: 15px;
