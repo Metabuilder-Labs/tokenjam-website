@@ -2,13 +2,15 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 
 // The 5 tiers — copy stays in sync with tokenjam/cli/cmd_tokenmaxx.py.
-// If the CLI thresholds or quips change, update both.
+// Primary classifier is the multiplier vs the user's plan fee; absolute
+// USD/mo thresholds are an API-user fallback calibrated against Max-5x
+// ($100/mo). If the CLI thresholds or quips change, update both.
 const tiers = [
-  { emoji: '💧',   label: 'TokenSipper',    range: '< $50/mo',           quip: 'Are you even using AI?' },
-  { emoji: '🥱',   label: 'TokenModerator', range: '$50 – $200/mo',      quip: 'Mostly reasonable. Try harder.' },
-  { emoji: '💸',   label: 'TokenMaxxer',    range: '$200 – $500/mo',     quip: 'You\'re paying Anthropic\'s rent.' },
-  { emoji: '🔥',   label: 'TokenChad',      range: '$500 – $1,500/mo',   quip: 'You\'re paying their interns\' rent too.' },
-  { emoji: '🔥🔥', label: 'TokenGigaChad', range: '$1,500+/mo',          quip: 'Touch grass. Then run `tj optimize`.' },
+  { emoji: '💧',   label: 'TokenSipper',    range: '< 1× plan',     apiFallback: '< $100/mo',      quip: 'Are you even using AI?' },
+  { emoji: '🥱',   label: 'TokenModerator', range: '1× – 4× plan',  apiFallback: '$100 – $400/mo', quip: 'Mostly reasonable. Try harder.' },
+  { emoji: '💸',   label: 'TokenMaxxer',    range: '4× – 10× plan', apiFallback: '$400 – $1,000/mo', quip: 'You\'re paying Anthropic\'s rent.' },
+  { emoji: '🔥',   label: 'TokenChad',      range: '10× – 20× plan',apiFallback: '$1,000 – $2,000/mo', quip: 'You\'re paying their interns\' rent too.' },
+  { emoji: '🔥🔥', label: 'TokenGigaChad', range: '20×+ plan',     apiFallback: '$2,000+/mo',     quip: 'Touch grass. Then run `tj optimize`.' },
 ];
 
 // Three commands the tweet promises. Keep these verbatim with the social copy.
@@ -18,6 +20,12 @@ const installLines = [
   'tj tokenmaxx',
 ];
 const installJoined = installLines.join('\n');
+
+// Pre-filled X (twitter) share intent. Generic enough that the user can
+// edit before posting; carries the @tokenjamdev mention and the page URL.
+const shareText = "Just discovered my #TokenMaxx tier with @tokenjamdev. Find yours:";
+const shareUrl = "https://tokenjam.dev/tokenmaxxing";
+const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
 ---
 <BaseLayout
   title="How hard are you TokenMaxxing? — TokenJam"
@@ -67,15 +75,63 @@ const installJoined = installLines.join('\n');
         </div>
       </section>
 
+      <!-- SAMPLE OUTPUT — show what the screenshot will look like before
+           the user installs. Verbatim rendering of the CLI Panel output
+           with the same green / teal accents so the page and terminal
+           feel like the same artifact. -->
+      <section class="tmx-sample-section">
+        <p class="tmx-sample-caption">Here's what you'll see — a real run for a Max-5x user.</p>
+        <pre class="tmx-sample"><span class="tmx-sample-border">╭─ </span><span class="tmx-sample-title">TokenJam TokenMaxxing Report</span><span class="tmx-sample-border"> ─────────────────────────────────────────────╮
+│                                                                              │
+│  🔥🔥 </span><span class="tmx-sample-bold">You're a TokenGigaChad.</span><span class="tmx-sample-border">                                                </span>
+<span class="tmx-sample-border">│                                                                              │
+│  Touch grass. Then run </span><span class="tmx-sample-green">tj optimize</span><span class="tmx-sample-border">.                                          </span>
+<span class="tmx-sample-border">│                                                                              │
+│  </span><span class="tmx-sample-bold">$4056.82</span><span class="tmx-sample-border"> in last 30d across </span><span class="tmx-sample-bold">33</span><span class="tmx-sample-border"> sessions.                                    </span>
+<span class="tmx-sample-border">│  That's </span><span class="tmx-sample-bold">40.6×</span><span class="tmx-sample-border"> your </span><span class="tmx-sample-bold">Max 5x plan</span><span class="tmx-sample-border"> cost (</span><span class="tmx-sample-bold">$100/mo flat</span><span class="tmx-sample-border">).                          </span>
+<span class="tmx-sample-border">│                                                                              │
+│  💡 No obvious savings flagged yet — run </span><span class="tmx-sample-green">tj optimize</span><span class="tmx-sample-border"> for the full report     </span>
+<span class="tmx-sample-border">│  once you have more data.                                                    </span>
+<span class="tmx-sample-border">│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+  </span><span class="tmx-sample-teal">Share your tier: screenshot the above and tag </span><span class="tmx-sample-teal-bold">@tokenjamdev</span></pre>
+      </section>
+
+      <!-- SHARE-ON-X strip — moved up under the install/sample so the
+           CTA is the next thing you see after "here's what you'll get."
+           Brighter background + X branding + pre-filled intent URL so
+           a single click composes a tweet. -->
+      <section class="tmx-share-strip">
+        <div class="tmx-share-inner">
+          <div class="tmx-share-icon" aria-hidden="true">
+            <svg viewBox="0 0 1200 1227" fill="currentColor"><path d="M714.163 519.284 1160.89 0H1055.03L667.137 450.887 357.328 0H0L468.492 681.821 0 1226.37H105.866L515.491 750.218 842.672 1226.37H1200L714.137 519.284h.026ZM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854v-.026Z"/></svg>
+          </div>
+          <div class="tmx-share-body">
+            <h2>Post your tier on X.</h2>
+            <p>Screenshot your output, tag <strong>@tokenjamdev</strong>, and we'll boost the best ones.</p>
+          </div>
+          <a
+            class="tmx-share-btn"
+            href={xIntent}
+            target="_blank"
+            rel="noopener noreferrer"
+            onclick="window.trackEvent && window.trackEvent('cta_click', 'conversion', 'tokenmaxx_share_on_x')"
+          >
+            <svg width="14" height="14" viewBox="0 0 1200 1227" fill="currentColor" aria-hidden="true"><path d="M714.163 519.284 1160.89 0H1055.03L667.137 450.887 357.328 0H0L468.492 681.821 0 1226.37H105.866L515.491 750.218 842.672 1226.37H1200L714.137 519.284h.026ZM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854v-.026Z"/></svg>
+            Share on X
+          </a>
+        </div>
+      </section>
+
       <!-- TIER LADDER -->
       <section class="tmx-tiers-section">
         <header class="section-head">
           <h2 class="section-h2">The 5 tiers</h2>
           <p class="section-lede">
-            Classification is based on the <strong>implied API value</strong> of your last 30 days of Claude Code usage —
-            what your tokens would cost at <a href="https://platform.claude.com/docs/en/docs/about-claude/pricing" target="_blank" rel="noopener noreferrer">Anthropic's per-token rates</a>,
-            regardless of whether you actually pay per-token (API) or pay a flat subscription fee (Pro / Max-5x / Max-20x).
-            If you're on a subscription plan, the output also shows the multiplier vs your flat fee.
+            Classification is based on <strong>how hard you're maxxing your plan</strong> —
+            the multiplier between your last-30-days
+            <a href="https://platform.claude.com/docs/en/docs/about-claude/pricing" target="_blank" rel="noopener noreferrer">implied API value</a>
+            and your plan's flat monthly fee. Works for <strong>Pro</strong> ($20), <strong>Max-5x</strong> ($100), and <strong>Max-20x</strong> ($200) subscriptions.
           </p>
         </header>
         <ol class="tmx-tiers">
@@ -92,6 +148,11 @@ const installJoined = installLines.join('\n');
             </li>
           ))}
         </ol>
+        <p class="tmx-tiers-footnote">
+          API users (pay per token, no plan to multiply against) get equivalent absolute thresholds —
+          calibrated against Max-5x so the tier name carries the same meaning:
+          <span class="tmx-tiers-fallback">{tiers.map(t => `${t.label.replace('Token','')} ${t.apiFallback}`).join(' · ')}</span>.
+        </p>
       </section>
 
       <!-- WHAT NEXT -->
@@ -108,15 +169,6 @@ const installJoined = installLines.join('\n');
           <a class="btn-secondary" href="/products/downsize" onclick="window.trackEvent && window.trackEvent('cta_click', 'engagement', 'tokenmaxx_to_downsize')">See how Downsize works →</a>
           <a class="btn-secondary" href="/observe" onclick="window.trackEvent && window.trackEvent('cta_click', 'engagement', 'tokenmaxx_to_observe')">Or the full observability stack →</a>
         </div>
-      </section>
-
-      <!-- SHARE -->
-      <section class="tmx-share-section">
-        <h2 class="tmx-share-h2">Post your tier.</h2>
-        <p>
-          Run <code>tj tokenmaxx</code>, screenshot the output, and post with
-          <strong>#tokenmaxx</strong>. We'll boost the best ones.
-        </p>
       </section>
 
     </article>
@@ -291,41 +343,140 @@ const installJoined = installLines.join('\n');
       flex-wrap: wrap;
     }
 
-    /* SHARE */
-    .tmx-share-section {
-      text-align: center;
-      padding: 40px 28px;
-      background: rgba(var(--accent-blue-rgb), 0.05);
-      border: 1px solid rgba(var(--accent-blue-rgb), 0.20);
-      border-radius: 16px;
+    /* SAMPLE OUTPUT — the screenshot preview block. Renders the exact
+       Panel output of `tj tokenmaxx` with the same green / teal color
+       cues so the page artifact reads as identical to the terminal one. */
+    .tmx-sample-section {
+      margin: 0 0 28px;
     }
-    .tmx-share-h2 {
+    .tmx-sample-caption {
       font-family: 'Geist', sans-serif;
-      font-size: clamp(20px, 2.4vw, 26px);
-      font-weight: 600;
-      letter-spacing: -0.01em;
+      font-size: 13px;
+      color: var(--white-faint);
+      text-align: center;
       margin: 0 0 12px;
     }
-    .tmx-share-section p {
+    .tmx-sample {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.4;
+      background: var(--navy-2);
+      color: var(--white-faint);
+      border: 1px solid var(--blue-line);
+      border-radius: 10px;
+      padding: 18px 20px;
+      overflow-x: auto;
+      margin: 0;
+      white-space: pre;
+    }
+    .tmx-sample-border { color: var(--white-faint); opacity: 0.55; }
+    .tmx-sample-title  { color: var(--white); font-weight: 600; }
+    .tmx-sample-bold   { color: var(--white); font-weight: 600; }
+    .tmx-sample-green  { color: #22C55E;     font-weight: 600; }
+    .tmx-sample-teal   { color: #22D3EE; }
+    .tmx-sample-teal-bold { color: #22D3EE; font-weight: 700; }
+
+    /* SHARE-ON-X strip — bright, pinned right under the sample so the
+       CTA sits where the eye lands after reading the preview. Uses X
+       brand color (near-black with high-contrast border) to read as
+       platform-specific without competing with the rest of the page. */
+    .tmx-share-strip {
+      margin: 0 0 80px;
+      padding: 22px 24px;
+      background: linear-gradient(
+        135deg,
+        rgba(34, 211, 238, 0.10) 0%,
+        rgba(34, 211, 238, 0.04) 100%
+      );
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      border-radius: 16px;
+    }
+    .tmx-share-inner {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .tmx-share-icon {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--white);
+    }
+    .tmx-share-icon svg { width: 20px; height: 20px; }
+    .tmx-share-body {
+      flex: 1;
+      min-width: 200px;
+    }
+    .tmx-share-body h2 {
       font-family: 'Geist', sans-serif;
-      font-size: 15px;
-      line-height: 1.55;
+      font-size: clamp(18px, 2vw, 22px);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 0 0 4px;
+      color: var(--white);
+    }
+    .tmx-share-body p {
+      font-family: 'Geist', sans-serif;
+      font-size: 14px;
       color: var(--white-faint);
       margin: 0;
     }
-    .tmx-share-section code {
-      font-family: 'Geist Mono', monospace;
-      font-size: 0.92em;
-      padding: 2px 6px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 4px;
+    .tmx-share-body strong {
       color: var(--white);
+    }
+    .tmx-share-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: var(--white);
+      color: #0F1115;
+      border-radius: 8px;
+      font-family: 'Geist', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 120ms ease, background-color 120ms ease;
+      flex-shrink: 0;
+    }
+    .tmx-share-btn:hover {
+      background: #f4f4f4;
+      transform: translateY(-1px);
+    }
+    .tmx-share-btn svg { color: #0F1115; }
+
+    /* Tier-ladder footnote — single line of API-fallback thresholds at
+       the bottom of the tier list so the visual stays multiplier-first
+       but API users still see their equivalent absolute thresholds. */
+    .tmx-tiers-footnote {
+      font-family: 'Geist', sans-serif;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--white-faint);
+      margin: 18px 4px 0;
+      text-align: center;
+    }
+    .tmx-tiers-fallback {
+      display: block;
+      margin-top: 4px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11.5px;
+      color: var(--white);
+      opacity: 0.85;
     }
 
     @media (max-width: 600px) {
       .tmx { padding: 40px 16px 64px; }
       .tmx-tier { padding: 14px 16px; gap: 14px; }
       .tmx-tier-emoji { font-size: 26px; width: 40px; }
+      .tmx-sample { font-size: 10px; padding: 14px; }
+      .tmx-share-btn { width: 100%; justify-content: center; }
     }
   </style>
 
