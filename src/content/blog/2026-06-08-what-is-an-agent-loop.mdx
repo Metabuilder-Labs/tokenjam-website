@@ -28,9 +28,6 @@ An agent loop is a program that repeatedly drives an AI agent toward a goal. It 
 
 On June 7, 2026, Peter Steinberger posted a sentence that cleared 2.2 million views and put the whole AI-coding timeline in a chokehold: "you shouldn't be prompting coding agents anymore. You should be designing loops that prompt your agents." The replies turned into a brawl over what it actually meant. The most-quoted answer, from Matthew Berman, was four words: "nobody knows but him and boris."
 
-![Peter Steinberger's June 7, 2026 post: "you shouldn't be prompting coding agents anymore. You should be designing loops that prompt your agents."](/blog/images/agent-loops/01-steinberger-tweet.png)
-*The six-word post that put the timeline in a chokehold. (screenshot)*
-
 That is the real story. A six-word phrase hit two million views while the people boosting it argued about what it meant. The idea underneath is not mysterious, though, and it is worth getting precise about, because it changes where your engineering effort goes and where your bill comes from.
 
 The cleanest definition came from Boris Cherny, who built Claude Code, speaking at the Acquired Unplugged event on June 2: "I don't prompt Claude anymore. I have loops that are running. They're the ones that are prompting Claude and figuring out what to do. My job is to write loops." Place yourself on his ladder and the shift gets concrete. A year ago he wrote code by hand with autocomplete. Then he ran five to ten Claude sessions in parallel and prompted each one. Now he does not prompt at all. He writes the loops, and the agents decide what to build next.
@@ -39,8 +36,8 @@ The cleanest definition came from Boris Cherny, who built Claude Code, speaking 
 
 For the last two years, most people used agents one task at a time. The shape was `human → prompt → agent → output`. You ask for one thing, read the answer, fix the prompt, ask again. That works for small tasks. It falls apart on real work, because real work is not one prompt. It is a cycle: set a goal, make a plan, do the work, verify the result, repair what failed, then decide whether to stop, ask, or continue.
 
-![Two panels: a one-shot "human → prompt → agent → output" flow on the left, and a repeating "goal → plan → act → verify → repair → stop/ask" loop on the right.](/blog/images/agent-loops/02-prompting-vs-loop.png)
-*One-shot prompting versus the loop the agent runs inside. (screenshot)*
+![Two panels: a one-shot "human → prompt → agent → output" flow on the left, and a repeating "goal → plan → act → verify → repair → stop/ask" loop on the right.](/blog/images/agent-loops/02-prompting-vs-loop.jpg)
+*One-shot prompting versus the loop the agent runs inside.*
 
 A loop is the program that runs that cycle for you. At its simplest, it is one agent working on itself: it researches, drafts, checks the draft against a goal, fixes what is weak, and runs the cycle again until the work clears the requirements. You are not prompting each step. The loop repeats the cycle on your behalf.
 
@@ -50,8 +47,8 @@ The shift is not "better prompts." It is designing the system the agent runs ins
 
 The word "loop" hides at least five different things, which is why the replies to Steinberger's tweet talked past each other. Here is the ladder, oldest to newest.
 
-![Timeline of agent loops: ReAct (2022), Self-Prompting / AutoGPT (2023), the Ralph loop (2025), productized /goal (2026), and multi-agent orchestration (now).](/blog/images/agent-loops/03-loop-lineage-timeline.png)
-*Five rungs, oldest to newest. (screenshot)*
+![Timeline of agent loops: ReAct (2022), Self-Prompting / AutoGPT (2023), the Ralph loop (2025), productized /goal (2026), and multi-agent orchestration (future).](/blog/images/agent-loops/03-loop-lineage-timeline.jpg)
+*Five rungs, oldest to newest.*
 
 The first rung is the academic while-loop. The 2022 [ReAct paper](https://arxiv.org/abs/2210.03629) formalized it: the model reasons, calls a tool, reads the result, and repeats until done. One model, one loop, a human watching. Next came AutoGPT in 2023, which handed the loop a goal and let it prompt itself. It became famous for spinning forever while accomplishing nothing, and that failure seeded years of "agents are a toy."
 
@@ -67,16 +64,13 @@ An **open loop** is exploratory. You give the agent a goal and a wide space to m
 
 A **closed loop** is bounded. A human designs the end-to-end path first: a clear goal, defined steps, an eval at each step, and a point where it stops or hands back to you. The agent still loops, but inside a framework you built. It gets better every run because each pass feeds the next, and it runs on a normal budget because the path is tight.
 
-![Side-by-side comparison: open loops are exploratory and burn tokens on an unlimited budget; closed loops are bounded by a human-designed path with evals and stop conditions and run on a normal budget.](/blog/images/agent-loops/04-open-vs-closed.png)
-*Open versus closed: the distinction that decides whether you can afford to run it. (screenshot)*
-
 You will see this carved up two ways. Some people use the two-mode split above. Others describe three levels: an open loop where work happens and nothing is captured, an end-to-end workflow that is written down yet static, and a closed loop that scores its output and writes the lesson back so run fifty is sharper than run one. The two framings line up cleanly. The middle "workflow" level is just a closed path that does not yet feed its results back into itself. For most production work, the bounded version is the one that pays off today.
 
 ## Verification is the load-bearing part
 
 The important part of a loop is not autonomy. It is verification. Without a way to check its work, a loop is just an agent confidently repeating its mistakes at scale. With verification, every run can produce signal: a wrong tool call points to a better tool boundary, a bad output points to a stronger eval, missing context points to better memory.
 
-![A conceptual illustration of a loop with a quality gate: work passes through a checkmark gate to ship, or is bounced back to repair if it fails.](/blog/images/agent-loops/05-verification-gate.png)
+![A conceptual illustration of a loop with a quality gate: work passes through a checkmark gate to ship, or is bounced back to repair if it fails.](/blog/images/agent-loops/05-verification-gate.jpg)
 *The gate that turns a loop from a confident-mistake machine into something you can trust. (generated)*
 
 This is why memory and evals sit next to the loop rather than off to the side. Memory gives the agent continuity across iterations. Evals give the loop a standard to measure against. Together they decide whether the work can be trusted. Boris Cherny's own list of tips for running an agent autonomously for hours ends on exactly this point: make sure the agent has a way to self-verify its work end to end. An open loop that writes code with no feedback is a machine for generating confident mistakes. A loop that writes, runs, reads the result, and corrects is the thing that actually works.
@@ -85,8 +79,8 @@ This is why memory and evals sit next to the loop rather than off to the side. M
 
 Here is where the topic turns from philosophy into a finance problem. Once the model writes the code for almost nothing, the cost moves to the loop running it. We covered the macro version of this in [the end of subsidized AI](/blog/2026-05-28-agent-cost-story-no-longer-hypothetical): Uber capped its engineers at $1,500 per person per tool per month for Claude Code and Cursor after burning its annual AI budget in four months. When the loop is the unit of work, the loop is the unit of spend.
 
-![A developer's tweet: "Every ai agent i shipped this year is a for-loop, an llm call, and a try/catch around the json parsing. The only thing agentic about it is the anthropic bill at the end of the month."](/blog/images/agent-loops/06-cost-tweet.png)
-*The cost punchline, from someone with their hands on the keyboard. (screenshot)*
+![A laptop on a dark desk with luminous orbital rings spiraling above it: a visual metaphor for autonomous loops running unattended while the developer sleeps.](/blog/images/agent-loops/06-loops-while-you-sleep.jpg)
+*When the loop runs while you sleep, the bill comes due in the morning.*
 
 The failure mode every team in production is scared of is the loop that does not stop. Without guardrails you get infinite loops and billing surprises orders of magnitude over budget. This is one of the named categories in [where your agent bill actually goes](/blog/2026-05-29-where-your-agent-bill-actually-goes): runaway loops are their own line item, distinct from context bloat or model overspending. Every serious write-up on loops converges on the same three hard stops: a maximum iteration count, no-progress detection, and a token or dollar ceiling. Setting and enforcing those caps across a fleet is the job of an [agent control plane](/blog/2026-05-21-what-is-an-agent-control-plane).
 
