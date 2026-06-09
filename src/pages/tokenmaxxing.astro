@@ -81,20 +81,20 @@ const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)
            feel like the same artifact. -->
       <section class="tmx-sample-section">
         <p class="tmx-sample-caption">Here's what you'll see — a real run for a Max-5x user.</p>
-        <pre class="tmx-sample"><span class="tmx-sample-border">╭─ </span><span class="tmx-sample-title">TokenJam TokenMaxxing Report</span><span class="tmx-sample-border"> ─────────────────────────────────────────────╮
-│                                                                              │
-│  🔥🔥 </span><span class="tmx-sample-bold">You're a TokenGigaChad.</span><span class="tmx-sample-border">                                                </span>
-<span class="tmx-sample-border">│                                                                              │
-│  Touch grass. Then run </span><span class="tmx-sample-green">tj optimize</span><span class="tmx-sample-border">.                                          </span>
-<span class="tmx-sample-border">│                                                                              │
-│  </span><span class="tmx-sample-bold">$4056.82</span><span class="tmx-sample-border"> in last 30d across </span><span class="tmx-sample-bold">33</span><span class="tmx-sample-border"> sessions.                                    </span>
-<span class="tmx-sample-border">│  That's </span><span class="tmx-sample-bold">40.6×</span><span class="tmx-sample-border"> your </span><span class="tmx-sample-bold">Max 5x plan</span><span class="tmx-sample-border"> cost (</span><span class="tmx-sample-bold">$100/mo flat</span><span class="tmx-sample-border">).                          </span>
-<span class="tmx-sample-border">│                                                                              │
-│  💡 No obvious savings flagged yet — run </span><span class="tmx-sample-green">tj optimize</span><span class="tmx-sample-border"> for the full report     </span>
-<span class="tmx-sample-border">│  once you have more data.                                                    </span>
-<span class="tmx-sample-border">│                                                                              │
-╰──────────────────────────────────────────────────────────────────────────────╯
-  </span><span class="tmx-sample-teal">Share your tier: screenshot the above and tag </span><span class="tmx-sample-teal-bold">@tokenjamdev</span></pre>
+        <pre class="tmx-sample"><span class="tmx-sample-border">╭─ </span><span class="tmx-sample-title">TokenJam TokenMaxxing Report</span><span class="tmx-sample-border"> ─────────────────────────────────────────────╮</span>
+<span class="tmx-sample-border">│                                                                              │</span>
+<span class="tmx-sample-border">│</span>  🔥🔥 <span class="tmx-sample-bold">You're a TokenGigaChad.</span>                                                <span class="tmx-sample-border">│</span>
+<span class="tmx-sample-border">│                                                                              │</span>
+<span class="tmx-sample-border">│</span>  Touch grass. Then run <span class="tmx-sample-green">tj optimize</span>.                                          <span class="tmx-sample-border">│</span>
+<span class="tmx-sample-border">│                                                                              │</span>
+<span class="tmx-sample-border">│</span>  <span class="tmx-sample-bold">$4056.82</span> in last 30d across <span class="tmx-sample-bold">33</span> sessions.                                    <span class="tmx-sample-border">│</span>
+<span class="tmx-sample-border">│</span>  That's <span class="tmx-sample-bold">40.6×</span> your <span class="tmx-sample-bold">Max 5x plan</span> cost (<span class="tmx-sample-bold">$100/mo flat</span>).                          <span class="tmx-sample-border">│</span>
+<span class="tmx-sample-border">│                                                                              │</span>
+<span class="tmx-sample-border">│</span>  💡 No obvious savings flagged yet — run <span class="tmx-sample-green">tj optimize</span> for the full report     <span class="tmx-sample-border">│</span>
+<span class="tmx-sample-border">│</span>  once you have more data.                                                    <span class="tmx-sample-border">│</span>
+<span class="tmx-sample-border">│                                                                              │</span>
+<span class="tmx-sample-border">╰──────────────────────────────────────────────────────────────────────────────╯</span>
+  <span class="tmx-sample-teal">Share your tier: screenshot the above and tag </span><span class="tmx-sample-teal-bold">@tokenjamdev</span></pre>
       </section>
 
       <!-- SHARE-ON-X strip — moved up under the install/sample so the
@@ -357,11 +357,15 @@ const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)
       margin: 0 0 12px;
     }
     .tmx-sample {
+      /* Default sample text uses the theme-aware primary color, so
+         prose ("Touch grass", "in last 30d", "for the full report") is
+         high-contrast in both light and dark themes. Only the box-
+         drawing characters are dimmed via .tmx-sample-border. */
       font-family: 'Geist Mono', monospace;
       font-size: 12.5px;
       line-height: 1.4;
       background: var(--navy-2);
-      color: var(--white-faint);
+      color: var(--white);
       border: 1px solid var(--blue-line);
       border-radius: 10px;
       padding: 18px 20px;
@@ -369,12 +373,16 @@ const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)
       margin: 0;
       white-space: pre;
     }
-    .tmx-sample-border { color: var(--white-faint); opacity: 0.55; }
-    .tmx-sample-title  { color: var(--white); font-weight: 600; }
-    .tmx-sample-bold   { color: var(--white); font-weight: 600; }
-    .tmx-sample-green  { color: #22C55E;     font-weight: 600; }
-    .tmx-sample-teal   { color: #22D3EE; }
-    .tmx-sample-teal-bold { color: #22D3EE; font-weight: 700; }
+    /* Only the box-drawing characters use the dimmed border style. */
+    .tmx-sample-border    { color: var(--white-faint); opacity: 0.55; }
+    .tmx-sample-title     { color: var(--white); font-weight: 700; }
+    /* Bold/numeric emphasis: full primary color + heavier weight so
+       numbers ($4056.82, 40.6×, 33) anchor the eye. */
+    .tmx-sample-bold      { color: var(--white); font-weight: 700; }
+    /* Brand accents — absolute hex so they work in both themes. */
+    .tmx-sample-green     { color: #16A34A; font-weight: 700; }
+    .tmx-sample-teal      { color: #0891B2; }
+    .tmx-sample-teal-bold { color: #0891B2; font-weight: 700; }
 
     /* SHARE-ON-X strip — bright, pinned right under the sample so the
        CTA sits where the eye lands after reading the preview. Uses X
@@ -430,13 +438,18 @@ const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)
     .tmx-share-body strong {
       color: var(--white);
     }
+    /* X "Share" button — canonical X brand look: solid black background,
+       white text + logo, with a subtle white border for definition. Uses
+       absolute hex (not theme tokens) so it stays branded in both light
+       and dark themes. */
     .tmx-share-btn {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       padding: 10px 18px;
-      background: var(--white);
-      color: #0F1115;
+      background: #000;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 8px;
       font-family: 'Geist', sans-serif;
       font-size: 14px;
@@ -446,10 +459,10 @@ const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)
       flex-shrink: 0;
     }
     .tmx-share-btn:hover {
-      background: #f4f4f4;
+      background: #1a1a1a;
       transform: translateY(-1px);
     }
-    .tmx-share-btn svg { color: #0F1115; }
+    .tmx-share-btn svg { color: #fff; }
 
     /* Tier-ladder footnote — single line of API-fallback thresholds at
        the bottom of the tier list so the visual stays multiplier-first
