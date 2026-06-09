@@ -29,12 +29,9 @@ const installJoined = installLines.join('\n');
 
       <!-- HERO -->
       <header class="tmx-hero">
-        <p class="tmx-hero-eyebrow">tokenmaxx</p>
-        <h1 class="tmx-hero-h1">How hard are you TokenMaxxing?</h1>
+        <h1 class="tmx-hero-h1">How hard are you <span class="tmx-hero-accent">TokenMaxxing</span>?</h1>
         <p class="tmx-hero-sub">
-          Everyone's pushing agent loops, deeper chains, bigger context windows.
-          Nobody's telling you what they cost. Find out your tier in
-          <strong>3 commands</strong> — no signup, runs entirely on your machine.
+          Find out your tier in <strong>3 commands</strong>. No signup. Runs locally.
         </p>
       </header>
 
@@ -75,8 +72,10 @@ const installJoined = installLines.join('\n');
         <header class="section-head">
           <h2 class="section-h2">The 5 tiers</h2>
           <p class="section-lede">
-            Classification is based on your monthly Claude Code spend over the last 30 days.
-            Plan-aware: if you're on Max-5x or Max-20x, the output also shows the multiplier vs your flat fee.
+            Classification is based on the <strong>implied API value</strong> of your last 30 days of Claude Code usage —
+            what your tokens would cost at <a href="https://platform.claude.com/docs/en/docs/about-claude/pricing" target="_blank" rel="noopener noreferrer">Anthropic's per-token rates</a>,
+            regardless of whether you actually pay per-token (API) or pay a flat subscription fee (Pro / Max-5x / Max-20x).
+            If you're on a subscription plan, the output also shows the multiplier vs your flat fee.
           </p>
         </header>
         <ol class="tmx-tiers">
@@ -127,25 +126,13 @@ const installJoined = installLines.join('\n');
     .tmx {
       max-width: 880px;
       margin: 0 auto;
-      padding: 60px 24px 96px;
+      padding: 24px 24px 96px;
     }
 
     /* HERO */
     .tmx-hero {
       text-align: center;
       margin-bottom: 56px;
-    }
-    .tmx-hero-eyebrow {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 999px;
-      background: rgba(var(--accent-blue-rgb), 0.12);
-      color: var(--accent-blue);
-      font-family: 'Geist Mono', monospace;
-      font-size: 11px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      margin: 0 0 18px;
     }
     .tmx-hero-h1 {
       font-family: 'Geist', sans-serif;
@@ -154,6 +141,12 @@ const installJoined = installLines.join('\n');
       letter-spacing: -0.025em;
       line-height: 1.05;
       margin: 0 0 18px;
+    }
+    /* "TokenMaxxing" accent — red to match the 🔥🔥 GigaChad tier highlight and
+       signal the cost-of-burning-tokens vibe. Avoids the muted on-brand blue,
+       which read as just another section header. */
+    .tmx-hero-accent {
+      color: #EF4444;
     }
     .tmx-hero-sub {
       font-family: 'Geist', sans-serif;
