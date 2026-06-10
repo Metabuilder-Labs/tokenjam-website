@@ -219,11 +219,37 @@ nav.tj-nav {
 }
 .theme-menu-item svg { flex-shrink: 0; }
 
-.nav-github {
-  display: inline-flex; align-items: center;
-  color: var(--white-dim); transition: color .2s;
+/* Star-on-GitHub pill, persistent across every page (replaces the old
+   icon-only .nav-github). Live count is fetched at build time via
+   src/lib/github.ts and cached for the whole build. */
+.nav-star {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 12px;
+  font-family: 'Geist', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--white-dim);
+  text-decoration: none;
+  border: 1px solid rgba(var(--accent-rgb), 0.16);
+  border-radius: 999px;
+  background: transparent;
+  transition: color .15s, border-color .15s, background-color .15s;
+  white-space: nowrap;
 }
-.nav-github:hover { color: var(--white); }
+.nav-star:hover {
+  color: var(--white);
+  border-color: rgba(var(--accent-rgb), 0.35);
+  background: var(--white-ghost);
+}
+.nav-star svg { color: var(--amber); flex-shrink: 0; }
+.nav-star-label { letter-spacing: -.005em; }
+.nav-star-count {
+  padding-left: 7px;
+  margin-left: 1px;
+  border-left: 1px solid rgba(var(--accent-rgb), 0.18);
+  font-variant-numeric: tabular-nums;
+  color: var(--white);
+}
 
 /* Primary CTA — mirrors the landing page button so the nav matches across pages */
 .btn-primary {
@@ -839,6 +865,24 @@ footer.tj-footer .footer-right {
 .t-blank   { display: block; height: 1.2em; }
 
 /* Related posts */
+.post-star-cta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 48px 0 16px;
+  padding: 22px 24px;
+  background: var(--navy-2);
+  border: 1px solid var(--blue-line);
+  border-radius: 12px;
+}
+.post-star-cta-text { flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 2px; }
+.post-star-cta-text strong { color: var(--white); font-weight: 600; font-size: 15px; }
+.post-star-cta-text span { color: var(--white-dim); font-size: 14px; line-height: 1.55; }
+.post-star-cta-btn { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.post-star-cta-btn svg { color: var(--amber); }
+.post-star-cta-count { font-variant-numeric: tabular-nums; opacity: .85; margin-left: 4px; }
+
 .related-posts { margin-top: 56px; padding-top: 32px; border-top: 1px solid var(--blue-line); }
 .related-posts h3 { font-size: 14px; font-family: 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: .08em; color: var(--white-faint); margin-bottom: 16px; }
 .related-posts ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
