@@ -241,7 +241,8 @@ nav.tj-nav {
   border-color: rgba(var(--accent-rgb), 0.35);
   background: var(--white-ghost);
 }
-.nav-star svg { color: var(--amber); flex-shrink: 0; }
+.nav-star svg { color: var(--white-dim); flex-shrink: 0; transition: color .15s; }
+.nav-star:hover svg { color: var(--white); }
 .nav-star-label { letter-spacing: -.005em; }
 .nav-star-count {
   padding-left: 7px;
