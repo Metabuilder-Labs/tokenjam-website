@@ -93,6 +93,51 @@ const imageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).toSt
 </head>
 <body>
 <Nav />
+
+<!-- Live-refresh the GitHub star count surfaced in the nav pill, hero CTA, and
+     blog post CTA. Build-time numbers paint first (no FOUC); this fetches the
+     current count and updates if it differs. Cached in localStorage for 15
+     minutes so casual navigation does not re-hit the API. -->
+<script is:inline>
+  (function () {
+    var KEY = 'tj-gh-stars';
+    var TTL = 15 * 60 * 1000;
+    var fmt = function (n) {
+      if (n == null) return '';
+      if (n >= 10000) return Math.round(n / 1000) + 'k';
+      if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+      return String(n);
+    };
+    function apply(n) {
+      var label = fmt(n);
+      document.querySelectorAll('[data-star-count]').forEach(function (el) {
+        if (label) { el.textContent = label; el.style.display = ''; }
+      });
+      document.querySelectorAll('[data-star-count-prefixed]').forEach(function (el) {
+        el.textContent = label ? '· ' + label : '';
+      });
+    }
+    var cached = null;
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) cached = JSON.parse(raw);
+    } catch (e) {}
+    var now = Date.now();
+    if (cached && typeof cached.value === 'number') apply(cached.value);
+    if (cached && now - cached.ts < TTL) return;
+    fetch('https://api.github.com/repos/metabuilder-labs/tokenjam', {
+      headers: { Accept: 'application/vnd.github+json' },
+    }).then(function (r) {
+      if (!r.ok) throw new Error('rate-limited');
+      return r.json();
+    }).then(function (data) {
+      var n = typeof data.stargazers_count === 'number' ? data.stargazers_count : null;
+      if (n == null) return;
+      apply(n);
+      try { localStorage.setItem(KEY, JSON.stringify({ value: n, ts: now })); } catch (e) {}
+    }).catch(function () { /* fall through to build-time number */ });
+  })();
+</script>
 <main class:list={["tj-main", wide && "tj-main--wide"]}>
   <slot />
 </main>
