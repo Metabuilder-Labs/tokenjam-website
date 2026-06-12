@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 
+// pipx (not pip) — sidesteps PEP 668 on macOS Homebrew Python and
+// Debian 12+ / Ubuntu 24+. Issue tokenjam#86.
 const installLines = [
-  'pip install "tokenjam[mcp]"',
+  "pipx install 'tokenjam[mcp]'",
   'tj onboard  --claude-code',
   'tj optimize',
 ];

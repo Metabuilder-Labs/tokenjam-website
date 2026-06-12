@@ -14,8 +14,10 @@ const tiers = [
 ];
 
 // Three commands the tweet promises. Keep these verbatim with the social copy.
+// pipx (not pip) — works on macOS Homebrew Python + Debian 12+ / Ubuntu 24+
+// where PEP 668 blocks `pip install` into the system Python (issue #86).
 const installLines = [
-  'pip install tokenjam',
+  'pipx install tokenjam',
   'tj onboard --claude-code',
   'tj tokenmaxx',
 ];
