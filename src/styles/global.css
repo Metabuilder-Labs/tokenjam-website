@@ -219,6 +219,31 @@ nav.tj-nav {
 }
 .theme-menu-item svg { flex-shrink: 0; }
 
+/* "Sign up" pill — opens the site-wide SubscribeDialog via [data-subscribe-open]. */
+.nav-subscribe {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 12px;
+  font-family: 'Geist', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--white);
+  background: rgba(var(--accent-blue-rgb), 0.10);
+  border: 1px solid rgba(var(--accent-blue-rgb), 0.25);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background-color .15s;
+  white-space: nowrap;
+}
+.nav-subscribe:hover {
+  background: rgba(var(--accent-blue-rgb), 0.18);
+  border-color: rgba(var(--accent-blue-rgb), 0.5);
+}
+.nav-subscribe svg { color: var(--accent-blue); flex-shrink: 0; }
+@media (max-width: 720px) {
+  .nav-subscribe-label { display: none; }
+  .nav-subscribe { padding: 6px 10px; }
+}
+
 /* Star-on-GitHub pill, persistent across every page (replaces the old
    icon-only .nav-github). Live count is fetched at build time via
    src/lib/github.ts and cached for the whole build. */
