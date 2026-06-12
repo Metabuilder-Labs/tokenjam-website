@@ -4,9 +4,8 @@ import Schema from '@/components/Schema.astro';
 import { getAuthor } from '@/lib/authors';
 import { articleSchema } from '@/lib/schema';
 import { readingTimeMinutes, relatedPosts, getPublishedPosts, type BlogPost } from '@/lib/blog';
-import { getStarCount, formatStars, ghUrl } from '@/lib/github';
+import { ghUrl } from '@/lib/github';
 
-const starLabel = formatStars(await getStarCount());
 const postStarHref = ghUrl('blog');
 
 interface Props {
@@ -84,7 +83,7 @@ const imageUrl = post.data.image ?? '/og-image.png';
         onclick="window.trackEvent && window.trackEvent('cta_click', 'conversion', 'star_github_blog_post')"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25z"/></svg>
-        Star on GitHub<span class="post-star-cta-count" data-star-count-prefixed>{starLabel ? `· ${starLabel}` : ''}</span>
+        Star on GitHub
       </a>
     </aside>
 
