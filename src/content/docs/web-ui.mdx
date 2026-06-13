@@ -15,12 +15,51 @@ The web UI is a single Vite-built bundle served by the local REST API. No extern
 
 ## Views
 
-- **Status:** agent overview with cost, tokens, tool calls, and active alerts.
-- **Traces:** trace list with span waterfall visualization. Click any span to see its full attribute set.
-- **Cost:** breakdown by agent, model, day, or tool. Stacked and time-series views.
-- **Alerts:** alert history with severity filtering. Acknowledge alerts inline.
-- **Budget:** view and edit daily/session cost limits per agent. Changes are written to your config file.
-- **Drift:** behavioral drift report with Z-score analysis. Compares the latest session against a learned baseline.
+<table>
+<tr>
+<td width="50%">
+
+**Status** — agent overview with cost, tokens, tool calls, and active alerts.
+
+![tj status page](/docs/web-ui/tj-status.png)
+
+</td>
+<td width="50%">
+
+**Traces** — recent traces with cost, duration, and span count. Click a row for the waterfall view.
+
+![tj traces page](/docs/web-ui/tj-traces.png)
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Cost** — spend broken down by day, agent, model, or tool.
+
+![tj cost page](/docs/web-ui/tj-cost.png)
+
+</td>
+<td width="50%">
+
+**Alerts** — full alert history with severity filter and inline detail expansion.
+
+![tj alerts page](/docs/web-ui/tj-alerts.png)
+
+</td>
+</tr>
+<tr>
+<td colspan="2">
+
+**Budget** — view and edit daily/per-session cost limits per agent, with recent budget alerts inline.
+
+![tj budget page](/docs/web-ui/tj-budget.png)
+
+</td>
+</tr>
+</table>
+
+**Drift** — behavioral drift report with Z-score analysis. Compares the latest session against a learned baseline. (Same page chrome as the others; reach via the Drift tab in the sidebar.)
 
 ## Auto-polling
 
