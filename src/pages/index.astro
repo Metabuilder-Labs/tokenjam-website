@@ -222,9 +222,8 @@ const installJoined = installLines.join('\n');
         <p class="hero-sub hero-sub-faint">Open-source. Runs locally. Full observability stack included.</p>
         <div class="hero-ctas">
           <a href="#install" class="btn-primary btn-lg" onclick="window.trackEvent && window.trackEvent('cta_click', 'conversion', 'get_started_hero')">Get started</a>
-          <a href={heroGhHref} target="_blank" rel="noopener noreferrer" class="btn-secondary btn-lg hero-star-btn" onclick="window.trackEvent && window.trackEvent('cta_click', 'conversion', 'star_github_hero')">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25z"/></svg>
-            <span data-star-phrase="Star it on GitHub">{heroStarLabel ? `Star it on GitHub (${heroStarLabel})` : 'Star it on GitHub'}</span>
+          <a href={heroGhHref} target="_blank" rel="noopener noreferrer" class="btn-secondary btn-lg" onclick="window.trackEvent && window.trackEvent('cta_click', 'conversion', 'star_github_hero')">
+            <span data-star-phrase="Star it on GitHub">{heroStarLabel ? `Star it on GitHub (${heroStarLabel} ⭐)` : 'Star it on GitHub'}</span>
           </a>
           <button type="button" class="btn-secondary btn-lg" data-subscribe-open="hero">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -639,12 +638,10 @@ const installJoined = installLines.join('\n');
     }
     .btn-secondary:hover { border-color: rgba(var(--accent-rgb), 0.4); background: var(--white-ghost); }
     .btn-lg { padding: 11px 22px; font-size: 14px; border-radius: 8px; }
-    .hero-star-btn svg { color: var(--amber); }
-    .hero-star-count { font-variant-numeric: tabular-nums; opacity: .85; margin-left: 2px; }
 
     /* ── HERO ─────────────────────────────────────── */
     .hero {
-      padding: 120px 48px 80px;
+      padding: calc(120px + var(--banner-h, 0px)) 48px 80px;
       background:
         radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--accent-blue-rgb), 0.08), transparent 60%),
         var(--navy);
@@ -1405,7 +1402,7 @@ const installJoined = installLines.join('\n');
     }
 
     @media (max-width: 640px) {
-      .hero { padding: 100px 16px 56px; }
+      .hero { padding: calc(100px + var(--banner-h, 0px)) 16px 56px; }
       .products-grid-section,
       .how,
       .install-section { padding-left: 16px; padding-right: 16px; }

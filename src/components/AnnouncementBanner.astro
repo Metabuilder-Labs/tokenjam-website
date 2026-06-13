@@ -1,0 +1,86 @@
+---
+/*
+ * Site-wide announcement banner. Fixed strip above the nav. Dismissible —
+ * the dismissed state is stored in localStorage under `tj-banner-dismissed`
+ * and applied pre-paint by a snippet in BaseLayout's <head>, so dismissed
+ * users never see a flash on subsequent loads.
+ *
+ * When visible, nav.tj-nav shifts down by var(--banner-h) and the page's
+ * top sections (main.tj-main, .hero) add the same offset to their padding.
+ * When dismissed, --banner-h is set to 0 and everything reverts.
+ */
+---
+<div class="tj-banner" id="tj-banner" role="region" aria-label="Site announcement">
+  <span class="tj-banner-text">
+    <span class="tj-banner-emoji" aria-hidden="true">🚀</span>
+    <span>Are you TokenMaxxing hard enough?</span>
+    <a href="/tokenmaxxing" class="tj-banner-cta" onclick="window.trackEvent && window.trackEvent('cta_click', 'engagement', 'banner_tokenmaxxing')">Find out in less than 5mins →</a>
+  </span>
+  <button type="button" class="tj-banner-close" id="tj-banner-close" aria-label="Dismiss announcement">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</div>
+
+<style is:global>
+  :root { --banner-h: 36px; }
+  html.banner-dismissed { --banner-h: 0px; }
+
+  .tj-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 101; /* above nav (100) */
+    height: var(--banner-h);
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 48px;
+    background: rgba(var(--accent-blue-rgb), 0.14);
+    color: var(--white);
+    font-family: 'Geist', sans-serif;
+    font-size: 13px;
+    line-height: 1;
+    border-bottom: 1px solid rgba(var(--accent-blue-rgb), 0.22);
+    overflow: hidden;
+    transition: height .15s;
+  }
+  .tj-banner-text { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .tj-banner-emoji { font-size: 14px; line-height: 1; }
+  .tj-banner-cta {
+    color: var(--accent-blue);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(var(--accent-blue-rgb), 0.4);
+    transition: color .15s, border-color .15s;
+  }
+  .tj-banner-cta:hover { color: var(--white); border-color: var(--white); }
+  .tj-banner-close {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; border: 0; border-radius: 4px;
+    color: var(--white-faint);
+    cursor: pointer;
+    transition: color .15s, background-color .15s;
+  }
+  .tj-banner-close:hover { color: var(--white); background: var(--white-ghost); }
+
+  html.banner-dismissed .tj-banner { display: none; }
+
+  @media (max-width: 540px) {
+    .tj-banner { padding: 0 36px 0 12px; font-size: 12px; }
+    .tj-banner-text { gap: 6px; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var KEY = 'tj-banner-dismissed';
+    var btn = document.getElementById('tj-banner-close');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      document.documentElement.classList.add('banner-dismissed');
+      try { localStorage.setItem(KEY, '1'); } catch (e) {}
+      if (window.trackEvent) window.trackEvent('banner_dismiss', 'engagement', 'tokenmaxxing');
+    });
+  })();
+</script>

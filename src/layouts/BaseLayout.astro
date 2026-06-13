@@ -3,6 +3,7 @@ import '@/styles/global.css';
 import Nav from '@/components/Nav.astro';
 import Footer from '@/components/Footer.astro';
 import SubscribeDialog from '@/components/SubscribeDialog.astro';
+import AnnouncementBanner from '@/components/AnnouncementBanner.astro';
 
 interface Props {
   title: string;
@@ -81,6 +82,17 @@ const imageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).toSt
     } catch (e) {}
   })();
 </script>
+<!-- Banner-dismissed init: must run synchronously before paint so dismissed users
+     don't see a flash of the announcement strip on subsequent loads. -->
+<script is:inline>
+  (function () {
+    try {
+      if (localStorage.getItem('tj-banner-dismissed') === '1') {
+        document.documentElement.classList.add('banner-dismissed');
+      }
+    } catch (e) {}
+  })();
+</script>
 
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="alternate icon" type="image/png" href="/favicon-32.png" />
@@ -93,6 +105,7 @@ const imageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).toSt
 <slot name="head" />
 </head>
 <body>
+<AnnouncementBanner />
 <Nav />
 
 <!-- Live-refresh the GitHub star count surfaced in the nav pill, hero CTA, and
@@ -117,12 +130,12 @@ const imageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).toSt
       document.querySelectorAll('[data-star-count-prefixed]').forEach(function (el) {
         el.textContent = label ? '· ' + label : '';
       });
-      // CTA form: "<CTA> (<count>)". The CTA text is the attribute value, e.g.
-      // data-star-phrase="Star it on GitHub" -> "Star it on GitHub (34)". When
-      // no count is available, the parens disappear and just the CTA remains.
+      // CTA form: "<CTA> (<count> ⭐)". The CTA text is the attribute value,
+      // e.g. data-star-phrase="Star it on GitHub" -> "Star it on GitHub (34 ⭐)".
+      // When no count is available, the parens disappear and just the CTA remains.
       document.querySelectorAll('[data-star-phrase]').forEach(function (el) {
         var cta = el.getAttribute('data-star-phrase') || 'Star on GitHub';
-        el.textContent = label ? cta + ' (' + label + ')' : cta;
+        el.textContent = label ? cta + ' (' + label + ' ⭐)' : cta;
       });
     }
     function init() {
