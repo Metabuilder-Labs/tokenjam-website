@@ -12,7 +12,7 @@ TokenJam works four ways. Pick the path that matches what you're running.
 For **Claude Code**, **Codex**, and any agent that already emits OpenTelemetry. No SDK, no code changes.
 
 ```bash
-pip install "tokenjam[mcp]"
+pipx install 'tokenjam[mcp]'
 tj onboard --claude-code    # or: tj onboard --codex
 # Restart your coding agent
 ```
@@ -26,7 +26,7 @@ Full guide: [Claude Code & Codex](/docs/claude-code).
 For any Python agent: Anthropic, OpenAI, Gemini, Bedrock, LangChain, CrewAI, and [10+ more frameworks](/docs/frameworks).
 
 ```bash
-pip install tokenjam
+pipx install tokenjam
 tj onboard    # creates config, generates ingest secret
 tj doctor     # verify your setup
 ```

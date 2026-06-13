@@ -1,26 +1,84 @@
 ---
 title: CLI reference
-description: 16 commands cover onboarding, status, traces, cost, alerts, budget, drift, tools, demo, export, MCP, serve, stop, doctor, and uninstall.
+description: Every tj subcommand — cost-optimization analyzers (downsize, cache, script, trim), tokenmaxx tier, backfill adapters, policy preview, observability (status, traces, cost, alerts, drift, budget), MCP server, and setup commands.
 section: cli-and-ui
 order: 1
 ---
 
-The `tj` CLI is the primary interface to TokenJam. Sixteen commands cover every workflow. All support `--json` for machine-readable output.
+The `tj` CLI is the primary interface to TokenJam. All commands support `--json` for machine-readable output.
 
-## Daily-use commands
+## Cost-optimization commands
+
+### `tj tokenmaxx`
+
+How hard are you TokenMaxxing? Reads your last 30 days of usage, classifies it into a tier (TokenSipper → TokenGigaChad) based on the multiplier vs your declared plan, and surfaces the downsize savings figure inline.
 
 ```bash
-tj status              # current state, cost, active alerts
-tj traces              # full span history with waterfall view
-tj cost --since 7d     # cost breakdown by agent, model, day
-tj alerts              # everything that fired while you were away
-tj budget              # view and set daily/session cost limits
-tj drift               # behavioral drift Z-scores vs baseline
-tj tools               # tool call history with error rates
-tj serve               # start the web UI + REST API
+tj tokenmaxx            # default 30-day window
+tj tokenmaxx --since 7d
+tj tokenmaxx --json
 ```
 
-Example:
+Find your tier visually on [tokenjam.dev/tokenmaxxing](/tokenmaxxing).
+
+### `tj optimize`
+
+Runs the four cost-optimization analyzers against your captured usage history. Analyzers are positional arguments — run all, or just the ones you want.
+
+```bash
+tj optimize                       # all analyzers
+tj optimize downsize              # one analyzer
+tj optimize downsize cache trim   # several
+```
+
+**Available analyzers:**
+
+- `downsize` — flags sessions whose structural shape matches a cheaper-model candidate in the same family. Surfaces examples to spot-check. Never claims quality equivalence.
+- `cache` — shows current caching ratio per (provider, model) and identifies stable prefixes that would benefit from prompt caching.
+- `cache-recommend` — Anthropic-only `cache_control` placement candidates from stable prefixes in your real prompt history.
+- `script` — clusters of deterministic `(tool_name, arg_shape)` sequences that could be replaced with a plain script.
+- `trim` — LLMLingua-2 local classifier scoring which prompt regions the model is likely to ignore. Requires `[capture] prompts = true` and the `tokenjam[bloat]` extra.
+- `budget-projection` — projects monthly spend against any `[budget.<provider>] usd` ceiling you've configured.
+
+**Flags:**
+
+```bash
+tj optimize --since 30d                            # window (default 30d)
+tj optimize --agent claude-code-myproj             # scope to one agent
+tj optimize --compare last-7d                      # window comparison
+tj optimize --budget anthropic --budget-usd 50     # test a different ceiling
+tj optimize --export-config claude-code            # write routing snippet to ~/.config/tokenjam/exports/
+tj optimize --json                                 # machine-readable
+```
+
+### `tj cost`
+
+Cost breakdown by agent, model, day, or tool. Same `--compare` flag as `tj optimize` for window-over-window diffs.
+
+```bash
+tj cost --since 7d
+tj cost --since 30d --group-by model
+tj cost --compare last-7d                          # 7d vs prior 7d, with top shifts by agent + model
+tj cost --compare last-month
+```
+
+### `tj report`
+
+Standalone HTML visualizations of analyzer findings. Opens in your default browser.
+
+```bash
+tj report --trim                # all agents, 30d window
+tj report --trim my-agent       # scope to one agent
+tj report --trim --no-open      # write file without opening
+```
+
+Output lives in `~/.cache/tokenjam/reports/`.
+
+## Observability commands
+
+### `tj status`
+
+Current state of every known agent — cost, tokens, tool calls, active alerts.
 
 ```
 $ tj status
@@ -35,18 +93,59 @@ $ tj status
   send_email called (sensitive action: critical)
 ```
 
+### Other observability commands
+
+```bash
+tj traces              # full span history with waterfall view
+tj alerts              # everything that fired while you were away
+tj budget              # view and edit daily/session cost limits per agent
+tj drift               # behavioral drift Z-scores vs baseline
+tj tools               # tool call history with error rates per agent
+```
+
 ## Setup and maintenance
 
 ```bash
-tj onboard                  # interactive setup for any agent
-tj onboard --claude-code    # Claude Code-specific setup
-tj onboard --codex          # Codex-specific setup
-tj doctor                   # verify config, daemon, MCP, env
-tj stop                     # stop the background daemon
-tj uninstall --yes          # remove everything tj installed
+tj onboard                                # interactive setup for any agent
+tj onboard --claude-code                  # zero-code Claude Code integration
+tj onboard --codex                        # zero-code Codex integration
+tj onboard --claude-code --plan max_5x    # skip the plan prompt, set Anthropic plan tier
+tj onboard --claude-code --reconfigure    # re-run against an existing config
+tj doctor                                 # verify config, daemon, MCP, env
+tj serve                                  # start the web UI + REST API
+tj stop                                   # stop the background daemon
+tj uninstall --yes                        # remove everything tj installed
 ```
 
-## Export and inspection
+`tj onboard --claude-code` auto-backfills the last 30 days of your existing `~/.claude/projects/` session logs on first run, so `tj optimize` and `tj tokenmaxx` work immediately.
+
+## Backfill adapters
+
+Ingest historical telemetry from other sources into the local DB. Idempotent — re-running the same source is safe.
+
+```bash
+tj backfill claude-code                                                          # ~/.claude/projects/*.jsonl
+tj backfill langfuse  --source-url https://cloud.langfuse.com --api-key ...
+tj backfill langfuse  --source-file langfuse-dump.json
+tj backfill helicone  --source-url https://api.helicone.ai    --api-key ...
+tj backfill helicone  --source-file helicone-dump.json
+tj backfill otlp      --source-file traces.json                                  # any OTLP JSON dump
+```
+
+All adapters support `--since 30d` (or `24h`, or an ISO-8601 timestamp) to scope the time window.
+
+## Policy
+
+Read-only preview of the unified policy surface (alerts, capture, budget, per-agent overrides). Doesn't open the DB.
+
+```bash
+tj policy list
+tj policy list --json
+```
+
+The `add | edit | apply` subcommands are tracked for a future release.
+
+## Export and integration
 
 ```bash
 tj export --format otlp        # forward to Grafana, Datadog, any OTel backend
@@ -54,20 +153,24 @@ tj export --format openevals   # openevals / agentevals trajectory evaluation
 tj export --format json        # NDJSON
 tj export --format csv
 tj demo                        # list reproducible incident scenarios
-tj demo retry-loop             # run one
-tj mcp                         # start the MCP server (stdin/stdout)
+tj demo retry-loop             # run one (no API keys needed)
+tj mcp                         # start the MCP server (stdio) for Claude Code / Codex
 ```
 
 See [Export](/docs/export) for the full export reference.
 
 ## Global flags
 
-- `--json`: machine-readable output. All commands support this.
-- `--config <path>`: override config file location.
-- `--quiet` / `--verbose`: control log verbosity.
+- `--json` — machine-readable output. Every command supports this.
+- `--config <path>` — override config file location.
+- `--db <path>` — override database path.
+- `--agent <id>` — scope output to a specific agent.
+- `--no-color` — disable colored output.
+- `-v` / `--verbose` — verbose logging.
 
 Per-command flags and exit codes are documented in the help text:
 
 ```bash
+tj --help
 tj <command> --help
 ```
