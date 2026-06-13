@@ -117,12 +117,12 @@ const imageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).toSt
       document.querySelectorAll('[data-star-count-prefixed]').forEach(function (el) {
         el.textContent = label ? '· ' + label : '';
       });
-      // Full phrase form, e.g. "34 stars on GitHub". Suffix configurable via
-      // data-star-phrase="stars on GitHub". Falls back to "Star on GitHub"
-      // when no count is available.
+      // CTA form: "<CTA> (<count>)". The CTA text is the attribute value, e.g.
+      // data-star-phrase="Star it on GitHub" -> "Star it on GitHub (34)". When
+      // no count is available, the parens disappear and just the CTA remains.
       document.querySelectorAll('[data-star-phrase]').forEach(function (el) {
-        var suffix = el.getAttribute('data-star-phrase') || 'stars on GitHub';
-        el.textContent = label ? label + ' ' + suffix : 'Star on GitHub';
+        var cta = el.getAttribute('data-star-phrase') || 'Star on GitHub';
+        el.textContent = label ? cta + ' (' + label + ')' : cta;
       });
     }
     function init() {
