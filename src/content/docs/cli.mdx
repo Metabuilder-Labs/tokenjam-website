@@ -13,13 +13,33 @@ The `tj` CLI is the primary interface to TokenJam. All commands support `--json`
 
 How hard are you TokenMaxxing? Reads your last 30 days of usage, classifies it into a tier (TokenSipper → TokenGigaChad) based on the multiplier vs your declared plan, and surfaces the downsize savings figure inline.
 
+If you're starting from a fresh machine, the three-command path from [tokenjam.dev/tokenmaxxing](/tokenmaxxing) gets you a tier in under a minute:
+
 ```bash
-tj tokenmaxx            # default 30-day window
-tj tokenmaxx --since 7d
-tj tokenmaxx --json
+pipx install tokenjam
+tj onboard --claude-code    # auto-backfills your last 30 days of Claude Code sessions
+tj tokenmaxx
 ```
 
-Find your tier visually on [tokenjam.dev/tokenmaxxing](/tokenmaxxing).
+Once you have data ingested, run it any time:
+
+```bash
+tj tokenmaxx                # default 30-day window
+tj tokenmaxx --since 7d
+tj tokenmaxx --json         # machine-readable
+```
+
+**Tier ladder** (multiplier vs your declared plan fee; absolute USD/mo fallback for API users calibrated against the Max-5x plan):
+
+| Tier | Multiplier | API USD/mo |
+|---|---|---|
+| 💧 TokenSipper | < 1× plan | < $100 |
+| 🥱 TokenModerator | 1× – 4× plan | $100 – $400 |
+| 💸 TokenMaxxer | 4× – 10× plan | $400 – $1,000 |
+| 🔥 TokenChad | 10× – 20× plan | $1,000 – $2,000 |
+| 🔥🔥 TokenGigaChad | 20×+ plan | $2,000+ |
+
+The multiplier line only renders when you have a subscription plan declared (`[budget.<provider>] plan = "max_5x"`). API users see absolute spend.
 
 ### `tj optimize`
 
