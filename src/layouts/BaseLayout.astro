@@ -125,25 +125,35 @@ const imageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).toSt
         el.textContent = label ? label + ' ' + suffix : 'Star on GitHub';
       });
     }
-    var cached = null;
-    try {
-      var raw = localStorage.getItem(KEY);
-      if (raw) cached = JSON.parse(raw);
-    } catch (e) {}
-    var now = Date.now();
-    if (cached && typeof cached.value === 'number') apply(cached.value);
-    if (cached && now - cached.ts < TTL) return;
-    fetch('https://api.github.com/repos/metabuilder-labs/tokenjam', {
-      headers: { Accept: 'application/vnd.github+json' },
-    }).then(function (r) {
-      if (!r.ok) throw new Error('rate-limited');
-      return r.json();
-    }).then(function (data) {
-      var n = typeof data.stargazers_count === 'number' ? data.stargazers_count : null;
-      if (n == null) return;
-      apply(n);
-      try { localStorage.setItem(KEY, JSON.stringify({ value: n, ts: now })); } catch (e) {}
-    }).catch(function () { /* fall through to build-time number */ });
+    function init() {
+      var cached = null;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) cached = JSON.parse(raw);
+      } catch (e) {}
+      var now = Date.now();
+      if (cached && typeof cached.value === 'number') apply(cached.value);
+      if (cached && now - cached.ts < TTL) return;
+      fetch('https://api.github.com/repos/metabuilder-labs/tokenjam', {
+        headers: { Accept: 'application/vnd.github+json' },
+      }).then(function (r) {
+        if (!r.ok) throw new Error('rate-limited');
+        return r.json();
+      }).then(function (data) {
+        var n = typeof data.stargazers_count === 'number' ? data.stargazers_count : null;
+        if (n == null) return;
+        apply(n);
+        try { localStorage.setItem(KEY, JSON.stringify({ value: n, ts: now })); } catch (e) {}
+      }).catch(function () { /* fall through to build-time number */ });
+    }
+    // Script is injected before <main> is parsed, so defer until the DOM is
+    // ready — otherwise apply() runs against an incomplete tree and elements
+    // in <main> (e.g. the hero "<N> stars on GitHub" span) don't get updated.
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   })();
 </script>
 <main class:list={["tj-main", wide && "tj-main--wide"]}>
