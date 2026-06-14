@@ -1,13 +1,79 @@
 ---
 title: Introduction
-description: TokenJam is open-source token economics for AI agents. See where your tokens go, find where they're wasted, and keep agents in line. Local-first, OTel-native, no signup.
+description: TokenJam is the cost-optimization layer for AI agents. Four analyzers (Downsize, Cache, Script, Trim) read your existing telemetry and surface where to cut spend — plus a full local-first observability stack underneath. Open-source, no signup, runs entirely on your machine.
 section: getting-started
 order: 1
 ---
 
-Your agent sends emails, writes files, calls APIs, and spends your money, all while you're away. Most observability tools were built for LLM developers building chat products. TokenJam was built for **agents with real-world consequences**: real-time cost tracking, safety alerts, behavioral drift detection, all running locally on your machine. **No cloud. No signup. No surprises.**
+**TokenJam is the cost-optimization layer for AI agents.** It reads your agent's telemetry — Claude Code session logs, OTel spans, Langfuse / Helicone history — and tells you where to cut spend. Four analyzers do the work, every recommendation is structural and reviewable, and the whole thing runs locally on your machine. No cloud, no signup, no vendor lock-in.
 
-## What you get
+## The four analyzers
+
+These are the primary surface of TokenJam. Each runs against your real usage history; each emits findings you can review and act on. None of them auto-applies changes to your agent — they surface candidates, you decide.
+
+### 🪶 Downsize
+
+Walks every LLM call in your trace history, classifies each session by structural shape (token counts, tool-call count, multi-turn vs single-turn), and flags sessions where a cheaper model in the same family is worth a look. **Never claims quality equivalence** — surfaces example sessions so you can spot-check before changing models.
+
+```bash
+tj optimize downsize
+```
+
+→ Details: [Downsize product page](/products/downsize)
+
+### 💾 Cache
+
+Two analyzers under one product. **Efficacy** shows your current caching ratio per (provider, model) so you can see how much spend is already cached. **Recommend** scans your prompt history for stable prefixes that appear across many calls and suggests where to place `cache_control` breakpoints — Anthropic-only in v1, with the exact savings calculation per breakpoint.
+
+```bash
+tj optimize cache
+tj optimize cache-recommend
+```
+
+→ Details: [Cache product page](/products/cache)
+
+### 📜 Script
+
+Clusters your sessions by `(tool_name, argument_shape)` signature. When the same sequence runs N+ times with zero branching, it flags those sessions as candidates for **replacing an agent loop with a plain script**. Deterministic work is cheaper than re-deriving the same plan from an LLM every time.
+
+```bash
+tj optimize script
+```
+
+→ Details: [Script product page](/products/script)
+
+### ✂️ Trim
+
+Runs every captured prompt through a local classifier (LLMLingua-2, ~280 MB, runs on your machine) that predicts which regions of the prompt the model is likely to ignore. Flags those low-significance regions as bloat candidates and shows you exactly which sections of your prompt template are safe to cut. **No API calls, no per-run cost** — the scoring model is local.
+
+```bash
+tj optimize trim
+```
+
+→ Details: [Trim product page](/products/trim)
+
+### Run them all
+
+```bash
+tj optimize                       # all four
+tj optimize downsize cache trim   # several
+```
+
+[Full `tj optimize` reference →](/docs/cli#tj-optimize)
+
+## TokenMaxx — the social entry point
+
+```bash
+tj tokenmaxx
+```
+
+A single-shot "how hard are you TokenMaxxing?" command that reads the last 30 days of usage, classifies it into a tier (TokenSipper → TokenGigaChad) based on the multiplier vs your declared plan, and surfaces the Downsize savings figure inline. Designed as a shareable screenshot artifact.
+
+Visit [tokenjam.dev/tokenmaxxing](/tokenmaxxing) for the tier ladder and 3-command quickstart.
+
+## Also included: full observability stack
+
+The analyzers ride on top of a complete local-first observability layer. Everything below is shipping in the base install — you don't need to opt in.
 
 **Real-time cost tracking.** Every LLM call is priced as it happens, by agent, model, session, and tool. Budget alerts fire before you hit the limit, not after.
 
@@ -16,6 +82,8 @@ Your agent sends emails, writes files, calls APIs, and spends your money, all wh
 **Behavioral drift detection.** `tj` builds a statistical baseline from your agent's real behavior and alerts when something deviates: a prompt tweak, a model update, a dependency bump. No LLM required.
 
 **Tool output validation.** Declare a JSON Schema for your tools or let `tj` infer one automatically. Schema violations are caught the moment they occur.
+
+**Backfill adapters.** Ingest historical telemetry from Langfuse, Helicone, raw OTLP dumps, or your existing Claude Code session logs — no waiting for new data to accumulate before the analyzers have something to chew on.
 
 **100% local.** DuckDB. Local REST API. No cloud backend. No API key for TokenJam itself. Your telemetry never leaves your machine unless you explicitly export it.
 
