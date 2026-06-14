@@ -353,6 +353,34 @@ nav.tj-nav {
   background: var(--blue-line);
   margin: 6px 4px;
 }
+.nav-mobile-theme {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 0 4px;
+}
+.nav-mobile-theme .theme-menu-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 8px;
+  font-family: 'Geist', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--white-dim);
+  background: transparent;
+  border: 1px solid var(--blue-line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background-color .15s;
+}
+.nav-mobile-theme .theme-menu-item:hover { color: var(--white); border-color: rgba(var(--accent-rgb), 0.3); }
+.nav-mobile-theme .theme-menu-item[aria-current="true"] {
+  color: var(--white);
+  background: var(--white-ghost);
+  border-color: rgba(var(--accent-rgb), 0.4);
+}
 
 @media (max-width: 640px) {
   nav.tj-nav { padding: 0 16px; }

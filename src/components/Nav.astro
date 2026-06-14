@@ -132,6 +132,22 @@ const productsActive = isActive('/products');
     <a href="/blog" role="menuitem" aria-current={isActive('/blog') ? 'page' : undefined}>Blog</a>
     <a href="/about" role="menuitem" aria-current={isActive('/about') ? 'page' : undefined}>About</a>
     <a href="https://github.com/metabuilder-labs/tokenjam" target="_blank" rel="noopener noreferrer" role="menuitem">GitHub</a>
+    <div class="nav-mobile-sep"></div>
+    <div class="nav-mobile-section">Theme</div>
+    <div class="nav-mobile-theme">
+      <button type="button" class="theme-menu-item" data-theme-pref="system">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        System
+      </button>
+      <button type="button" class="theme-menu-item" data-theme-pref="light">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        Light
+      </button>
+      <button type="button" class="theme-menu-item" data-theme-pref="dark">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        Dark
+      </button>
+    </div>
   </div>
 </nav>
 
@@ -148,7 +164,8 @@ const productsActive = isActive('/products');
       document.documentElement.setAttribute('data-theme-pref', pref);
       if (resolved === 'light') document.documentElement.setAttribute('data-theme', 'light');
       else document.documentElement.removeAttribute('data-theme');
-      picker.querySelectorAll('.theme-menu-item').forEach(function (item) {
+      // Update both the desktop picker and the mobile burger menu items.
+      document.querySelectorAll('.theme-menu-item').forEach(function (item) {
         item.setAttribute('aria-current', item.dataset.themePref === pref ? 'true' : 'false');
       });
     }
@@ -168,7 +185,8 @@ const productsActive = isActive('/products');
       var open = picker.classList.toggle('open');
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
-    picker.querySelectorAll('.theme-menu-item').forEach(function (item) {
+    // Bind clicks for theme buttons in BOTH the desktop picker and the mobile menu.
+    document.querySelectorAll('.theme-menu-item').forEach(function (item) {
       item.addEventListener('click', function () {
         setPref(item.dataset.themePref);
         picker.classList.remove('open');
