@@ -22,7 +22,8 @@
 </div>
 
 <style is:global>
-  :root { --banner-h: 36px; }
+  :root { --banner-h: 36px; --banner-bg: #0E1A30; }
+  [data-theme="light"] { --banner-bg: #E8F0FE; }
   html.banner-dismissed { --banner-h: 0px; }
 
   .tj-banner {
@@ -32,12 +33,16 @@
     height: var(--banner-h);
     display: flex; align-items: center; justify-content: center;
     padding: 0 48px;
-    background: rgba(var(--accent-blue-rgb), 0.14);
+    /* Solid surface so page content doesn't show through. Dark theme uses
+       a tinted navy panel; light theme falls back to navy-2 (white in
+       light theme). Keep the bottom hairline in accent-blue to preserve
+       the "this is an announcement, not the nav" cue. */
+    background: var(--banner-bg, #0E1A30);
     color: var(--white);
     font-family: 'Geist', sans-serif;
     font-size: 13px;
     line-height: 1;
-    border-bottom: 1px solid rgba(var(--accent-blue-rgb), 0.22);
+    border-bottom: 1px solid rgba(var(--accent-blue-rgb), 0.28);
     overflow: hidden;
     transition: height .15s;
   }
