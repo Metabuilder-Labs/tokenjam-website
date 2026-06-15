@@ -5,7 +5,7 @@ author: "anil-murty"
 publishDate: 2026-06-15
 tags: ["cost", "tokenmaxxing", "agents", "thesis"]
 pillar: "thesis"
-image: "/og-image.png"
+image: "/blog/the-problem-with-tokenmaxxing.jpg"
 ---
 
 import TLDR from '@/components/TLDR.astro';
@@ -13,7 +13,7 @@ import DefinitionBox from '@/components/DefinitionBox.astro';
 import FAQBlock from '@/components/FAQBlock.astro';
 
 <TLDR>
-- TokenMaxxing is running a flat-rate AI subscription hard enough that the tokens you burn would cost many times the sticker price at metered API rates. A $100/month Max plan doing $4,000 of API-equivalent work is a 40× tokenmaxx.
+- TokenMaxxing is the practice of squeezing every token your flat-rate AI subscription will give you. A $100/month Max plan doing $4,000 of API-equivalent work is a 40× tokenmaxx.
 - That gap is not a hack you found. It's a subsidy the provider is paying, and the subsidy is being withdrawn this quarter. Anthropic's programmatic credit cap lands today, June 15. GitHub Copilot moved to usage-based billing on June 1.
 - Fable 5 is the cleanest signal yet: priced at 2× Opus 4.8, roughly 2× more verbose per task, and removed from flat subscription plans on June 23, two weeks after launch.
 - The economics don't survive the IPO that several of these providers are heading toward. Public markets price companies on margins, and subsidized inference is a negative-margin line item.
@@ -34,7 +34,7 @@ If you want your own number before reading the rest, `tj tokenmaxx` reads your e
 
 ## Where the word came from
 
-The "-maxxing" suffix arrived from internet subculture, where looksmaxxing and similar terms described optimizing one variable to its absolute ceiling. Developers borrowed it for token usage sometime in early 2026, around when the first viral Claude Code bill screenshots started circulating. Tools like `ccusage` made it easy to read your local session logs and compute the implied API value of a flat-rate month. Once you could put a dollar figure on it, the comparison game wrote itself.
+The "-maxxing" suffix arrived from internet subculture, where looksmaxxing and similar terms described optimizing one variable to its absolute ceiling. Developers borrowed it for token usage sometime in early 2026, around when the first viral Claude Code bill screenshots started circulating. Once you could read your local session logs and put a dollar figure on a flat-rate month, the comparison game wrote itself.
 
 The framing caught on because the numbers were genuinely startling. A developer paying $100 a month would discover they had consumed $3,000 or $4,000 of tokens at list API prices. That felt like winning. The screenshots got tiers, the tiers got names, and "are you tokenmaxxing hard enough?" became a real question people asked each other.
 
@@ -72,25 +72,13 @@ This is not an isolated policy. Anthropic's programmatic credit cap takes effect
 
 The reason tokenmaxxing went viral is that the number is shocking when you finally see it. Here's a real run for a Max 5x user, from `tj tokenmaxx`:
 
-```
-╭─ TokenJam TokenMaxxing Report ─────────────────────────────────────────────╮
-│                                                                              │
-│  🔥🔥 You're a TokenMegaMaxxer.                                              │
-│                                                                              │
-│  Touch grass. Then run tj optimize.                                          │
-│                                                                              │
-│  $4056.82 in last 30d across 33 sessions.                                    │
-│  That's 40.6× your Max 5x plan cost ($100/mo flat).                          │
-│                                                                              │
-│  💡 No obvious savings flagged yet — run tj optimize for the full report     │
-│  once you have more data.                                                    │
-│                                                                              │
-╰──────────────────────────────────────────────────────────────────────────────╯
-```
+![tj tokenmaxx output: "🔥🔥 You're a TokenMegaMaxxer. Touch grass. Then run tj optimize. $4056.82 in last 30d across 33 sessions. That's 40.6× your Max 5x plan cost ($100/mo flat)."](/blog/images/tokenmaxxing/03-tj-tokenmaxx-output.png)
 
 $4,056 of API-equivalent value on a $100 plan. A 40.6× multiple. Under the subsidy, that reads as a flex. Read against the credit cap that lands today, it reads as a forecast: that's roughly what this person's usage will cost once the flat-rate cushion is gone and the meter is running.
 
 The tiers people share map directly to how exposed they are when the subsidy ends:
+
+![Six tokenmaxx tiers stacked from TokenSipper at the base to TokenGigaMaxxer at the top, with TokenModerator, TokenMaxxer, TokenSuperMaxxer, and TokenMegaMaxxer in between.](/blog/images/tokenmaxxing/01-tier-ladder.jpg)
 
 | Tier | Multiple | What it means |
 | --- | --- | --- |
@@ -112,6 +100,8 @@ The operational one is usage. The numbers from last quarter were not edge cases.
 The financial one is the IPO horizon. Several of the providers underwriting these flat plans are on a path to public markets. Private companies can run negative gross margin on a product line and call it growth. Public companies get repriced the quarter after they file, on earnings per share and on margin, by analysts who treat subsidized inference as exactly the kind of line item you cut to show a path to profitability. Once the story has to be EPS growth instead of usage growth, "we let power users consume 40× their subscription fee" is the first slide that gets challenged in the board meeting. The companies can't keep losing money on the heaviest users indefinitely, and the moment public-market discipline arrives, they won't.
 
 Could specific policies get walked back? Sure. Caps can expand, a free window can get extended, a seat price can quietly absorb more value for a while. The direction does not reverse. The multi-year trajectory is that agent users feel their token consumption directly. Tokenmaxxing as a free sport has an expiry date, and the dates on the calendar this month are the first installments.
+
+![An old industrial utility meter with a 'TOKENS / $ / CYCLE' face wired into a laptop that reads 'METERED BILLING ARRIVING_' in amber CRT type — a visual metaphor for the flat-rate cushion ending and metered billing taking over.](/blog/images/tokenmaxxing/02-metered-billing.jpg)
 
 ## What to do about it
 
