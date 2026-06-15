@@ -1,16 +1,17 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 
-// The 5 tiers — copy stays in sync with tokenjam/cli/cmd_tokenmaxx.py.
+// The 6 tiers — copy stays in sync with tokenjam/cli/cmd_tokenmaxx.py.
 // Primary classifier is the multiplier vs the user's plan fee; absolute
 // USD/mo thresholds are an API-user fallback calibrated against Max-5x
 // ($100/mo). If the CLI thresholds or quips change, update both.
 const tiers = [
-  { emoji: '💧',   label: 'TokenSipper',    range: '< 1× plan',     apiFallback: '< $100/mo',      quip: 'Are you even using AI?' },
-  { emoji: '🥱',   label: 'TokenModerator', range: '1× – 4× plan',  apiFallback: '$100 – $400/mo', quip: 'Mostly reasonable. Try harder.' },
-  { emoji: '💸',   label: 'TokenMaxxer',    range: '4× – 10× plan', apiFallback: '$400 – $1,000/mo', quip: 'You\'re paying Anthropic\'s rent.' },
-  { emoji: '🔥',   label: 'TokenChad',      range: '10× – 20× plan',apiFallback: '$1,000 – $2,000/mo', quip: 'You\'re paying their interns\' rent too.' },
-  { emoji: '🔥🔥', label: 'TokenGigaChad', range: '20×+ plan',     apiFallback: '$2,000+/mo',     quip: 'Touch grass. Then run `tj optimize`.' },
+  { emoji: '💧',     label: 'TokenSipper',      range: '< 1× plan',      apiFallback: '< $100/mo',        quip: 'Are you even using AI?' },
+  { emoji: '🥱',     label: 'TokenModerator',   range: '1× – 4× plan',   apiFallback: '$100 – $400/mo',   quip: 'Mostly reasonable. Try harder.' },
+  { emoji: '💸',     label: 'TokenMaxxer',      range: '4× – 10× plan',  apiFallback: '$400 – $1,000/mo', quip: 'You\'re paying Anthropic\'s rent.' },
+  { emoji: '🔥',     label: 'TokenSuperMaxxer', range: '10× – 20× plan', apiFallback: '$1,000 – $2,000/mo', quip: 'You\'re paying their interns\' rent too.' },
+  { emoji: '🔥🔥',   label: 'TokenMegaMaxxer',  range: '20× – 50× plan', apiFallback: '$2,000 – $5,000/mo', quip: 'Touch grass. Then run `tj optimize`.' },
+  { emoji: '🔥🔥🔥', label: 'TokenGigaMaxxer',  range: '50×+ plan',      apiFallback: '$5,000+/mo',       quip: 'Anthropic\'s CFO knows your name.' },
 ];
 
 // Three commands the tweet promises. Keep these verbatim with the social copy.
@@ -31,7 +32,7 @@ const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)
 ---
 <BaseLayout
   title="How hard are you TokenMaxxing? — TokenJam"
-  description="Find out your AI token-spending tier in three commands. TokenJam reads your existing Claude Code session logs and classifies your 30-day usage into a tier from TokenSipper to TokenGigaChad. Open-source, local-first, no signup."
+  description="Find out your AI token-spending tier in three commands. TokenJam reads your existing Claude Code session logs and classifies your 30-day usage into a tier from TokenSipper to TokenGigaMaxxer. Open-source, local-first, no signup."
   image="/og-image.png"
 >
   <main class="tj-main">
@@ -85,7 +86,7 @@ const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)
         <p class="tmx-sample-caption">Here's what you'll see — a real run for a Max-5x user.</p>
         <pre class="tmx-sample"><span class="tmx-sample-border">╭─ </span><span class="tmx-sample-title">TokenJam TokenMaxxing Report</span><span class="tmx-sample-border"> ─────────────────────────────────────────────╮</span>
 <span class="tmx-sample-border">│                                                                              │</span>
-<span class="tmx-sample-border">│</span>  🔥🔥 <span class="tmx-sample-bold">You're a TokenGigaChad.</span>                                                <span class="tmx-sample-border">│</span>
+<span class="tmx-sample-border">│</span>  🔥🔥 <span class="tmx-sample-bold">You're a TokenMegaMaxxer.</span>                                              <span class="tmx-sample-border">│</span>
 <span class="tmx-sample-border">│                                                                              │</span>
 <span class="tmx-sample-border">│</span>  Touch grass. Then run <span class="tmx-sample-green">tj optimize</span>.                                          <span class="tmx-sample-border">│</span>
 <span class="tmx-sample-border">│                                                                              │</span>
@@ -128,7 +129,7 @@ const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)
       <!-- TIER LADDER -->
       <section class="tmx-tiers-section">
         <header class="section-head">
-          <h2 class="section-h2">The 5 tiers</h2>
+          <h2 class="section-h2">The 6 tiers</h2>
           <p class="section-lede">
             Classification is based on <strong>how hard you're maxxing your plan</strong> —
             the multiplier between your last-30-days
@@ -196,9 +197,9 @@ const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)
       line-height: 1.05;
       margin: 0 0 18px;
     }
-    /* "TokenMaxxing" accent — red to match the 🔥🔥 GigaChad tier highlight and
-       signal the cost-of-burning-tokens vibe. Avoids the muted on-brand blue,
-       which read as just another section header. */
+    /* "TokenMaxxing" accent — red to match the 🔥🔥🔥 GigaMaxxer tier highlight
+       and signal the cost-of-burning-tokens vibe. Avoids the muted on-brand
+       blue, which read as just another section header. */
     .tmx-hero-accent {
       color: #EF4444;
     }
@@ -268,8 +269,9 @@ const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)
       background: rgba(255, 255, 255, 0.035);
       border-color: rgba(255, 255, 255, 0.18);
     }
-    /* The TokenGigaChad row gets a subtle warning glow to mirror the 🔥🔥 emphasis */
-    .tmx-tier[data-tier="TokenGigaChad"] {
+    /* The TokenGigaMaxxer row (top tier, 50×+) gets a subtle warning glow to
+       mirror the 🔥🔥🔥 emphasis. */
+    .tmx-tier[data-tier="TokenGigaMaxxer"] {
       background: linear-gradient(90deg, rgba(239, 68, 68, 0.08), rgba(245, 158, 11, 0.04));
       border-color: rgba(239, 68, 68, 0.35);
     }
