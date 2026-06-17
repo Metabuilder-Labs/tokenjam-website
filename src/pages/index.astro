@@ -186,6 +186,25 @@ const productsRaw = [
       { t: '    Estimated savings: $87/mo, plus ~30s latency per execution.',                 c: 'success'},
     ],
   },
+  {
+    slug: 'reuse',
+    name: 'Reuse',
+    blurb: 'Find planning your agent keeps redoing and pays for every time.',
+    output: [
+      { t: 'Repeated planning detected (last 30d):',                                           c: 'label'  },
+      { t: '  • Cluster "patch-release": 31 sessions share one plan skeleton',                 c: 'val'    },
+      { t: '    (read changelog → bump version → run tests → tag → push)',                     c: 'val'    },
+      { t: '  • Planning portion: ~2,100 tokens/session on claude-opus-4-7',                   c: 'val'    },
+      { t: '  • The skeleton is identical across all 31 runs; only the version',               c: 'val'    },
+      { t: '    string and date change.',                                                      c: 'val'    },
+      { t: '  • You paid to generate this plan 31 times.',                                     c: 'val'    },
+      { t: '  • Estimated recoverable: ~$54/mo if served from a plan cache',                   c: 'success'},
+      { t: '    (or ~$61/mo if converted to a slash command)',                                 c: 'success'},
+      { t: '',                                                                                 c: 'blank'  },
+      { t: '     ⚠ Structural analysis only. Review the exported templates',                   c: 'warn'   },
+      { t: '       in `tj report --reuse` before reusing them.',                               c: 'warn'   },
+    ],
+  },
 ];
 
 // Decorate each product with its accent color from the data catalog.
@@ -206,7 +225,7 @@ const installJoined = installLines.join('\n');
 ---
 <BaseLayout
   title="TokenJam — Driving Token efficiency for AI agents"
-  description="TokenJam reads your agent's telemetry and tells you when to downsize, when to trim prompts, what to cache, and what to script. The result is a lower AI bill."
+  description="TokenJam reads your agent's telemetry and tells you when to downsize, when to trim prompts, what to cache, what to script, and what to reuse. The result is a lower AI bill."
   image="/og-image.png"
   wide
 >
@@ -217,7 +236,7 @@ const installJoined = installLines.join('\n');
         <h1 class="hero-h1">Driving Token Efficiency For AI Agents</h1>
         <p class="hero-sub">
           TokenJam reads your agent's telemetry and tells you when to downsize,
-          when to trim prompts, what to cache, and what to script. The result is a lower AI bill.
+          when to trim prompts, what to cache, what to script, and what to reuse. The result is a lower AI bill.
         </p>
         <p class="hero-sub hero-sub-faint">Open-source. Runs locally. Full observability stack included.</p>
         <div class="hero-ctas">
@@ -372,7 +391,7 @@ const installJoined = installLines.join('\n');
   <!-- FOUR-PRODUCT SUMMARY -->
   <section class="products-grid-section">
     <header class="section-head">
-      <h2 class="section-h2">Four analyzers. One install.</h2>
+      <h2 class="section-h2">Five analyzers. One install.</h2>
       <p class="section-lede">
         Each analyzer reads the same captured telemetry and surfaces a different shape of waste.
       </p>
@@ -415,7 +434,7 @@ const installJoined = installLines.join('\n');
     </div>
 
     <div class="products-cta-strip">
-      <p>All four are in the open-source CLI. Install once, analyze everything.</p>
+      <p>All five are in the open-source CLI. Install once, analyze everything.</p>
       <div class="products-cta-buttons">
         <a href="#install" class="btn-primary">Get started</a>
         <a href="https://github.com/metabuilder-labs/tokenjam" target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub</a>
@@ -438,7 +457,7 @@ const installJoined = installLines.join('\n');
       <div class="how-col">
         <h3 class="how-h3">Analyzing Data</h3>
         <p>
-          Four analyzers, each grounded in published research and validated against your own data. Findings carry explicit confidence levels. TokenJam never claims a smaller model would have produced an identical answer; it shows the candidates with evidence, and you decide what to apply.
+          Five analyzers, each grounded in published research and validated against your own data. Findings carry explicit confidence levels. TokenJam never claims a smaller model would have produced an identical answer; it shows the candidates with evidence, and you decide what to apply.
         </p>
       </div>
       <div class="how-col">
@@ -515,7 +534,7 @@ const installJoined = installLines.join('\n');
   <section class="cloud-teaser">
     <div class="cloud-teaser-inner">
       <span class="cloud-eyebrow">TokenJam Cloud</span>
-      <h2 class="cloud-h2">Hosted, multi-user, governed. Same four products, run across your team's agents.</h2>
+      <h2 class="cloud-h2">Hosted, multi-user, governed. Same five products, run across your team's agents.</h2>
       <p class="cloud-body">
         Cloud aggregates the analyzers across every agent your team runs. Recommendations land in a shared dashboard instead of N developers each running <code>tj optimize</code> locally. Policies for routing, budgets, and sensitive-action rules are defined once and applied across the fleet.
       </p>
@@ -1115,7 +1134,7 @@ const installJoined = installLines.join('\n');
     }
     /* flex:1 + min-height floor — terminal grows to fill available card space, but never
        collapses below the height of the tallest output (Downsize). Shorter outputs trail
-       with whitespace at the bottom so all four cards' terminals match visually. */
+       with whitespace at the bottom so all five cards' terminals match visually. */
     .product-card-body {
       padding: 16px 18px;
       margin: 0;

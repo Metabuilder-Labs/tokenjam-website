@@ -48,6 +48,23 @@ const { product } = Astro.props;
       </div>
     </section>
 
+    {/* Optional "Reuse is not Cache / not Script" style disambiguation
+        block, between problem and mechanism. Only renders if the product
+        defines a contrasts array. */}
+    {product.contrasts && product.contrasts.length > 0 && (
+      <section class="pp-section">
+        <h2 class="pp-h2">How it differs</h2>
+        <div class="pp-contrasts">
+          {product.contrasts.map((c) => (
+            <div class="pp-contrast">
+              <h3 class="pp-contrast-vs">{c.vs}</h3>
+              <p class="pp-contrast-body">{c.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
     <!-- HOW IT WORKS -->
     <section class="pp-section">
       <h2 class="pp-h2">How it works</h2>
@@ -230,6 +247,35 @@ const { product } = Astro.props;
       max-width: 720px;
     }
     .pp-prose p:last-child { margin-bottom: 0; }
+
+    /* CONTRASTS — "X is not Y" disambiguation block. House style allows
+       at most two pairs, so render as a single column without dividers. */
+    .pp-contrasts {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 720px;
+    }
+    .pp-contrast {
+      padding: 22px 24px;
+      background: rgba(var(--product-accent-rgb), 0.06);
+      border: 1px solid rgba(var(--product-accent-rgb), 0.22);
+      border-radius: 12px;
+    }
+    .pp-contrast-vs {
+      font-family: 'Geist', sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -.01em;
+      color: var(--product-accent);
+      margin: 0 0 8px;
+    }
+    .pp-contrast-body {
+      color: var(--white);
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0;
+    }
 
     /* CALLOUT */
     .pp-callout {

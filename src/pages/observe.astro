@@ -67,13 +67,14 @@ const features = [
 ];
 
 // Powers-the-analyzers list. The point of this section: observability isn't
-// a bolt-on. It's the substrate the four analyzers ride on. Each analyzer
+// a bolt-on. It's the substrate the five analyzers ride on. Each analyzer
 // needs particular telemetry shapes that the observability stack collects.
 const analyzerLinks = [
   { slug: 'downsize', name: 'Downsize', needs: 'token counts, tool-call shape, session classification' },
   { slug: 'cache',    name: 'Cache',    needs: 'captured prompts and prefix-stability tracking' },
   { slug: 'script',   name: 'Script',   needs: 'tool-name + argument-shape signatures per session' },
   { slug: 'trim',     name: 'Trim',     needs: 'captured prompt content for token-significance scoring' },
+  { slug: 'reuse',    name: 'Reuse',    needs: 'plan-skeleton clustering across completed sessions' },
 ];
 ---
 <BaseLayout
@@ -91,7 +92,7 @@ const analyzerLinks = [
         <p class="observe-hero-sub">
           TokenJam isn't only a cost-optimization tool — it's a full local-first observability
           tool for AI agents. Traces, drift, alerts, budgets, schema validation, and a web UI.
-          The four analyzers ride on top of this substrate. Free, open-source, MIT-licensed.
+          The five analyzers ride on top of this substrate. Free, open-source, MIT-licensed.
         </p>
         <div class="observe-hero-ctas">
           <a href="/#install" class="btn-primary btn-lg">Get started</a>

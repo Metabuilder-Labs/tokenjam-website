@@ -3,7 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 ---
 <BaseLayout
   title="About — TokenJam"
-  description="TokenJam is the cost-optimization layer for AI agents. It reads your agent's telemetry and surfaces insights that reduce your AI bill across four sub-products: Downsize, Trim, Cache, and Script."
+  description="TokenJam is the cost-optimization layer for AI agents. It reads your agent's telemetry and surfaces insights that reduce your AI bill across five sub-products: Downsize, Trim, Cache, Script, and Reuse."
 >
   <main class="tj-main">
     <article class="about">
@@ -15,7 +15,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
         <h2>What is TokenJam?</h2>
         <p>
           TokenJam is the cost-optimization layer for your AI agents. It reads your agent's
-          telemetry and surfaces insights that reduce your AI bill. It does this through four
+          telemetry and surfaces insights that reduce your AI bill. It does this through five
           sub-products, each implementing a well-researched cost-optimization technique. It
           also bundles a full observability stack: traces, drift detection, budgets,
           sensitive-action alerts, and more.
@@ -51,6 +51,13 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
             sequence runs N+ times with zero branching, it flags those sessions as candidates
             for replacing an agent loop with a plain Python script. Deterministic work is way
             cheaper than re-deriving the same plan from an LLM every time.
+          </li>
+          <li>
+            <strong>TokenJam "Reuse":</strong> Clusters your sessions by plan shape and isolates
+            the planning portion. When the same skeleton repeats across many runs with only
+            small details changing, it flags the cluster as a reuse candidate and quantifies
+            what you spent regenerating the plan, then exports the skeleton as a reviewable
+            template you can serve from a cache or convert into a slash command.
           </li>
         </ol>
       </section>

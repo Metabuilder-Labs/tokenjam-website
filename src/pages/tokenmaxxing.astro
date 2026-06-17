@@ -163,10 +163,11 @@ const xIntent = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)
         <h2 class="tmx-next-h2">What does it actually do with that?</h2>
         <p>
           The tier is the shock value. The point of the tool is what comes next:
-          <code>tj optimize</code> runs four analyzers against your usage history and
-          surfaces specific savings candidates — sessions where a cheaper model would
+          <code>tj optimize</code> runs five analyzers against your usage history and
+          surfaces specific savings candidates: sessions where a cheaper model would
           have done the same job, prompt sections you could trim, prefixes you could
-          cache, deterministic sequences you could replace with a script.
+          cache, deterministic sequences you could replace with a script, and repeated
+          planning you could serve from a template instead of regenerating.
         </p>
         <div class="tmx-next-ctas">
           <a class="btn-secondary" href="/products/downsize" onclick="window.trackEvent && window.trackEvent('cta_click', 'engagement', 'tokenmaxx_to_downsize')">See how Downsize works →</a>

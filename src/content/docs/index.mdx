@@ -1,13 +1,13 @@
 ---
 title: Introduction
-description: TokenJam is the cost-optimization layer for AI agents. Four analyzers (Downsize, Cache, Script, Trim) read your existing telemetry and surface where to cut spend — plus a full local-first observability stack underneath. Open-source, no signup, runs entirely on your machine.
+description: TokenJam is the cost-optimization layer for AI agents. Five analyzers (Downsize, Cache, Script, Trim, Reuse) read your existing telemetry and surface where to cut spend, plus a full local-first observability stack underneath. Open-source, no signup, runs entirely on your machine.
 section: getting-started
 order: 1
 ---
 
-**TokenJam is the cost-optimization layer for AI agents.** It reads your agent's telemetry — Claude Code session logs, OTel spans, Langfuse / Helicone history — and tells you where to cut spend. Four analyzers do the work, every recommendation is structural and reviewable, and the whole thing runs locally on your machine. No cloud, no signup, no vendor lock-in.
+**TokenJam is the cost-optimization layer for AI agents.** It reads your agent's telemetry (Claude Code session logs, OTel spans, Langfuse / Helicone history) and tells you where to cut spend. Five analyzers do the work, every recommendation is structural and reviewable, and the whole thing runs locally on your machine. No cloud, no signup, no vendor lock-in.
 
-## The four analyzers
+## The five analyzers
 
 These are the primary surface of TokenJam. Each runs against your real usage history; each emits findings you can review and act on. None of them auto-applies changes to your agent — they surface candidates, you decide.
 
@@ -52,10 +52,20 @@ tj optimize trim
 
 → Details: [Trim product page](/products/trim)
 
+### ♻️ Reuse
+
+Clusters your sessions by plan shape and isolates the planning portion of each run. When the same skeleton repeats across many sessions with only small details changing (the same release sequence, the same review loop, the same patch flow), it flags the cluster as a reuse candidate and quantifies what you spent regenerating the plan. Exports each skeleton via `tj report --reuse` as a reviewable template you can serve from a cache or convert into a slash command. **Structural analysis only** — review the templates before reusing them.
+
+```bash
+tj optimize reuse
+```
+
+→ Details: [Reuse product page](/products/reuse)
+
 ### Run them all
 
 ```bash
-tj optimize                       # all four
+tj optimize                       # all five
 tj optimize downsize cache trim   # several
 ```
 
