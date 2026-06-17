@@ -1187,6 +1187,27 @@ const installJoined = installLines.join('\n');
 
     @media (max-width: 820px) {
       .products-grid { grid-template-columns: 1fr; }
+      /* On mobile each card already takes the full row, so the
+         centering rule for an odd trailing card is unnecessary and
+         would visually squash it to half-width. Reset it. */
+      .products-grid > article:last-child:nth-child(odd) {
+        grid-column: auto;
+        justify-self: stretch;
+        width: auto;
+        max-width: none;
+      }
+      /* Narrow viewports + mono font make terminals wrap heavily and
+         the min-height floor compounds it. Shrink the type and let
+         each card hug its own content. Horizontal scroll is the
+         escape hatch if a single line is still too wide. */
+      .product-card-term { font-size: 11px; line-height: 1.55; }
+      .product-card-body {
+        font-size: 10.5px;
+        min-height: 0;
+        padding: 14px 14px;
+        white-space: pre;
+        overflow-x: auto;
+      }
     }
 
     /* ── HOW IT WORKS ─────────────────────────────── */
