@@ -11,6 +11,7 @@ image: "/blog/model-autorouting.jpg"
 import TLDR from '@/components/TLDR.astro';
 import DefinitionBox from '@/components/DefinitionBox.astro';
 import FAQBlock from '@/components/FAQBlock.astro';
+import Terminal from '@/components/Terminal.astro';
 
 <TLDR>
 - AI model autorouting picks which model answers each request instead of sending everything to one default model.
@@ -36,6 +37,8 @@ That's the opening AI model autorouting walks into. If you could send the typo f
 
 ## The three things people call "routing"
 
+![Three side-by-side panels on black: a failover mechanism with one path rerouting around a broken model, a load-balancer fanning equal traffic into three identical squares, and a prompt-aware router inspecting the request through a magnifying glass before choosing between three differently-shaped models.](/blog/images/autorouting/01-three-kinds-of-routing.jpg)
+
 The word "routing" covers three mechanisms that do very different jobs. Sorting them out is the fastest way to cut through the marketing.
 
 The first is **failover**. The primary model errors or times out, so the request falls through to a backup. This is a reliability feature. It keeps your app up when a provider has a bad minute. It makes no judgment about which model is right for the request.
@@ -57,6 +60,8 @@ A router needs to answer one question fast, before the real model runs: is this 
 **Predictive routing** estimates per-model quality (and sometimes cost) for the specific prompt, then optimizes the tradeoff. This is the line of work behind Chip Huyen's "predictive human preference" framing, which RouteLLM builds on directly.
 
 Cascading is a close cousin worth naming. Instead of deciding up front, a cascade tries the cheap model first, checks whether the answer clears a confidence bar, and only escalates if it doesn't. FrugalGPT is the canonical example. Routing makes one decision and one call; cascading may make several, trading extra latency for not having to predict difficulty in advance.
+
+![Side-by-side flow diagrams. Left panel "ROUTING": request goes through "predict difficulty" into a single chosen model and out to an answer. Right panel "CASCADING": request hits a cheap model first, a confidence check branches "yes" to an answer or "no" to a strong model. Caption: "Routing predicts once. Cascading escalates only on failure."](/blog/images/autorouting/02-routing-vs-cascading.jpg)
 
 Most real systems also expose a dial: a knob from "always pick the most capable model" to "always pick the cheapest." Where you set it depends on how much quality you're willing to risk to save money, and that answer is different for a customer-facing agent than for a batch summarization job.
 
@@ -80,6 +85,22 @@ Concretely, before you wire up any router you want answers to: what fraction of 
 
 This is exactly the gap [TokenJam Downsize](/products/downsize) closes. It walks every LLM call in your captured trace history, classifies each session by structural shape (input and output token counts, tool-call count, single- versus multi-turn), and flags the sessions that match a small-task pattern. Then it computes what those calls would have cost on a cheaper model and shows you the difference, grounded in your data rather than someone's leaderboard. A real run against a Claude Code project flagged 47% of sessions as candidates for a smaller model, with the savings figure attached to each finding.
 
+<Terminal title="tj optimize — downsize">
+<span class="tline"><span class="t-prompt">$ </span><span class="t-cmd">tj optimize</span></span>
+<span class="tline t-blank"> </span>
+<span class="tline t-dim">Analyzing 247 sessions, 9.8K spans, 4.0M tokens (last 30d)…</span>
+<span class="tline t-blank"> </span>
+<span class="tline t-label">  ① Model downgrade: 47% of sessions look Haiku-eligible</span>
+<span class="tline t-val">     • 116 of 247 sessions match structural heuristics</span>
+<span class="tline t-val">     • Currently: claude-opus-4-7, claude-sonnet-4-7</span>
+<span class="tline t-val">     • Suggested target: claude-haiku-4-5</span>
+<span class="tline t-success">     • At current usage: $1,886 → $254 (-86% on flagged sessions)</span>
+<span class="tline t-success">     • Estimated monthly savings: $1,632 (-38% total)</span>
+<span class="tline t-blank"> </span>
+<span class="tline t-warn">     ⚠ Structural heuristic only. Run `tj optimize --validate`</span>
+<span class="tline t-warn">       to replay-test on your actual sessions before applying.</span>
+</Terminal>
+
 Downsize never claims the cheaper model would have produced an identical answer. It surfaces candidates with evidence and leaves the call to you. Under the hood it leans on the same research above: FrugalGPT's cascade-confidence framing and RouteLLM as the routing engine for the validated tier. The structural pass ships in the open-source CLI; a replay-validated tier actually re-runs flagged sessions through the cheaper model and compares tool-call sequences before recommending anything.
 
 Think of it as the step before routing. Downsize tells you where routing would pay off and where it wouldn't. Once you know that, configuring a router (or just changing a default in your agent settings) is the easy part.
@@ -88,11 +109,11 @@ Think of it as the step before routing. Downsize tells you where routing would p
 
 The measurement runs locally and reads telemetry you already have, so there's nothing to instrument first:
 
-```
-pipx install tokenjam
-tj onboard --claude-code
-tj optimize downsize
-```
+<Terminal title="install">
+<span class="tline"><span class="t-prompt">$ </span><span class="t-cmd">pipx install tokenjam</span></span>
+<span class="tline"><span class="t-prompt">$ </span><span class="t-cmd">tj onboard --claude-code</span></span>
+<span class="tline"><span class="t-prompt">$ </span><span class="t-cmd">tj optimize downsize</span></span>
+</Terminal>
 
 `onboard` reads your existing Claude Code session logs from the last 30 days. `tj optimize downsize` gives you the list of over-provisioned sessions with a dollar figure on each. If you'd rather see the one-line "how hard am I overpaying" version first, `tj tokenmaxx` reads the same history and prints a single shareable summary (more on that in [the problem with TokenMaxxing](/blog/2026-06-15-the-problem-with-tokenmaxxing)).
 
@@ -119,4 +140,5 @@ Routing is a powerful lever once you know which tasks to pull it for. Measure fi
 - [Hybrid LLM: Cost-Efficient and Quality-Aware Query Routing](https://arxiv.org/abs/2404.14618) (ICLR 2024). The most production-realistic of the routing papers.
 - [RouterBench](https://arxiv.org/abs/2403.12031). A standardized benchmark for comparing routers across 400k+ measured outcomes.
 - [Predictive Human Preference](https://huyenchip.com/2024/02/28/predictive-human-preference.html) (Chip Huyen). The model-ranking-to-routing framing that RouteLLM builds on.
+- [TokenJam Downsize](/products/downsize). The measurement step before any router. Reads your own session history and flags the calls a cheaper model would have handled.
 - [What is agent observability?](/blog/2026-05-09-agent-observability). Why measurement is the prerequisite for every optimization, routing included.

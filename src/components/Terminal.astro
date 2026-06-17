@@ -1,0 +1,41 @@
+---
+/*
+ * Styled terminal block reusable from MDX. Renders the same .terminal /
+ * .terminal-titlebar / .terminal-body / .tline / .t-* visual the homepage
+ * product cards and /tokenmaxxing install strip use. Title shows in the
+ * titlebar; children go in the body.
+ *
+ * Usage in MDX:
+ *
+ *   import Terminal from '@/components/Terminal.astro';
+ *
+ *   <Terminal title="install">
+ *     <span class="tline"><span class="t-prompt">$ </span><span class="t-cmd">pipx install tokenjam</span></span>
+ *   </Terminal>
+ *
+ * Or just drop pre-formatted lines as children; whitespace is preserved.
+ */
+interface Props {
+  title?: string;
+}
+const { title } = Astro.props;
+---
+<div class="terminal blog-terminal">
+  <div class="terminal-titlebar">
+    <span class="dot dot-r"></span>
+    <span class="dot dot-y"></span>
+    <span class="dot dot-g"></span>
+    {title && <span class="terminal-title">{title}</span>}
+  </div>
+  <div class="terminal-body">
+    <slot />
+  </div>
+</div>
+
+<style is:global>
+  /* Blog terminals sit inside .prose, which adds margins to its children.
+     Give the wrapper its own breathing room and clear .prose's defaults. */
+  .prose .blog-terminal { margin: 28px 0; }
+  .prose .blog-terminal .terminal-body { padding: 18px 22px; }
+  .prose .blog-terminal .tline { margin: 0; }
+</style>
