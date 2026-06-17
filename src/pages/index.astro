@@ -1064,6 +1064,15 @@ const installJoined = installLines.join('\n');
       gap: 28px;
       margin-top: 8px;
     }
+    /* When the last card sits alone on its row (odd total), span both
+       columns and center it at single-card width so it doesn't leave
+       an awkward blank slot on the right. */
+    .products-grid > article:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: 100%;
+      max-width: calc(50% - 14px); /* 28px gap / 2 = 14px to match column width */
+    }
     .product-card {
       position: relative;
       display: flex;
