@@ -47,7 +47,10 @@ const productsActive = isActive('/products');
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3.5l3 3 3-3"/></svg>
       </button>
       <div class="nav-products-menu" role="menu" aria-labelledby="nav-products-toggle">
-        {products.map((p) => (
+        {/* 5 analyzers in catalog order; Lens is filtered out and rendered
+            after Observe further down so the dropdown reads:
+            analyzers -> sep -> infrastructure (Observe, Lens). */}
+        {products.filter((p) => p.slug !== 'lens').map((p) => (
           <a href={`/products/${p.slug}`} role="menuitem" class="nav-products-item">
             <span class="nav-products-icon" aria-hidden="true" style={`color:${p.accent}`} set:html={p.icon}></span>
             <div class="nav-products-text">
@@ -66,6 +69,15 @@ const productsActive = isActive('/products');
             <span class="nav-products-tag">Traces, drift, alerts, schema</span>
           </div>
         </a>
+        {products.filter((p) => p.slug === 'lens').map((p) => (
+          <a href={`/products/${p.slug}`} role="menuitem" class="nav-products-item">
+            <span class="nav-products-icon" aria-hidden="true" style={`color:${p.accent}`} set:html={p.icon}></span>
+            <div class="nav-products-text">
+              <span class="nav-products-name" style={`color:${p.accent}`}>{p.name}</span>
+              <span class="nav-products-tag">{p.tagline}</span>
+            </div>
+          </a>
+        ))}
       </div>
     </li>
     <li><a href="/docs" aria-current={isActive('/docs') ? 'page' : undefined}>Docs</a></li>

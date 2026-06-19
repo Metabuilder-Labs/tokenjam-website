@@ -174,8 +174,9 @@ const { product } = Astro.props;
       padding: 100px 32px 64px;
     }
 
-    /* HERO — "TokenJam {Product}". Brand prefix in white, product name in the per-product accent. */
-    .pp-hero { margin-bottom: 56px; }
+    /* HERO — "TokenJam {Product}". Centered icon chip in the product accent,
+       brand prefix in white, product name in the per-product accent. */
+    .pp-hero { margin-bottom: 56px; text-align: center; }
     .pp-name-icon {
       display: inline-flex;
       align-items: center;
@@ -195,6 +196,7 @@ const { product } = Astro.props;
       font-size: clamp(48px, 7vw, 96px);
       margin: 0 0 20px;
       display: flex;
+      justify-content: center;
       flex-wrap: wrap;
       gap: 0.22em;
     }
@@ -207,20 +209,21 @@ const { product } = Astro.props;
       line-height: 1.2;
       font-size: clamp(20px, 2.4vw, 30px);
       color: var(--white);
-      margin: 0 0 14px;
+      margin: 0 auto 14px;
       max-width: 720px;
     }
     .pp-sub {
       color: var(--white-dim);
       font-size: clamp(15px, 1.3vw, 17px);
       line-height: 1.55;
-      margin: 0 0 28px;
+      margin: 0 auto 28px;
       max-width: 720px;
     }
     .pp-hero-ctas {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      justify-content: center;
     }
 
     /* SECTIONS */
