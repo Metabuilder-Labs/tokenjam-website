@@ -4,10 +4,15 @@ import { products, productIcons } from '@/data/products';
 import type { ProductData } from '@/data/products';
 
 export function getStaticPaths() {
-  return products.map((p) => ({
-    params: { slug: p.slug },
-    props: { product: p },
-  }));
+  // Lens has its own dedicated page (src/pages/products/lens.astro) because
+  // it's a UI surface with a different rhythm (no problem/mechanism/confidence
+  // narrative). Filter it out here so the routes don't collide.
+  return products
+    .filter((p) => p.cardVariant !== 'browser')
+    .map((p) => ({
+      params: { slug: p.slug },
+      props: { product: p },
+    }));
 }
 
 interface Props { product: ProductData; }

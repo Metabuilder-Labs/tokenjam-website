@@ -42,24 +42,28 @@ export interface ContrastPair {
 }
 
 export interface ProductData {
-  slug: 'downsize' | 'trim' | 'cache' | 'script' | 'reuse';
+  slug: 'downsize' | 'trim' | 'cache' | 'script' | 'reuse' | 'lens';
   name: string;
   shortBlurb: string;     // matches the homepage card blurb
   heroClaim: string;      // h1 claim
   /** Vibrant brand accent used across the product page (hero name, confidence-tier chip, etc.) */
   accent: string;         // hex
   accentRgb: string;      // "R, G, B" — for rgba() variants
-  problem: string[];      // paragraphs
-  /** Short "X is not Y" disambiguation block, used when this analyzer is
-   *  easy to confuse with another. Rendered between problem and mechanism. */
+  /** Homepage card preview frame. Defaults to 'terminal' (CLI mock). Lens
+   *  uses 'browser' because it's a UI surface, not a CLI. */
+  cardVariant?: 'terminal' | 'browser';
+  /** Analyzer-only narrative fields. Lens populates only the headline-level
+   *  fields and is rendered by a dedicated /products/lens page; the
+   *  dynamic [slug] route filters it out via getStaticPaths. */
+  problem?: string[];     // paragraphs
   contrasts?: ContrastPair[];
-  mechanism: string[];    // paragraphs
-  privacyNote?: string;   // Trim only
-  confidence: ConfidenceLevel[];
-  exampleOutput: TerminalLine[];
-  exampleCaption: string; // small label above the terminal
-  usage: UsageEntry[];
-  research: Citation[];
+  mechanism?: string[];   // paragraphs
+  privacyNote?: string;
+  confidence?: ConfidenceLevel[];
+  exampleOutput?: TerminalLine[];
+  exampleCaption?: string;
+  usage?: UsageEntry[];
+  research?: Citation[];
 }
 
 export const products: ProductData[] = [
@@ -372,6 +376,22 @@ export const products: ProductData[] = [
       },
     ],
   },
+
+  // ── LENS ─────────────────────────────────────────────────
+  // Lens is the local web UI surface (the `tj serve` dashboard) that brings
+  // every analyzer's findings into one screen. It isn't a sixth analyzer; it
+  // sits alongside them as the visualization layer. cardVariant: 'browser'
+  // tells the homepage to use a browser-chrome card preview, and the dynamic
+  // [slug] route filters this entry out (the dedicated lens.astro handles it).
+  {
+    slug: 'lens',
+    name: 'Lens',
+    cardVariant: 'browser',
+    shortBlurb: "See your spend, your recoverable waste, and your alerts at a glance, in a local browser dashboard.",
+    heroClaim: "The local dashboard for every analyzer's findings.",
+    accent: '#06B6D4',
+    accentRgb: '6, 182, 212',
+  },
 ];
 
 export function getProduct(slug: string): ProductData | undefined {
@@ -402,4 +422,5 @@ export const productIcons: Record<ProductData['slug'], string> = {
   cache:    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>`,
   script:   `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
   reuse:    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
+  lens:     `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16" y2="16"/></svg>`,
 };

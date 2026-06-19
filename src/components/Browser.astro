@@ -1,0 +1,189 @@
+---
+/*
+ * Browser-chrome frame, the visual rhyme of Terminal.astro. Used for Lens
+ * card previews and dedicated /products/lens page screenshots, so the UI
+ * surface gets a UI-shaped wrapper (not a CLI-shaped one).
+ *
+ *   <Browser url="127.0.0.1:7391/#/overview">
+ *     ...HTML composition of the dashboard mock...
+ *   </Browser>
+ *
+ * Styling matches the existing .terminal block so the two card variants
+ * sit side by side on the homepage without one feeling foreign.
+ */
+interface Props {
+  url?: string;
+}
+const { url = '127.0.0.1:7391/' } = Astro.props;
+---
+<div class="browser">
+  <div class="browser-titlebar">
+    <span class="dot dot-r"></span>
+    <span class="dot dot-y"></span>
+    <span class="dot dot-g"></span>
+    <span class="browser-url">{url}</span>
+  </div>
+  <div class="browser-body">
+    <slot />
+  </div>
+</div>
+
+<style is:global>
+  .browser {
+    background: var(--navy-3);
+    border: 1px solid rgba(var(--accent-rgb), 0.2);
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 100%;
+    box-shadow:
+      0 0 0 1px rgba(var(--accent-rgb), 0.08),
+      0 24px 60px rgba(0, 0, 0, 0.45),
+      0 0 80px rgba(var(--accent-rgb), 0.08);
+    font-family: 'Geist', sans-serif;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--white-dim);
+  }
+  .browser-titlebar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    background: rgba(var(--accent-rgb), 0.05);
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
+  }
+  .browser .dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+  .browser .dot-r { background: #ff5f57; }
+  .browser .dot-y { background: #ffbd2e; }
+  .browser .dot-g { background: #28c840; }
+  .browser-url {
+    flex: 1;
+    text-align: center;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: rgba(var(--accent-rgb), 0.5);
+    background: rgba(var(--accent-rgb), 0.06);
+    border-radius: 999px;
+    padding: 3px 12px;
+    border: 1px solid rgba(var(--accent-rgb), 0.08);
+  }
+  .browser-body {
+    padding: 16px 18px;
+    text-align: left;
+  }
+
+  /* ── Lens preview composition ───────────────────────────────
+     Used inside <Browser> on the homepage card and on /products/lens.
+     Keeps all the styling here so callers just compose with `lp-*` divs. */
+  .lp-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .lp-title { font-weight: 600; color: var(--white); letter-spacing: -.005em; }
+  .lp-meta { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--white-faint); }
+  .lp-band {
+    background: rgba(var(--accent-rgb), 0.04);
+    border: 1px solid rgba(var(--accent-rgb), 0.08);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-top: 10px;
+  }
+  .lp-band-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 8px;
+  }
+  .lp-band-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--white-faint);
+  }
+  .lp-band-chip {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--product-accent, var(--accent-blue));
+    background: rgba(var(--product-accent-rgb, 6, 182, 212), 0.12);
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+  .lp-hero-val {
+    font-family: 'Geist', sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    color: var(--white);
+    line-height: 1.1;
+  }
+  .lp-spark {
+    display: flex; align-items: flex-end; gap: 3px;
+    height: 22px;
+    margin: 8px 0 6px;
+  }
+  .lp-spark > span {
+    flex: 1;
+    background: linear-gradient(to top, rgba(var(--product-accent-rgb, 6, 182, 212), 0.4), rgba(var(--product-accent-rgb, 6, 182, 212), 0.85));
+    border-radius: 2px;
+    min-width: 4px;
+  }
+  .lp-caveat {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10.5px;
+    color: var(--white-faint);
+    margin-top: 4px;
+  }
+  .lp-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .lp-tile {
+    background: var(--navy);
+    border: 1px solid rgba(var(--accent-rgb), 0.1);
+    border-radius: 6px;
+    padding: 8px 10px;
+    min-width: 0;
+  }
+  .lp-tile-name {
+    font-size: 10.5px;
+    color: var(--white-faint);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lp-tile-val {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    color: var(--white);
+    font-weight: 500;
+  }
+  .lp-tile-val--ok { color: var(--green); }
+  .lp-tile-val--null { color: var(--white-faint); }
+  .lp-health {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    color: var(--white-dim);
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+  .lp-health-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    flex-shrink: 0;
+  }
+
+  /* Wider preview (used on /products/lens at full-page width) */
+  .lp-tiles--six { grid-template-columns: repeat(6, 1fr); }
+  @media (max-width: 720px) {
+    .lp-tiles--six { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .lp-tiles { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

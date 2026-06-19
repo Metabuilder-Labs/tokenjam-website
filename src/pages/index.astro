@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { products as productCatalog, productIcons } from '@/data/products';
+import Browser from '@/components/Browser.astro';
+import LensOverviewPreview from '@/components/LensOverviewPreview.astro';
 import { getStarCount, formatStars, ghUrl } from '@/lib/github';
 
 const heroStarLabel = formatStars(await getStarCount());
@@ -190,6 +192,7 @@ const productsRaw = [
     slug: 'reuse',
     name: 'Reuse',
     blurb: 'Find planning your agent keeps redoing and pays for every time.',
+    variant: 'terminal',
     output: [
       { t: 'Repeated planning detected (last 30d):',                                           c: 'label'  },
       { t: '  • Cluster "patch-release": 31 sessions share one plan skeleton',                 c: 'val'    },
@@ -204,6 +207,13 @@ const productsRaw = [
       { t: '     ⚠ Structural analysis only. Review the exported templates',                   c: 'warn'   },
       { t: '       in `tj report --reuse` before reusing them.',                               c: 'warn'   },
     ],
+  },
+  {
+    slug: 'lens',
+    name: 'Lens',
+    blurb: 'See your spend, your recoverable waste, and your alerts at a glance, in a local browser dashboard.',
+    variant: 'browser',
+    output: [],
   },
 ];
 
@@ -313,9 +323,11 @@ const installJoined = installLines.join('\n');
           <div class="flow-mobile-rail flow-mobile-rail--out" aria-hidden="true"><span></span><span></span></div>
           <p class="flow-mobile-label flow-mobile-label--out">Optimization analyzers</p>
 
-          <!-- Products column -->
+          <!-- Products column. Lens is excluded here because the hero
+               diagram narrates the analyzer flow (telemetry in -> analyzers
+               out); Lens is the UI surface, not an analyzer. -->
           <ul class="flow-products" id="flow-products">
-            {products.map((p) => (
+            {products.filter((p) => p.slug !== 'lens').map((p) => (
               <li
                 class="flow-node flow-product"
                 data-id={p.slug}
@@ -391,9 +403,10 @@ const installJoined = installLines.join('\n');
   <!-- FOUR-PRODUCT SUMMARY -->
   <section class="products-grid-section">
     <header class="section-head">
-      <h2 class="section-h2">Five analyzers. One install.</h2>
+      <h2 class="section-h2">Five analyzers + Lens. One install.</h2>
       <p class="section-lede">
         Each analyzer reads the same captured telemetry and surfaces a different shape of waste.
+        <strong>Lens</strong> brings them together in a local dashboard you can open in your browser.
       </p>
     </header>
 
@@ -415,17 +428,25 @@ const installJoined = installLines.join('\n');
             </h3>
             <p class="product-card-blurb">{p.blurb}</p>
           </header>
-          <div class="terminal product-card-term">
-            <div class="terminal-titlebar">
-              <span class="dot dot-r"></span>
-              <span class="dot dot-y"></span>
-              <span class="dot dot-g"></span>
-              <span class="terminal-title">tj optimize — {p.slug}</span>
+          {p.variant === 'browser' ? (
+            <div class="product-card-preview">
+              <Browser url="127.0.0.1:7391/#/overview">
+                <LensOverviewPreview />
+              </Browser>
             </div>
-            <pre class="terminal-body product-card-body">{p.output.map((line) => (
-              <span class={`tline t-${line.c}`}>{line.t || ' '}</span>
-            ))}</pre>
-          </div>
+          ) : (
+            <div class="terminal product-card-term">
+              <div class="terminal-titlebar">
+                <span class="dot dot-r"></span>
+                <span class="dot dot-y"></span>
+                <span class="dot dot-g"></span>
+                <span class="terminal-title">tj optimize — {p.slug}</span>
+              </div>
+              <pre class="terminal-body product-card-body">{p.output.map((line) => (
+                <span class={`tline t-${line.c}`}>{line.t || ' '}</span>
+              ))}</pre>
+            </div>
+          )}
           <a class="product-card-link" href={`/products/${p.slug}`}>
             See how it works <span aria-hidden="true">→</span>
           </a>
@@ -434,7 +455,7 @@ const installJoined = installLines.join('\n');
     </div>
 
     <div class="products-cta-strip">
-      <p>All five are in the open-source CLI. Install once, analyze everything.</p>
+      <p>All six are in the open-source CLI. Install once, analyze everything.</p>
       <div class="products-cta-buttons">
         <a href="#install" class="btn-primary">Get started</a>
         <a href="https://github.com/metabuilder-labs/tokenjam" target="_blank" rel="noopener noreferrer" class="btn-secondary">GitHub</a>
@@ -1064,14 +1085,23 @@ const installJoined = installLines.join('\n');
       gap: 28px;
       margin-top: 8px;
     }
-    /* When the last card sits alone on its row (odd total), span both
-       columns and center it at single-card width so it doesn't leave
-       an awkward blank slot on the right. */
-    .products-grid > article:last-child:nth-child(odd) {
-      grid-column: 1 / -1;
-      justify-self: center;
-      width: 100%;
-      max-width: calc(50% - 14px); /* 28px gap / 2 = 14px to match column width */
+    /* Browser-variant card preview slot. Uses the same flex:1 + min-height
+       floor as .product-card-body so terminal and browser cards keep matched
+       heights across the grid. The min-height value mirrors the analyzer
+       terminals' floor (320px) so all six cards line up. */
+    .product-card-preview {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 320px;
+    }
+    .product-card-preview > .browser {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card-preview > .browser > .browser-body {
+      flex: 1;
     }
     .product-card {
       position: relative;
@@ -1187,15 +1217,6 @@ const installJoined = installLines.join('\n');
 
     @media (max-width: 820px) {
       .products-grid { grid-template-columns: 1fr; }
-      /* On mobile each card already takes the full row, so the
-         centering rule for an odd trailing card is unnecessary and
-         would visually squash it to half-width. Reset it. */
-      .products-grid > article:last-child:nth-child(odd) {
-        grid-column: auto;
-        justify-self: stretch;
-        width: auto;
-        max-width: none;
-      }
       /* Narrow viewports + mono font make terminals wrap heavily and
          the min-height floor compounds it. Shrink the type and let
          each card hug its own content. Horizontal scroll is the
@@ -1208,6 +1229,7 @@ const installJoined = installLines.join('\n');
         white-space: pre;
         overflow-x: auto;
       }
+      .product-card-preview { min-height: 0; }
     }
 
     /* ── HOW IT WORKS ─────────────────────────────── */

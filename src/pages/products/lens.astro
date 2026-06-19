@@ -1,0 +1,372 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getProduct, productIcons } from '@/data/products';
+import Browser from '@/components/Browser.astro';
+import LensOverviewPreview from '@/components/LensOverviewPreview.astro';
+import Callout from '@/components/Callout.astro';
+
+const product = getProduct('lens')!;
+---
+<BaseLayout
+  title={`TokenJam ${product.name} — ${product.heroClaim}`}
+  description={`${product.heroClaim} ${product.shortBlurb}`}
+  wide
+>
+  <article
+    class="pp"
+    style={`--product-accent: ${product.accent}; --product-accent-rgb: ${product.accentRgb};`}
+  >
+    <!-- HERO -->
+    <header class="pp-hero">
+      <span class="pp-name-icon" aria-hidden="true" set:html={productIcons['lens']}></span>
+      <h1 class="pp-name">
+        <span class="pp-name-brand">TokenJam</span>
+        <span class="pp-name-product">{product.name}</span>
+      </h1>
+      <p class="pp-claim">{product.heroClaim}</p>
+      <p class="pp-sub">
+        TokenJam Lens is the dashboard you get when you run <code>tj serve</code>. It runs entirely
+        on your machine (no signup, no cloud) and brings the output of every analyzer, every alert,
+        and every cost trend into one screen you can open in your browser.
+      </p>
+      <div class="pp-hero-ctas">
+        <a href="/#install" class="btn-primary">Get started</a>
+        <a href="https://github.com/metabuilder-labs/tokenjam" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </header>
+
+    <!-- SCREENSHOT A — Overview -->
+    <section class="pp-section">
+      <h2 class="pp-h2">Overview, your triage front door</h2>
+      <p class="pp-section-lede">
+        Three bands answer "where am I, and what should I look at next?" in one glance. Cost hero
+        with a sparkline and an honest run-rate caption. Recoverable waste tiles, one per analyzer,
+        showing dollar values or "✓ at 100%" when there's nothing to recover. A one-line health
+        summary covering alerts, drift, and budgets. Every tile drills into the detail screen with
+        filters pre-applied via URL.
+      </p>
+      <div class="lens-screenshot">
+        <Browser url="127.0.0.1:7391/#/overview">
+          <LensOverviewPreview expanded={true} />
+        </Browser>
+      </div>
+    </section>
+
+    <!-- SCREENSHOT B — Optimize -->
+    <section class="pp-section">
+      <h2 class="pp-h2">Every analyzer's findings in one place</h2>
+      <p class="pp-section-lede">
+        Lens reads from the same <code>tj optimize</code> analyzers the CLI does, plus a dedicated
+        Optimize tab where you see each analyzer's findings side by side, filter by agent, and
+        compare against a previous window. New analyzers (like Reuse) appear automatically: the
+        band is registry-driven.
+      </p>
+      <div class="lens-screenshot">
+        <Browser url="127.0.0.1:7391/#/optimize">
+          <div class="lens-tab-meta">
+            <span>Window: <strong>Last 30d</strong></span>
+            <span>Agent: <strong>all</strong></span>
+            <span>Compare: <strong>previous</strong></span>
+          </div>
+          <div class="lens-find">
+            <div class="lens-find-head">
+              <span class="lens-find-num" style="color: #3B82F6;">①</span>
+              <span class="lens-find-name">Downsize</span>
+              <span class="lens-find-savings">$42 / mo</span>
+            </div>
+            <p>8 of 47 sessions match a smaller-model candidate shape. Estimated recoverable: $42 / mo. Review before applying.</p>
+          </div>
+          <div class="lens-find">
+            <div class="lens-find-head">
+              <span class="lens-find-num" style="color: #F59E0B;">②</span>
+              <span class="lens-find-name">Cache</span>
+              <span class="lens-find-savings lens-find-savings--ok">✓ at 100%</span>
+            </div>
+            <p><code>anthropic/claude-opus-4-7</code> · efficacy 100% (2.79 B tokens). Already optimized, nothing to recover.</p>
+          </div>
+          <div class="lens-find">
+            <div class="lens-find-head">
+              <span class="lens-find-num" style="color: #8B5CF6;">⑤</span>
+              <span class="lens-find-name">Reuse</span>
+              <span class="lens-find-savings">$54 / mo</span>
+            </div>
+            <p>1 cluster found: 31 sessions share the "patch-release" skeleton (read changelog → bump version → run tests → tag → push). Estimated recoverable: $54 / mo (cache-reuse) or $61 / mo (script replacement).</p>
+          </div>
+        </Browser>
+      </div>
+    </section>
+
+    <!-- SCREENSHOT C — Cost -->
+    <section class="pp-section">
+      <h2 class="pp-h2">Cost transparency, with the math</h2>
+      <p class="pp-section-lede">
+        The Cost screen shows your spend as a real chart with hover tooltips, and the cost table
+        now includes <code>CACHE R</code> and <code>CACHE W</code> columns so a cache-heavy
+        <code>$1.44</code> span is no longer a mystery. Run-rate projections are explicitly
+        captioned "linear run-rate, not a forecast": Lens never claims to predict.
+      </p>
+      <div class="lens-screenshot">
+        <Browser url="127.0.0.1:7391/#/cost">
+          <div class="lens-tab-meta">
+            <span>Window: <strong>30d</strong></span>
+            <span>Group by: <strong>model</strong></span>
+          </div>
+          <div class="lp-band">
+            <div class="lp-band-head">
+              <span class="lp-band-label">Spend over time</span>
+              <span class="lp-hero-val">$1,247.83</span>
+            </div>
+            <div class="lp-spark" style="height: 44px; gap: 4px;" aria-hidden="true">
+              <span style="height: 18%"></span><span style="height: 28%"></span><span style="height: 22%"></span>
+              <span style="height: 36%"></span><span style="height: 26%"></span><span style="height: 50%"></span>
+              <span style="height: 62%"></span><span style="height: 78%"></span><span style="height: 68%"></span>
+              <span style="height: 92%"></span><span style="height: 70%"></span><span style="height: 56%"></span>
+              <span style="height: 48%"></span><span style="height: 40%"></span><span style="height: 58%"></span>
+              <span style="height: 72%"></span><span style="height: 64%"></span><span style="height: 50%"></span>
+            </div>
+          </div>
+          <table class="lens-cost-table">
+            <thead>
+              <tr>
+                <th>MODEL</th>
+                <th class="num">TOKENS IN</th>
+                <th class="num">CACHE R</th>
+                <th class="num">CACHE W</th>
+                <th class="num">COST</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>claude-opus-4-8</code></td>
+                <td class="num">294 K</td>
+                <td class="num">698.8 M</td>
+                <td class="num">0</td>
+                <td class="num">$468.53</td>
+              </tr>
+              <tr>
+                <td><code>claude-opus-4-7</code></td>
+                <td class="num">38.8 K</td>
+                <td class="num">1.53 B</td>
+                <td class="num">1.48 M</td>
+                <td class="num">$1,115.44</td>
+              </tr>
+              <tr class="lens-cost-total">
+                <td><strong>TOTAL</strong></td>
+                <td class="num">369 K</td>
+                <td class="num">2.79 B</td>
+                <td class="num">2.95 M</td>
+                <td class="num"><strong>$1,247.83</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </Browser>
+      </div>
+    </section>
+
+    <!-- HONESTY CALLOUT -->
+    <section class="pp-section">
+      <Callout type="tip">
+        <p><strong>Lens runs entirely on your machine.</strong> No data leaves it, not even to
+        TokenJam. The dashboard works fully offline. Every recoverable-USD figure is an honest
+        heuristic estimate, never a promise. Subscription users (Claude Max, ChatGPT Plus) see
+        token-share framing instead of dollar figures, because flat-fee billing means dollars
+        don't change at the margin.</p>
+      </Callout>
+    </section>
+
+    <!-- GET STARTED -->
+    <section class="pp-section">
+      <h2 class="pp-h2">Get started</h2>
+      <p class="pp-section-lede">
+        Three commands. Local. No signup. Open the dashboard at <code>127.0.0.1:7391</code> in
+        your browser.
+      </p>
+      <div class="terminal pp-terminal">
+        <div class="terminal-titlebar">
+          <span class="dot dot-r"></span>
+          <span class="dot dot-y"></span>
+          <span class="dot dot-g"></span>
+          <span class="terminal-title">install</span>
+        </div>
+        <pre class="terminal-body pp-terminal-body">
+<span class="tline"><span class="t-prompt">$ </span><span class="t-cmd">pipx install tokenjam</span></span>
+<span class="tline"><span class="t-prompt">$ </span><span class="t-cmd">tj serve</span></span>
+<span class="tline t-dim">  → open http://127.0.0.1:7391/</span></pre>
+      </div>
+      <p class="pp-fineprint">
+        Source on <a href="https://github.com/metabuilder-labs/tokenjam" target="_blank" rel="noopener noreferrer">GitHub</a>.
+        Lens shipped in <a href="https://github.com/metabuilder-labs/tokenjam/releases/tag/v0.4.0" target="_blank" rel="noopener noreferrer">v0.4.0</a>.
+        Reference docs in the <a href="/docs">docs site</a>.
+      </p>
+    </section>
+  </article>
+
+  <style>
+    /* Lens-specific scoped styles. The .pp-* shell styles come from
+       [slug].astro's scope but those are scoped CIDs — re-declare what
+       we need here so the Lens page stands on its own. */
+    .pp { max-width: 980px; margin: 0 auto; padding: calc(72px + var(--banner-h, 0px)) 24px 96px; }
+    .pp-hero { text-align: center; margin-bottom: 56px; }
+    .pp-name-icon {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      background: rgba(var(--product-accent-rgb), 0.12);
+      color: var(--product-accent);
+      margin-bottom: 20px;
+    }
+    .pp-name-icon svg { width: 28px; height: 28px; }
+    .pp-name {
+      font-family: 'Geist', sans-serif;
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1;
+      font-size: clamp(48px, 7vw, 96px);
+      margin: 0 0 20px;
+      display: flex; justify-content: center; flex-wrap: wrap;
+      gap: 0.22em;
+    }
+    .pp-name-brand   { color: var(--white); }
+    .pp-name-product { color: var(--product-accent); }
+    .pp-claim {
+      font-family: 'Geist', sans-serif;
+      font-weight: 500;
+      letter-spacing: -.015em;
+      line-height: 1.2;
+      font-size: clamp(20px, 2vw, 26px);
+      color: var(--white);
+      margin: 0 0 16px;
+    }
+    .pp-sub {
+      color: var(--white-dim);
+      font-size: 17px;
+      line-height: 1.6;
+      max-width: 680px;
+      margin: 0 auto 28px;
+    }
+    .pp-sub code, .pp-section-lede code, .pp-fineprint code {
+      font-family: 'Geist Mono', monospace;
+      font-size: .9em;
+      padding: 1px 6px;
+      background: var(--white-ghost);
+      border-radius: 4px;
+      color: var(--white);
+    }
+    .pp-hero-ctas {
+      display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+    }
+    .pp-section {
+      padding-top: 56px;
+      border-top: 1px solid var(--blue-line);
+      margin-top: 56px;
+    }
+    .pp-h2 {
+      font-family: 'Geist', sans-serif;
+      font-weight: 600;
+      letter-spacing: -.015em;
+      font-size: clamp(24px, 2.6vw, 30px);
+      color: var(--white);
+      margin: 0 0 16px;
+    }
+    .pp-section-lede {
+      color: var(--white-dim);
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0 0 24px;
+      max-width: 760px;
+    }
+    .pp-fineprint {
+      color: var(--white-faint);
+      font-size: 13px;
+      margin: 16px 0 0;
+    }
+    .pp-fineprint a {
+      color: var(--accent-blue);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .pp-terminal { margin-top: 4px; }
+    .pp-terminal-body { padding: 18px 22px; margin: 0; }
+
+    /* Lens screenshot block: makes the browser frame breathe a little
+       inside the section. */
+    .lens-screenshot { margin-top: 4px; }
+    .lens-tab-meta {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11.5px;
+      color: var(--white-faint);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(var(--accent-rgb), 0.08);
+    }
+    .lens-tab-meta strong { color: var(--white); font-weight: 600; }
+
+    .lens-find {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(var(--accent-rgb), 0.06);
+    }
+    .lens-find:last-child { border-bottom: 0; }
+    .lens-find-head {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 4px;
+    }
+    .lens-find-num { font-family: 'Geist Mono', monospace; font-weight: 600; }
+    .lens-find-name {
+      flex: 1;
+      font-weight: 600;
+      color: var(--white);
+    }
+    .lens-find-savings {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      color: var(--green);
+    }
+    .lens-find-savings--ok { color: var(--green); }
+    .lens-find p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--white-dim); }
+    .lens-find code {
+      font-family: 'Geist Mono', monospace;
+      font-size: .92em;
+      padding: 1px 5px;
+      background: var(--white-ghost);
+      border-radius: 4px;
+      color: var(--white);
+    }
+
+    .lens-cost-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      font-size: 12px;
+    }
+    .lens-cost-table th {
+      text-align: left;
+      font-family: 'Geist Mono', monospace;
+      font-weight: 600;
+      color: var(--white-faint);
+      letter-spacing: .04em;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
+    }
+    .lens-cost-table td {
+      padding: 8px 10px;
+      color: var(--white-dim);
+      border-bottom: 1px solid rgba(var(--accent-rgb), 0.06);
+    }
+    .lens-cost-table td code {
+      font-family: 'Geist Mono', monospace;
+      color: var(--white);
+      background: transparent;
+      padding: 0;
+    }
+    .lens-cost-table .num { text-align: right; font-family: 'Geist Mono', monospace; font-variant-numeric: tabular-nums; }
+    .lens-cost-table .lens-cost-total td {
+      border-bottom: 0;
+      color: var(--white);
+    }
+  </style>
+</BaseLayout>

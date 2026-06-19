@@ -1,0 +1,87 @@
+---
+/*
+ * Compressed Lens Overview mock used inside a <Browser> frame. Renders the
+ * three Overview bands: spend hero with sparkline + run-rate caveat, three
+ * recoverable-waste tiles (including the at-ceiling "✓ at 100%" state),
+ * and the one-line health summary.
+ *
+ * Lives outside the Browser frame so the homepage tile (smaller chrome)
+ * and the /products/lens hero screenshot (larger chrome) can reuse it.
+ */
+interface Props {
+  /** Show a six-tile variant (used on the dedicated Lens page) instead of
+   *  the three-tile compact version (used on the homepage card). */
+  expanded?: boolean;
+}
+const { expanded = false } = Astro.props;
+---
+<div class="lp-row">
+  <span class="lp-title">Overview</span>
+  <span class="lp-meta">Last 7d</span>
+</div>
+
+<div class="lp-band">
+  <div class="lp-band-head">
+    <span class="lp-band-label">Spend · last 7d</span>
+    <span class="lp-hero-val">$284.71</span>
+  </div>
+  <div class="lp-spark" aria-hidden="true">
+    <span style="height: 18%"></span>
+    <span style="height: 26%"></span>
+    <span style="height: 42%"></span>
+    <span style="height: 58%"></span>
+    <span style="height: 88%"></span>
+    <span style="height: 70%"></span>
+    <span style="height: 48%"></span>
+  </div>
+  <div class="lp-caveat">At this pace, ~$1,219 by end of June</div>
+  <div class="lp-caveat">(linear run-rate, not a forecast)</div>
+</div>
+
+<div class="lp-band">
+  <div class="lp-band-head">
+    <span class="lp-band-label">Recoverable waste</span>
+    <span class="lp-band-chip">Estimated</span>
+  </div>
+  <div class={`lp-tiles${expanded ? ' lp-tiles--six' : ''}`}>
+    <div class="lp-tile">
+      <div class="lp-tile-name">Downsize</div>
+      <div class="lp-tile-val">$42 / mo</div>
+    </div>
+    <div class="lp-tile">
+      <div class="lp-tile-name">Cache</div>
+      <div class="lp-tile-val lp-tile-val--ok">✓ at 100%</div>
+    </div>
+    {expanded && (
+      <div class="lp-tile">
+        <div class="lp-tile-name">Script</div>
+        <div class="lp-tile-val lp-tile-val--null">no findings</div>
+      </div>
+    )}
+    {expanded && (
+      <div class="lp-tile">
+        <div class="lp-tile-name">Trim</div>
+        <div class="lp-tile-val lp-tile-val--null">not run</div>
+      </div>
+    )}
+    <div class="lp-tile">
+      <div class="lp-tile-name">Reuse</div>
+      <div class="lp-tile-val">$54 / mo</div>
+    </div>
+    {expanded && (
+      <div class="lp-tile">
+        <div class="lp-tile-name">Cache-rec.</div>
+        <div class="lp-tile-val">enable cap.</div>
+      </div>
+    )}
+  </div>
+</div>
+
+<div class="lp-health">
+  <span class="lp-health-dot" aria-hidden="true"></span>
+  <span>3 unread alerts</span>
+  <span>·</span>
+  <span>0 agents drifting</span>
+  {expanded && <span>·</span>}
+  {expanded && <span>1 budget near 80%</span>}
+</div>
