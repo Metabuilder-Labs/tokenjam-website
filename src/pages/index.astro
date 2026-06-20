@@ -636,14 +636,14 @@ const installJoined = installLines.join('\n');
     .flow-beam {
       fill: none;
       stroke: currentColor;
-      stroke-width: 1;
-      opacity: 0.16;
+      stroke-width: 1.1;
+      opacity: 0.28;
       color: var(--white);
       transition: opacity .25s, stroke-width .25s;
     }
     .flow-beam.is-active {
-      opacity: 0.55;
-      stroke-width: 1.4;
+      opacity: 0.7;
+      stroke-width: 1.5;
       color: var(--accent-blue);
     }
     .flow-particle {
@@ -766,8 +766,8 @@ const installJoined = installLines.join('\n');
          Analyzers shrink to compact chips (icon + name + arrow only).
          Lens grows into a full browser preview at the end so the visualization
          step is visible, not just hinted at. */
-      grid-template-columns: minmax(220px, 280px) minmax(200px, 1fr) minmax(170px, 200px) minmax(280px, 360px);
-      gap: clamp(20px, 3vw, 56px);
+      grid-template-columns: minmax(180px, 220px) minmax(220px, 1fr) minmax(150px, 180px) minmax(260px, 320px);
+      gap: clamp(24px, 4vw, 72px);
       align-items: center;
       min-height: 500px;
     }
@@ -1044,13 +1044,13 @@ const installJoined = installLines.join('\n');
     }
     .flow-beam {
       fill: none;
-      stroke: rgba(var(--accent-rgb), 0.14);
-      stroke-width: 1;
+      stroke: rgba(var(--accent-rgb), 0.26);
+      stroke-width: 1.1;
       transition: stroke .25s, stroke-width .25s;
     }
     .flow-beam.is-active {
       stroke: url(#beam-gradient);
-      stroke-width: 1.5;
+      stroke-width: 1.6;
     }
     .flow-particle {
       fill: url(#particle-glow);
