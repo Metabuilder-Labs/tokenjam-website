@@ -362,22 +362,14 @@ const installJoined = installLines.join('\n');
           <p class="flow-mobile-label flow-mobile-label--lens">Visualized in</p>
 
           <!-- Lens column. Sits to the far right because every analyzer's
-               findings end up visualized here in the local browser dashboard. -->
+               findings end up visualized here in the local browser dashboard.
+               Showing the full preview (not a chip) makes the visualization
+               step the visible terminus of the entire flow. -->
           <div class="flow-lens-col">
-            <a
-              href="/products/lens"
-              id="flow-lens"
-              class="flow-lens-chip"
-              data-id="lens"
-              style="--product-accent: #06B6D4; --product-accent-rgb: 6, 182, 212;"
-            >
-              <span class="flow-lens-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16" y2="16"/></svg>
-              </span>
-              <span class="flow-lens-text">
-                <span class="flow-lens-name">Lens</span>
-                <span class="flow-lens-tag">Local WebUI</span>
-              </span>
+            <a href="/products/lens" id="flow-lens" class="flow-lens-preview" aria-label="TokenJam Lens — local dashboard">
+              <Browser url="127.0.0.1:7391/#/overview">
+                <LensOverviewPreview />
+              </Browser>
             </a>
           </div>
         </div>
@@ -770,10 +762,12 @@ const installJoined = installLines.join('\n');
       position: relative;
       display: grid;
       /* 4 cols: sources | (center + observe satellite) | analyzers | lens.
-         The (center+observe) column is fluid so the jar can breathe; lens is
-         a compact end-cap column since it's a single chip. */
-      grid-template-columns: minmax(190px, 240px) minmax(280px, 1fr) minmax(220px, 260px) minmax(140px, 180px);
-      gap: clamp(28px, 4vw, 80px);
+         Sources get more headroom so labels like "OpenTelemetry" don't crowd.
+         Analyzers shrink to compact chips (icon + name + arrow only).
+         Lens grows into a full browser preview at the end so the visualization
+         step is visible, not just hinted at. */
+      grid-template-columns: minmax(220px, 280px) minmax(200px, 1fr) minmax(170px, 200px) minmax(280px, 360px);
+      gap: clamp(20px, 3vw, 56px);
       align-items: center;
       min-height: 500px;
     }
@@ -828,8 +822,8 @@ const installJoined = installLines.join('\n');
       margin-top: 2px;
     }
 
-    /* Lens end-cap column. Single chip vertically centered. Cyan accent
-       differentiates it from both analyzers and Observe. */
+    /* Lens end-cap column. Full browser preview vertically centered.
+       Cyan accent on the browser chrome differentiates it from analyzers. */
     .flow-lens-col {
       display: flex;
       align-items: center;
@@ -837,49 +831,37 @@ const installJoined = installLines.join('\n');
       position: relative;
       z-index: 2;
     }
-    .flow-lens-chip {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px 14px;
-      background: var(--navy-2);
-      border: 1px solid var(--blue-line);
-      border-radius: 10px;
+    .flow-lens-preview {
+      display: block;
       text-decoration: none;
-      color: var(--white);
-      transition: border-color .2s, background .2s, transform .2s, box-shadow .2s;
+      transition: transform .2s, box-shadow .2s;
+      width: 100%;
+      --product-accent: #06B6D4;
+      --product-accent-rgb: 6, 182, 212;
     }
-    .flow-lens-chip:hover {
-      border-color: rgba(var(--product-accent-rgb), 0.55);
-      background: rgba(var(--product-accent-rgb), 0.06);
-      transform: translateX(2px);
-      box-shadow: 0 10px 22px rgba(var(--product-accent-rgb), 0.12);
+    .flow-lens-preview:hover { transform: translateX(2px); }
+    /* Compact the inner browser frame for the hero scale. */
+    .flow-lens-preview .browser {
+      font-size: 11px;
+      line-height: 1.4;
     }
-    .flow-lens-icon {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 36px; height: 36px;
-      border-radius: 9px;
-      background: rgba(var(--product-accent-rgb), 0.14);
-      color: var(--product-accent);
-      flex-shrink: 0;
-      filter: drop-shadow(0 0 6px rgba(var(--product-accent-rgb), 0.35));
-    }
-    .flow-lens-text {
-      display: flex; flex-direction: column;
-      font-family: 'Geist', sans-serif;
-      line-height: 1.1;
-    }
-    .flow-lens-name {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--product-accent);
-      letter-spacing: -.005em;
-    }
-    .flow-lens-tag {
-      font-family: 'Geist Mono', monospace;
-      font-size: 10.5px;
-      color: var(--white-faint);
-      letter-spacing: .02em;
-      margin-top: 2px;
-    }
+    .flow-lens-preview .browser-titlebar { padding: 7px 10px; }
+    .flow-lens-preview .browser-url { font-size: 10px; padding: 2px 8px; }
+    .flow-lens-preview .browser-body { padding: 10px 12px; }
+    .flow-lens-preview .lp-title { font-size: 12px; }
+    .flow-lens-preview .lp-meta { font-size: 10px; }
+    .flow-lens-preview .lp-band { padding: 8px 10px; margin-top: 6px; }
+    .flow-lens-preview .lp-band-head { margin-bottom: 4px; }
+    .flow-lens-preview .lp-band-label { font-size: 9.5px; }
+    .flow-lens-preview .lp-band-chip { font-size: 8.5px; padding: 1px 5px; }
+    .flow-lens-preview .lp-hero-val { font-size: 19px; }
+    .flow-lens-preview .lp-spark { height: 16px; gap: 2px; margin: 5px 0 4px; }
+    .flow-lens-preview .lp-caveat { font-size: 9px; }
+    .flow-lens-preview .lp-tile { padding: 5px 7px; }
+    .flow-lens-preview .lp-tile-name { font-size: 9px; }
+    .flow-lens-preview .lp-tile-val { font-size: 10px; }
+    .flow-lens-preview .lp-health { font-size: 9.5px; margin-top: 6px; gap: 6px; }
+    .flow-lens-preview .lp-health-dot { width: 5px; height: 5px; }
 
     .flow-sources, .flow-products {
       list-style: none;
@@ -1007,10 +989,11 @@ const installJoined = installLines.join('\n');
       padding: 0;
     }
     .flow-product-link {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px 14px;
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px;
       text-decoration: none;
       color: var(--white);
+      font-size: 13px;
       border-radius: 7px;
     }
     /* Per-analyzer icon coloured by the product's accent var. Observe overrides
@@ -1122,7 +1105,7 @@ const installJoined = installLines.join('\n');
         display: flex;
         justify-content: center;
       }
-      .flow-lens-chip { width: 100%; max-width: 320px; }
+      .flow-lens-preview { width: 100%; max-width: 360px; }
 
       .flow-mobile-label {
         display: block;
