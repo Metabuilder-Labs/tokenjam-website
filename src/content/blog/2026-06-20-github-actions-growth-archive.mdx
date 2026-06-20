@@ -5,7 +5,7 @@ author: "anil-murty"
 publishDate: 2026-06-20
 tags: ["github-actions", "open-source", "growth"]
 pillar: "infrastructure"
-image: "/blog/images/github-growth/traffic-w25.png"
+image: "/blog/images/github-growth/header.png"
 ---
 
 import TLDR from '@/components/TLDR.astro';
@@ -22,6 +22,8 @@ import FAQBlock from '@/components/FAQBlock.astro';
 ## The data GitHub quietly throws away
 
 Open your repo's Insights → Traffic tab. You get a two-week view of clones, visitors, and the referrers sending people your way. It's genuinely useful. It's also a sliding 14-day window, and GitHub keeps nothing behind it. The [Traffic API](https://docs.github.com/en/rest/metrics/traffic) is explicit about this: clones and views are retained for 14 days, full stop.
+
+![GitHub Insights → Traffic tab for the tokenjam repo, showing 14 days of clones and views with the two-week window cut-off plainly visible.](/blog/images/github-growth/github-insights-traffic.png)
 
 Most maintainers find out the hard way. You ship something, a post or a Show HN lands, and a week or two later you want to look back at the spike to see what it actually did. The window has already slid past it. There is no setting to extend the retention, no export button, and no way to ask GitHub for last month's numbers. If you didn't capture it, it didn't happen.
 
@@ -43,7 +45,11 @@ Two things break that first draft, and both cost an afternoon if you don't know 
 
 **The default token can't read the Traffic API.** Every workflow gets an automatic `GITHUB_TOKEN`, and your instinct is to use it. The Traffic endpoints require `Administration: Read` permission, which the default token cannot be granted. There's no `administration` key you can add under `permissions:` in the workflow (putting one there is a parse error), and the default token simply 403s on these endpoints. The fix is a fine-grained personal access token with `Administration: Read`, scoped to the repo, stored as a secret. One more gotcha inside that gotcha: the token has to be owned by the **org** that owns the repo. A personal-account token can't see an org repo and fails with *"Resource not accessible by personal access token."*
 
+![GitHub fine-grained PAT permission settings showing Administration set to "Read", scoped to a single org-owned repository.](/blog/images/github-growth/gh-pat.png)
+
 **A protected `main` won't take the bot's push.** If your `main` requires pull requests, enforces status checks, and has `enforce_admins` turned on, then nothing pushes directly to it, including your workflow. Even an admin-owned PAT can't bypass classic branch protection in that configuration, which is the whole point of turning it on. So the commit step fails, and now you're staring at the choice between weakening the protection on your primary branch or giving up on the automation. Both are bad.
+
+![GitHub branch protection rules for main: require pull requests, require status checks, restrict pushes, with enforce_admins toggled on.](/blog/images/github-growth/gh-branch-protection.png)
 
 That second problem is the interesting one, because the fix isn't a workaround. It's a better design.
 
@@ -53,9 +59,15 @@ Here's the insight that makes the whole thing clean: a weekly traffic snapshot i
 
 So don't commit it to `main`. Push it to a separate [orphan branch](https://git-scm.com/docs/git-checkout#Documentation/git-checkout.txt---orphanltnew-branchgt) instead. An orphan branch has no shared history with `main`. It's a parallel timeline in the same repository, with its own commits and, crucially, its own protection policy. In the tokenjam repo that branch is called `traffic-data`, and it holds one JSON file per week and nothing else.
 
+![Diagram of an orphan branch: a single repository hosting two unconnected commit timelines, with main on top carrying source code and traffic-data below carrying weekly JSON snapshots and no shared ancestry.](/blog/images/github-growth/orhpan-branch.png)
+
 Now the two-token dance falls out naturally. The *read* step authenticates with the fine-grained PAT, because reading the Traffic API needs `Administration: Read`. The *write* step pushes to `traffic-data` with the ordinary `GITHUB_TOKEN`, because that branch is deliberately unprotected and `contents: write` is enough to land a commit there. No protection bypass, no weakening of `main`, no second admin token for the push. Two refs, two protection policies, no exceptions.
 
+![Diagram of the two-token handshake: a fine-grained PAT with Administration Read calls the Traffic API and the default GITHUB_TOKEN with contents write pushes the result onto the unprotected traffic-data branch.](/blog/images/github-growth/two-token-handshake.png)
+
 `main` stays exactly as locked-down as you want it: every change reviewed, every check enforced, the bot nowhere near it. The archive grows on its own branch indefinitely. The two timelines never touch.
+
+![Side-by-side view of the two branches living in one repo: main on the left protected and code-only, traffic-data on the right unprotected and data-only, with no edges connecting their commits.](/blog/images/github-growth/two-branches.png)
 
 Here's the entire workflow that does it, running live in the tokenjam repo:
 
@@ -136,6 +148,8 @@ jobs:
 
 A few details worth pointing at. The job checks out `main` to get the script, runs it with the PAT, then does a shallow clone of `traffic-data` and copies only the new JSON into it before pushing. That keeps `main`'s file tree from ever leaking onto the data branch. The push is idempotent: re-running a week refreshes that week's file instead of creating a duplicate, so a manual backfire during testing doesn't make a mess. And any API failure exits non-zero, which shows up red in the Actions tab so a silently-broken archive can't go unnoticed for months.
 
+![GitHub Actions run for the traffic-archive workflow, with a successful "Archive traffic data" step and a successful "Publish the archive to the traffic-data branch" step.](/blog/images/github-growth/traffic-data-gh-action.png)
+
 ## What a week of the archive looks like
 
 Honesty first: the tokenjam archive is one week old as I write this. There's a single full snapshot on the branch, `traffic/2026-W25.json`. So this isn't a "look at our hockey stick" section. The point is the pattern of having the data at all, not the size of the number.
@@ -157,6 +171,10 @@ The full, exact instructions live in [`growth/README.md`](https://github.com/Met
 5. Leave it alone. It runs every Sunday at noon UTC and drops one JSON per week onto `traffic-data`.
 
 Read the [README](https://github.com/Metabuilder-Labs/tokenjam/blob/main/growth/README.md) for the parts that bite (the org-owned-PAT requirement especially), then clone the workflow into your own repo and change the owner string.
+
+![GitHub branch view of traffic-data in the tokenjam repo, showing a single traffic/ directory and one weekly JSON file as the only contents.](/blog/images/github-growth/traffic-data-branch.png)
+
+![The traffic-data branch's 2026-W25.json file opened in GitHub, displaying the captured clones, views, top referrers, and top paths in the canonical schema.](/blog/images/github-growth/traffic-data-json.png)
 
 I built this because tokenjam is an open-source-first product. The analyzer is free and MIT-licensed, and the repo is the acquisition funnel, which means I was letting GitHub erase my most important growth data every two weeks. The 50-line action fixed that. If you're in the same spot, the workflow is at [`Metabuilder-Labs/tokenjam → .github/workflows/traffic-archive.yml`](https://github.com/Metabuilder-Labs/tokenjam/blob/main/.github/workflows/traffic-archive.yml). Steal it; a star is the only thanks I'm asking for. (And if you'd like your AI agents to spend less while you're in there, that's what tokenjam itself does.)
 
