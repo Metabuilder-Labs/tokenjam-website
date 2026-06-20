@@ -783,6 +783,10 @@ const installJoined = installLines.join('\n');
     }
     /* Observe satellite — small pill anchored to the right of the jar.
        Neutral white accent so it reads as infrastructure, not a 5th analyzer. */
+    /* Observe sits over the jar -> analyzer beams, so its background must be
+       a solid (non-translucent) token in both states; otherwise the beams
+       show through the pill on hover (was using var(--white-ghost), which is
+       a semi-transparent overlay). z-index above .flow-svg keeps it on top. */
     .flow-observe {
       display: flex; align-items: center; gap: 10px;
       padding: 10px 14px;
@@ -793,11 +797,13 @@ const installJoined = installLines.join('\n');
       color: var(--white-dim);
       transition: border-color .2s, color .2s, background .2s, transform .2s;
       flex-shrink: 0;
+      position: relative;
+      z-index: 4;
     }
     .flow-observe:hover {
       color: var(--white);
       border-color: rgba(var(--accent-rgb), 0.35);
-      background: var(--white-ghost);
+      background: var(--navy-3);
       transform: translateX(2px);
     }
     .flow-observe-icon {
