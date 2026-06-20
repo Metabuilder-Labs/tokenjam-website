@@ -1089,7 +1089,10 @@ const installJoined = installLines.join('\n');
         min-height: 0;
       }
       .flow-sources, .flow-products { gap: 8px; }
-      .flow-center { min-height: 120px; }
+      /* Keep the desktop center height so the absolutely-positioned 180px
+         ring doesn't overflow into the Observe satellite below it. The
+         earlier 120px override caused the ring to clip the Observe pill. */
+      .flow-center { min-height: 220px; }
       .flow-svg { display: none; } /* On mobile, just show stacks; beams hide */
 
       /* Center+Observe wrapper stacks vertically on mobile so each step of
