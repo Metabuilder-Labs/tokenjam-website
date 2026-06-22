@@ -12,11 +12,14 @@ interface Props {
   /** Show a six-tile variant (used on the dedicated Lens page) instead of
    *  the three-tile compact version (used on the homepage card). */
   expanded?: boolean;
+  /** Heading shown in the mock's title row. Defaults to the route name
+   *  ("Overview"); the hero flow terminus overrides it to "Lens". */
+  title?: string;
 }
-const { expanded = false } = Astro.props;
+const { expanded = false, title = 'Overview' } = Astro.props;
 ---
 <div class="lp-row">
-  <span class="lp-title">Overview</span>
+  <span class="lp-title">{title}</span>
   <span class="lp-meta">Last 7d</span>
 </div>
 

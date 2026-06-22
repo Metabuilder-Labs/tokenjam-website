@@ -69,29 +69,31 @@ const heroSources = [
     svgInner: `<path fill="currentColor" d="M9.5 7.2v-.95c.17-.02.35-.03.52-.03 4.81-.15 7.96 4.13 7.96 4.13s-3.4 4.72-7.05 4.72c-.5 0-.96-.08-1.43-.24V12.4c1.86.22 2.23.96 3.36 2.78l2.49-2.1S13.5 9.66 9.6 9.06c-.04 0-.06-.01-.1-.01v.05c1.13.6 2.36 2.05 3.34 4.07-1.07-.45-2.04-.71-3.34-.71-.95 0-1.91.12-2.43.26V7.2zm0-1.95v1.83c.13-.01.25-.03.38-.04 5.04-.17 8.34 4.13 8.34 4.13s-3.78 4.59-7.7 4.59c-.36 0-.7-.04-1.02-.1v1.13c.27.03.55.05.84.05 3.65 0 6.28-1.86 8.83-4.07 1.55 1.24 2.21 1.32 2.21 1.32-.65.41-2.13 1.34-3.39 1.65 0 0-.41 1.31-2.69 1.79-2.96.6-5.83-.92-7.95-2.42 0 0-.21.15-.39.27v1.45h13.4V5.25H9.5z"/>`,
   },
   {
-    // LangChain — interlocking chain links (the brand glyph alongside the parrot).
+    // LangChain — official brand mark (simple-icons path).
     id: 'langchain', name: 'LangChain', group: 'agent',
     brand: '#1C898D', brandRgb: '28, 137, 141',
     products: ['LangChain', 'LangGraph'],
-    svgInner: `<path fill="currentColor" d="M9.5 7H7a4.5 4.5 0 0 0 0 9h2.5v-2.5H7a2 2 0 1 1 0-4h2.5V7zm5 0v2.5H17a2 2 0 1 1 0 4h-2.5V16H17a4.5 4.5 0 0 0 0-9h-2.5zM8.5 11h7v1.6h-7V11z"/>`,
+    svgInner: `<path fill="currentColor" d="M13.796 0a6.93 6.93 0 0 0-4.91 2.019L5.451 5.455l3.273 3.27 3.432-3.432a2.284 2.284 0 0 1 3.277 0 2.28 2.28 0 0 1 0 3.275L12 12.001l3.273 3.273 3.433-3.435c2.692-2.692 2.692-7.127 0-9.82A6.92 6.92 0 0 0 13.796 0m-5.07 8.728-3.433 3.434c-2.692 2.693-2.692 7.126 0 9.819A6.92 6.92 0 0 0 10.203 24a6.93 6.93 0 0 0 4.911-2.02l3.432-3.432-3.271-3.272-3.433 3.433a2.284 2.284 0 0 1-3.277 0 2.28 2.28 0 0 1 0-3.276L12 12z"/>`,
   },
   {
-    // LiteLLM — "LL" monogram (BerriAI's fan-out router across 100+ providers).
+    // LiteLLM — high-speed train, BerriAI's brand mark (litellm.ai logo/favicon).
     id: 'litellm', name: 'LiteLLM', group: 'agent',
     brand: '#8B5CF6', brandRgb: '139, 92, 246',
     products: ['LiteLLM', 'CrewAI', 'AutoGen', 'LlamaIndex', 'Pydantic AI', 'Haystack'],
-    svgInner: `<path fill="currentColor" d="M4 5v14h6.5v-2.6H6.7V5H4Zm9 0v14h6.5v-2.6h-3.8V5H13Z"/>`,
+    svgInner: `<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.1V7a4 4 0 0 0 8 0V3.1"/><path d="m9 15-1-1"/><path d="m15 15 1-1"/><path d="M9 19c-2.8 0-5-2.2-5-5v-4a8 8 0 0 1 16 0v4c0 2.8-2.2 5-5 5Z"/><path d="m8 19-2 3"/><path d="m16 19 2 3"/></g>`,
   },
   {
-    // Langfuse — bold serif "L" (their primary glyph).
+    // Langfuse — official wave mark (langfuse.com/brand). Multi-color, so the
+    // chip keeps the brand fills; 512-space paths scaled into the 24 viewBox.
     id: 'langfuse', name: 'Langfuse', group: 'obs',
-    brand: '#22D3EE', brandRgb: '34, 211, 238',
+    brand: '#4E9CFF', brandRgb: '78, 156, 255',
     products: ['Langfuse', 'Helicone'],
-    svgInner: `<path fill="currentColor" d="M7 4v16h11v-3.2h-7.5V4H7z"/>`,
+    multiColor: true,
+    svgInner: `<g transform="scale(0.046875)"><path fill="#FF5D5F" d="M254.75 302.25L285.25 326.75C285.25 326.75 308.587 309.418 325.75 306.875C343.75 304.208 362.954 314.244 380.75 326.208C407.629 344.279 430.25 367.208 430.25 367.208L456.75 341.208C456.75 341.208 383.686 262.047 325.75 269.208C287.75 273.905 254.75 302.25 254.75 302.25Z"/><path fill="#4E9CFF" d="M80.25 151.286L55.25 178.786C55.25 178.786 124.902 243.786 179.75 243.786C204.75 243.786 239.419 224.201 269.25 198.757C286.25 184.257 305.25 167.786 324.25 167.786C337.021 167.786 353.866 174.551 369.75 192.316C369.75 192.316 380.003 186.168 386.25 181.75C391.74 177.868 399.896 171.25 399.896 171.25C377.047 146.864 343.998 129.038 324.25 130.786C292.25 130.79 269.25 150.711 240.75 173.75C212.25 196.789 200.25 206.286 179.75 206.286C145.25 206.286 80.25 151.286 80.25 151.286Z"/><path fill="#4E9CFF" d="M80.25 360.75L55.25 333.25C55.25 333.25 124.902 268.25 179.75 268.25C204.75 268.25 239.419 287.835 269.25 313.279C286.25 327.779 305.25 344.25 324.25 344.25C337.083 344.25 353.799 337.207 369.75 319.25C369.75 319.25 379.339 325.161 385.25 329.25C391.328 333.455 400.25 340.407 400.25 340.407C377.39 364.987 344.1 383.007 324.25 381.25C292.25 381.246 273.25 364.289 244.75 341.25C216.25 318.211 200.25 305.75 179.75 305.75C145.25 305.75 80.25 360.75 80.25 360.75Z"/><path fill="#4E9CFF" d="M406.25 213.25C399.745 217.746 389.25 224.25 389.25 224.25C389.25 224.25 395.25 237.25 395.25 254.75C395.25 272.25 389.75 287.25 389.75 287.25C389.75 287.25 399.172 293.135 405.25 297.25C411.564 301.525 421.25 308.75 421.25 308.75C421.25 308.75 432.75 284.75 432.75 254.75C432.75 224.75 421.25 202.25 421.25 202.25C421.25 202.25 412.226 209.12 406.25 213.25Z"/><path fill="#FF5D5F" d="M256.25 209.25L285.25 185.25C285.25 185.25 308.587 202.04 325.75 204.583C343.75 207.25 362.954 197.214 380.75 185.25C407.629 167.179 430.25 144.25 430.25 144.25L456.75 170.25C456.75 170.25 383.686 249.411 325.75 242.25C287.75 237.553 256.25 209.25 256.25 209.25Z"/><path fill="#FF5D5F" d="M186.255 130.25C223.755 130.25 255.25 162.25 255.25 162.25C255.25 162.25 246.487 169.155 240.75 173.75C234.775 178.536 225.25 186.25 225.25 186.25C225.25 186.25 208.755 168.75 186.255 168.75C177.028 168.75 165.039 174.292 152.255 185.25C142.391 193.705 132.129 204.216 125.255 217.25C119.31 228.52 116.068 241.802 115.755 255.75C115.361 273.269 121.571 291.634 131.755 306.25C138.58 316.046 146.726 323.418 155.255 329.75C166.323 337.968 177.865 343.75 186.255 343.75C195.217 343.75 203.274 340.635 209.255 337.75C218.755 332.25 226.25 325.75 226.25 325.75L255.75 350.25C255.75 350.25 243.75 362.25 227.255 371.25C216.595 376.507 202.895 381.75 186.255 381.75C169.626 381.75 150.315 372.915 132.255 359.25C120.579 350.416 109.135 339.948 100.255 327.25C85.7005 306.438 78.2004 281.118 78.2502 255.75C78.3008 230.065 86.5823 204.625 101.255 183.75C124.255 153.75 158.273 130.25 186.255 130.25Z"/></g>`,
   },
   {
     // OpenTelemetry — hexagon outline with center dot (matches their hex mark).
-    id: 'opentelemetry', name: 'OpenTelemetry', group: 'obs',
+    id: 'opentelemetry', name: 'OTLP', group: 'obs',
     brand: '#F5A800', brandRgb: '245, 168, 0',
     products: ['Any OTLP source', 'Custom spans'],
     svgInner: `<path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 2.5l8.4 4.85v9.7L12 21.9l-8.4-4.85v-9.7L12 2.5z"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/>`,
@@ -217,9 +219,22 @@ const productsRaw = [
   },
 ];
 
+// Short taglines mirror the Products dropdown subtext (see Nav.astro) so the
+// hero chips and the nav menu describe each analyzer identically.
+const productTaglines: Record<string, string> = {
+  downsize: 'Right-size the model per task',
+  trim:     'Cut prompt bloat',
+  cache:    'Find cacheable prefixes',
+  script:   'Replace deterministic agents',
+  reuse:    'Stop re-planning repeated work',
+  lens:     'Local WebUI dashboard',
+};
+const observeTagline = 'Traces, drift, alerts, schema';
+
 // Decorate each product with its accent color from the data catalog.
 const products = productsRaw.map((p) => ({
   ...p,
+  tagline: productTaglines[p.slug] ?? '',
   accent: accentBySlug[p.slug]?.accent ?? '#ededed',
   accentRgb: accentBySlug[p.slug]?.accentRgb ?? '237, 237, 237',
 }));
@@ -331,6 +346,7 @@ const installJoined = installLines.join('\n');
               <span class="flow-observe-name">Observe</span>
               <span class="flow-observe-tag">Observability layer</span>
             </span>
+            <span class="flow-observe-tooltip" role="tooltip">{observeTagline}</span>
           </a>
           </div>
 
@@ -353,6 +369,7 @@ const installJoined = installLines.join('\n');
                   <span class="flow-product-name">{p.name}</span>
                   <span class="flow-product-arrow" aria-hidden="true">→</span>
                 </a>
+                {p.tagline && <span class="flow-product-tooltip" role="tooltip">{p.tagline}</span>}
               </li>
             ))}
           </ul>
@@ -368,7 +385,7 @@ const installJoined = installLines.join('\n');
           <div class="flow-lens-col">
             <a href="/products/lens" id="flow-lens" class="flow-lens-preview" aria-label="TokenJam Lens — local dashboard">
               <Browser url="127.0.0.1:7391/#/overview">
-                <LensOverviewPreview />
+                <LensOverviewPreview title="Lens" />
               </Browser>
             </a>
           </div>
@@ -766,7 +783,7 @@ const installJoined = installLines.join('\n');
          Analyzers shrink to compact chips (icon + name + arrow only).
          Lens grows into a full browser preview at the end so the visualization
          step is visible, not just hinted at. */
-      grid-template-columns: minmax(170px, 200px) minmax(220px, 1fr) minmax(150px, 180px) minmax(260px, 320px);
+      grid-template-columns: minmax(120px, 132px) minmax(220px, 1fr) max-content minmax(260px, 320px);
       gap: clamp(24px, 4vw, 72px);
       align-items: center;
       min-height: 500px;
@@ -877,7 +894,9 @@ const installJoined = installLines.join('\n');
       flex-direction: column;
       gap: 10px;
       position: relative;
-      z-index: 2;
+      /* Above the center/observe stacking contexts (z-index 3/4) so the
+         side tooltips lift in front of the TokenJam circle and beams. */
+      z-index: 6;
     }
     .flow-node {
       position: relative;
@@ -913,6 +932,13 @@ const installJoined = installLines.join('\n');
       color: var(--brand);
     }
     .flow-source-mark.is-multicolor { background: rgba(255, 255, 255, 0.04); }
+    /* TokenJam's brand is near-white, which vanishes on the light theme's pale
+       mark background. Use the theme-adaptive ink color so the jar glyph stays
+       visible (near-white on dark, black on light). */
+    .flow-source[data-id="tokenjam"] .flow-source-mark {
+      color: var(--white);
+      border-color: rgba(127, 127, 127, 0.4);
+    }
     .flow-source-mark svg { display: block; }
     .flow-source-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -951,8 +977,67 @@ const installJoined = installLines.join('\n');
       background: var(--brand);
       flex-shrink: 0;
     }
-    @media (max-width: 820px) {
+    @media (max-width: 900px) {
       .flow-source-tooltip { display: none; }
+    }
+
+    /* Analyzer chip tooltip — mirrors the Products dropdown subtext. Positioned
+       to the LEFT of the chip (toward the diagram center) so it never collides
+       with the Lens preview on the right. */
+    .flow-product-tooltip {
+      position: absolute;
+      top: 50%;
+      right: calc(100% + 12px);
+      transform: translateY(-50%);
+      background: var(--navy);
+      border: 1px solid rgba(var(--product-accent-rgb, 255, 255, 255), 0.4);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--white-dim);
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s;
+      z-index: 5;
+    }
+    .flow-product:hover .flow-product-tooltip,
+    .flow-product:focus-within .flow-product-tooltip {
+      opacity: 1;
+    }
+
+    /* Observe pill tooltip — sits below the pill (the pill is centered next to
+       the jar, so a side tooltip would crowd the circle). */
+    .flow-observe-tooltip {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--navy);
+      border: 1px solid rgba(var(--accent-rgb), 0.4);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      line-height: 1.4;
+      color: var(--white-dim);
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s;
+      z-index: 5;
+    }
+    .flow-observe:hover .flow-observe-tooltip,
+    .flow-observe:focus-within .flow-observe-tooltip {
+      opacity: 1;
+    }
+    @media (max-width: 900px) {
+      .flow-product-tooltip,
+      .flow-observe-tooltip { display: none; }
     }
 
     .flow-center {
@@ -1026,6 +1111,9 @@ const installJoined = installLines.join('\n');
       font-family: 'Geist', sans-serif;
       font-size: 14px;
       font-weight: 500;
+      /* flex:1 pushes the arrow to the right edge so arrows align in a column;
+         the analyzers grid track is sized to content (max-content) so there's
+         no empty box space after the arrow. */
       flex: 1;
     }
     .flow-product-arrow {
@@ -1090,14 +1178,77 @@ const installJoined = installLines.join('\n');
     /* Mobile-only flow direction cues — hidden on desktop so the 3-col grid layout is unchanged. */
     .flow-mobile-label, .flow-mobile-rail { display: none; }
 
-    /* Mobile flow: collapse to vertical */
-    @media (max-width: 820px) {
+    /* Intermediate width: before the full mobile collapse, drop the source
+       labels and show just the brand logos on the left so they never truncate
+       ("Anthro…"). Engages just above where names start clipping (~1050px),
+       down to the 900px mobile breakpoint. */
+    @media (min-width: 901px) and (max-width: 1050px) {
+      .flow-grid {
+        grid-template-columns: minmax(46px, 54px) minmax(220px, 1fr) max-content minmax(260px, 320px);
+      }
+      .flow-source {
+        justify-content: center;
+        padding: 8px 6px;
+        gap: 0;
+      }
+      .flow-source-name { display: none; }
+    }
+
+    /* Mobile flow: collapse to vertical. Set above the width where the Lens
+       preview starts cutting off / overlapping the analyzers (~835px) so the
+       desktop diagram never renders cramped. */
+    @media (max-width: 900px) {
       .flow-grid {
         grid-template-columns: 1fr;
         gap: 12px;
         min-height: 0;
       }
-      .flow-sources, .flow-products { gap: 8px; }
+      /* Analyzers collapse to 3-up: Downsize/Trim/Cache on row 1, Script/Reuse
+         on row 2. Flex-wrap + justify-center so the short second row centers
+         (a 3-col grid would left-align it). Each chip is a third of the row. */
+      .flow-products {
+        display: flex;
+        flex-direction: row; /* base rule is column — must reset for the row wrap */
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        max-width: 360px;
+        margin: 0 auto;
+      }
+      .flow-product {
+        flex: 0 0 calc((100% - 16px) / 3);
+        min-width: 0;
+      }
+      .flow-product-link {
+        justify-content: center;
+        min-width: 0;
+        padding: 10px 6px;
+        gap: 6px;
+      }
+      .flow-product-name { flex: none; font-size: 12.5px; }
+      .flow-product-arrow { display: none; }
+      /* Sources collapse to a centered logo cluster (1–2 rows) — just the brand
+         marks, no names or card chrome, so the long vendor list stays compact. */
+      .flow-sources {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        max-width: 340px;
+        margin: 0 auto;
+      }
+      .flow-source {
+        padding: 0;
+        gap: 0;
+        background: none;
+        border: none;
+      }
+      .flow-source:hover { background: none; }
+      .flow-source-name { display: none; }
+      .flow-source-mark { width: 42px; height: 42px; }
+      .flow-source-mark svg { width: 24px; height: 24px; }
       /* Keep the desktop center height so the absolutely-positioned 180px
          ring doesn't overflow into the Observe satellite below it. The
          earlier 120px override caused the ring to clip the Observe pill. */
@@ -1132,30 +1283,41 @@ const installJoined = installLines.join('\n');
       .flow-mobile-rail {
         display: block;
         position: relative;
-        width: 2px;
+        width: 16px;
         height: 56px;
         margin: 4px auto;
-        background: linear-gradient(to bottom, transparent, var(--blue-line) 20%, var(--blue-line) 80%, transparent);
-        overflow: hidden;
       }
+      /* Thin guide line drawn behind the moving arrows. */
+      .flow-mobile-rail::before {
+        content: '';
+        position: absolute;
+        left: 50%; top: 0; bottom: 0;
+        width: 2px; margin-left: -1px;
+        background: linear-gradient(to bottom, transparent, var(--blue-line) 20%, var(--blue-line) 80%, transparent);
+      }
+      /* Moving chevrons pointing down — convey the top→bottom flow direction. */
       .flow-mobile-rail span {
         position: absolute;
         left: 50%;
-        margin-left: -3px;
-        width: 6px; height: 6px;
-        border-radius: 50%;
-        background: var(--accent-blue);
-        box-shadow: 0 0 8px rgba(var(--accent-blue-rgb), 0.85);
+        margin-left: -5px;
+        width: 10px; height: 10px;
+        border-right: 2px solid var(--accent-blue);
+        border-bottom: 2px solid var(--accent-blue);
+        border-radius: 1px;
+        transform: rotate(45deg);
+        filter: drop-shadow(0 0 4px rgba(var(--accent-blue-rgb), 0.8));
         animation: flow-mobile-drop 1.6s linear infinite;
       }
       .flow-mobile-rail span:nth-child(2) { animation-delay: -0.8s; }
       .flow-mobile-rail--out span {
-        background: var(--green);
-        box-shadow: 0 0 8px rgba(var(--green-rgb), 0.85);
+        border-right-color: var(--green);
+        border-bottom-color: var(--green);
+        filter: drop-shadow(0 0 4px rgba(var(--green-rgb), 0.8));
       }
       .flow-mobile-rail--lens span {
-        background: #06B6D4;
-        box-shadow: 0 0 8px rgba(6, 182, 212, 0.85);
+        border-right-color: #06B6D4;
+        border-bottom-color: #06B6D4;
+        filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.8));
       }
       .flow-mobile-label--lens { color: rgba(6, 182, 212, 0.7); }
     }
