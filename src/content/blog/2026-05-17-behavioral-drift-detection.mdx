@@ -192,7 +192,7 @@ TokenJam is the only one of these where drift is *built in*, *runs locally*, *us
 If you've been running Claude Code for a few weeks, you almost certainly already have ≥ 10 sessions worth of baseline data. Claude Code emits OTel telemetry when `CLAUDE_CODE_ENABLE_TELEMETRY=1` is set, and TokenJam ingests it directly.
 
 ```bash
-$ pip install tokenjam
+$ pipx install tokenjam
 $ tj onboard --claude-code
 $ # ... Run Claude Code as normal for a few sessions ...
 $ tj drift report
@@ -232,13 +232,13 @@ Detecting it doesn't require an embedding model, a vendor cloud, or a billing re
 That's the entire premise of TokenJam: name the autonomous-agent failure modes that span-counting dashboards can't see, fire alerts while they're happening, and run it locally on your laptop. Drift detection is one of thirteen.
 
 ```bash
-pip install tokenjam
+pipx install tokenjam
 tj onboard --claude-code
 tj drift report   # after ~10 sessions
 ```
 
 - **GitHub:** [Metabuilder-Labs/tokenjam](https://github.com/Metabuilder-Labs/tokenjam)
-- **PyPI:** `pip install tokenjam`
+- **PyPI:** `pipx install tokenjam`
 - **The launch post:** [I let Claude Code run overnight in --dangerously-skip-permissions](/blog/2026-05-15-overnight-claude-code-bill)
 - **The pricing teardown:** [LangSmith TCO is 10.7x sticker](/blog/2026-05-15-langsmith-tco-teardown)
 

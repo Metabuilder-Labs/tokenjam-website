@@ -163,7 +163,7 @@ The first three lines are the entire Claude Code-side change. Everything else is
 If you want the shortest-possible-distance version we ship as `tj`:
 
 ```bash
-pip install tokenjam
+pipx install tokenjam
 tj onboard --claude-code      # writes config, daemonizes, sets the env vars
 tj demo run retry-loop        # synthetic alert in ~60 seconds
 ```
@@ -208,7 +208,7 @@ Cursor hasn't made that move. That's a workflow choice, and it's defensible for 
 
 ```bash
 export CLAUDE_CODE_ENABLE_TELEMETRY=1
-pip install tokenjam
+pipx install tokenjam
 tj onboard --claude-code
 ```
 

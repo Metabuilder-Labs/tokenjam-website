@@ -99,7 +99,7 @@ export const products: ProductData[] = [
     ],
     exampleCaption: 'tj optimize',
     exampleOutput: [
-      { t: '$ pip install "tokenjam[mcp]"',                                                    c: 'cmd'    },
+      { t: '$ pipx install tokenjam',                                                    c: 'cmd'    },
       { t: '$ tj onboard --claude-code',                                                      c: 'cmd'    },
       { t: '  → Detects Claude Code installation',                                            c: 'dim'    },
       { t: '  → Reads ~/.claude/projects/<project>/<session>.jsonl files (last 30d)',         c: 'dim'    },

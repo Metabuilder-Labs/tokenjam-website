@@ -16,7 +16,7 @@ import FAQBlock from '@/components/FAQBlock.astro';
 - The headline LangSmith Plus price is $39/seat/month. The all-in cost. Extended traces, retention, the seats *and* the cloud bill it implies. Runs about **10.7x** the sticker for a real team ([CheckThat.ai's audit](https://www.checkthat.ai/blog/the-real-cost-of-langsmith-2025)). A team of 5 looks like $195/month at the sticker; it looks closer to $2,000/month once you count usage and overage.
 - On 2026-05-13 LangChain shipped [LangSmith Engine](https://www.langchain.com/blog/introducing-langsmith-engine) and [SmithDB](https://www.langchain.com/blog/introducing-smithdb). A new data layer for agent observability. The good news: the platform got faster. The pricing model didn't change shape.
 - Langfuse self-host is a genuine alternative. But it's [Docker Compose + ClickHouse + a Postgres + a Redis](https://langfuse.com/self-hosting/docker-compose). One weekend, then it's on your ops on-call.
-- For an indie running Claude Code on a laptop, the right shape is neither of those. It's `pip install tokenjam`, one DuckDB file, no account.
+- For an indie running Claude Code on a laptop, the right shape is neither of those. It's `pipx install tokenjam`, one DuckDB file, no account.
 - The numbers below are sourced. The conclusion isn't "LangSmith is bad". They have a real customer. The conclusion is that the indie / two-person-startup tier is *priced out* of every cloud option and *operationally cliffed* on every self-host option except one.
 </TLDR>
 
@@ -94,7 +94,7 @@ To make this concrete, here's an audit of *minimum* RAM footprint for a working 
 | Helicone self-host | 4-5 | ~3 GB | Postgres + ClickHouse + Redis |
 | **TokenJam** | 1 | ~80 MB | DuckDB (single file) |
 
-A `pip install tokenjam` followed by `tj serve` is one Python process, one DuckDB file under `~/.tj/`, no other infrastructure. That's not a critique of Langfuse's architecture choices. They're correct for the scale they target. It's that **for a one or two-person team, that shape is the entire bill.**
+A `pipx install tokenjam` followed by `tj serve` is one Python process, one DuckDB file under `~/.tj/`, no other infrastructure. That's not a critique of Langfuse's architecture choices. They're correct for the scale they target. It's that **for a one or two-person team, that shape is the entire bill.**
 
 ## What it actually costs to run TokenJam: the math
 
@@ -160,7 +160,7 @@ That's not a feature LangSmith is bad at. It's a feature LangSmith doesn't try t
 This is what 60 seconds with TokenJam looks like. Installable on the same laptop you're reading this on:
 
 ```bash
-$ pip install tokenjam
+$ pipx install tokenjam
 $ tj onboard --claude-code
 [tj] writing ~/.tj/config.toml (ingest_secret: f3a4...e91d)
 [tj] installing launchd daemon ~/Library/LaunchAgents/dev.tokenjam.daemon.plist
@@ -197,7 +197,7 @@ Are you a 2-person team running production agents and want zero ops?
 
 Are you an indie running Claude Code / Codex / a ralph loop on your
 laptop overnight and you want a Discord alert when something goes wrong?
-  → TokenJam. `pip install tokenjam`. No account.
+  → TokenJam. `pipx install tokenjam`. No account.
 
 Are you running long-running autonomous agents (LangGraph, CrewAI,
 AutoGen) where the failure mode is "spends $X overnight and silently"?
@@ -215,16 +215,16 @@ We are explicitly *not* selling against LangSmith on the enterprise features. We
 
 Two technical co-founders, zero users on day one. Pure OSS for the next 12 months. No hosted version (going SaaS turns us into a worse Langfuse). No per-seat pricing because there are no seats. The 13-alert taxonomy is wired. The MCP server lets Claude Code query its own observability mid-session. The DuckDB file is on your laptop. That's the whole product.
 
-If you're a small team paying $2,000/month for trace volume on LangSmith and the *autonomous agent* failure modes (retry loops, drift, surprise costs) are what's actually keeping you up at night. Try `pip install tokenjam` alongside it for a week. Worst case you've spent an evening. Best case you cancel a seat or two.
+If you're a small team paying $2,000/month for trace volume on LangSmith and the *autonomous agent* failure modes (retry loops, drift, surprise costs) are what's actually keeping you up at night. Try `pipx install tokenjam` alongside it for a week. Worst case you've spent an evening. Best case you cancel a seat or two.
 
 ```bash
-pip install tokenjam
+pipx install tokenjam
 tj onboard --claude-code
 tj demo run retry-loop
 ```
 
 - **GitHub:** [Metabuilder-Labs/tokenjam](https://github.com/Metabuilder-Labs/tokenjam)
-- **PyPI:** `pip install tokenjam`
+- **PyPI:** `pipx install tokenjam`
 - **The launch post:** [I let Claude Code run overnight in --dangerously-skip-permissions](/blog/2026-05-15-overnight-claude-code-bill)
 
 ## Common questions

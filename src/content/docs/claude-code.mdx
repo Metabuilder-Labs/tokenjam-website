@@ -12,7 +12,7 @@ TokenJam ships first-class support for the two most-used coding agents: **Claude
 Monitor every Claude Code session (costs, tool calls, API requests, errors) with two commands:
 
 ```bash
-pipx install 'tokenjam[mcp]'
+pipx install tokenjam
 tj onboard --claude-code
 # Restart Claude Code, then:
 tj status --agent claude-code-<project>
@@ -76,7 +76,7 @@ Claude calls `setup_project`, which writes `.claude/settings.json` with the righ
 Monitor every Codex session. Run once, globally:
 
 ```bash
-pipx install 'tokenjam[mcp]'
+pipx install tokenjam
 tj onboard --codex
 ```
 
