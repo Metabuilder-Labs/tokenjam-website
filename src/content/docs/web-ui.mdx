@@ -1,73 +1,108 @@
 ---
 title: Web UI
-description: A local dashboard at http://127.0.0.1:7391 with status, traces, cost, alerts, budget, and drift views.
+description: TokenJam Lens — a local dashboard at http://127.0.0.1:7391 with the Dashboard triage view, plus Status, Traces, Cost, Analytics, Alerts, Drift, Optimize, and Budget.
 section: cli-and-ui
 order: 2
 ---
 
-`tj serve` starts a local dashboard at `http://127.0.0.1:7391/`.
+`tj serve` starts **TokenJam Lens**, a local dashboard at `http://127.0.0.1:7391/`.
 
 ```bash
 tj serve
 ```
 
-The web UI is a single Vite-built bundle served by the local REST API. No external dependencies, no cloud calls.
+The web UI is a single Vite-built bundle served by the local REST API. No external dependencies, no cloud calls — it reads the same local store the CLI does.
 
-## Views
+## How costs are framed
+
+TokenJam never tells you that you "saved" money. It only ever shows what is **estimated recoverable**, and it adapts the unit to how you pay:
+
+- **Subscription plans** (the "Max 5x plan" badge by the page title) — you see your **token share** and a **× plan value** multiplier (how many times your flat plan fee your usage is worth at on-demand rates). You never see a raw dollar figure, because there isn't one to show.
+- **API keys** — you see **dollars**, since every token has a real per-unit price.
+- **Per-item cost is always tokens.** Traces, agents, and the cost table report token counts; the dollar/multiplier translation only happens at the headline level.
+
+Every recoverable-waste figure carries an **Estimated** tag. Nothing is presented as realized savings until you act on it.
+
+## Dashboard
+
+The **Dashboard** is the default landing view. It merges what used to be the separate "Overview" page into a single triage surface, so the first thing you see is where your tokens are going and what is recoverable.
+
+![TokenJam Lens dashboard — recoverable-waste triage band, health-at-a-glance, and the embedded pivot explorer](/docs/web-ui/tj-dashboard.png)
+
+It has three stacked sections:
+
+- **Recoverable Waste (Estimated)** — one tile per analyzer: **Downsize**, **Cache**, **Script**, **Reuse**, **Trim**. Each tile shows its current finding ("No candidates", "✓ 100% cache efficacy", "Not ready") and **drills through in place** — click a tile to expand the underlying detail without leaving the Dashboard.
+- **Health at a glance** — unread alerts, agents drifting (vs. their learned baseline), budgets at risk, and recent session activity, each as a single-number card.
+- **Explore** — an embedded **pivot explorer**: pick a **metric × dimension × chart** (e.g. Spend by Model as Bars), flip the **Stack**, and read the headline KPIs (× plan value, tokens, sessions, events) with period-over-period deltas and a run-rate line. One-click **Presets** (Spend by model, Cost leaderboard, Tokens over time, Tool usage) and **Export CSV** are built in. The time-window selector (Last 7d / 30d / 90d) scopes the whole page.
+
+The same pivot answers very different questions without leaving the page:
 
 <table>
 <tr>
 <td width="50%">
 
-**Status** — agent overview with cost, tokens, tool calls, and active alerts.
+**Cost leaderboard** — Spend × Model as a ranked leaderboard.
 
-![tj status page](/docs/web-ui/tj-status.png)
-
-</td>
-<td width="50%">
-
-**Traces** — recent traces with cost, duration, and span count. Click a row for the waterfall view.
-
-![tj traces page](/docs/web-ui/tj-traces.png)
-
-</td>
-</tr>
-<tr>
-<td width="50%">
-
-**Cost** — spend broken down by day, agent, model, or tool.
-
-![tj cost page](/docs/web-ui/tj-cost.png)
+![Dashboard pivot configured as a spend-by-model leaderboard](/docs/web-ui/tj-dashboard-leaderboard.png)
 
 </td>
 <td width="50%">
 
-**Alerts** — full alert history with severity filter and inline detail expansion.
+**Tool usage** — Events × Tool category, ranked.
 
-![tj alerts page](/docs/web-ui/tj-alerts.png)
-
-</td>
-</tr>
-<tr>
-<td colspan="2">
-
-**Budget** — view and edit daily/per-session cost limits per agent, with recent budget alerts inline.
-
-![tj budget page](/docs/web-ui/tj-budget.png)
+![Dashboard pivot configured as a tool-usage leaderboard](/docs/web-ui/tj-dashboard-tools.png)
 
 </td>
 </tr>
 </table>
 
-**Drift** — behavioral drift report with Z-score analysis. Compares the latest session against a learned baseline. (Same page chrome as the others; reach via the Drift tab in the sidebar.)
+## Status
+
+Per-agent overview. Toggle between **Cards** and **List** (List is the default); each agent shows cost today (tokens), tokens in/out, tool calls, elapsed/active time, and any active alerts. Click an agent for its detail, or jump straight to its cost or traces. Recent alerts are listed inline below.
+
+![tj status page — per-agent cards with cost, tokens, tool calls, and recent alerts](/docs/web-ui/tj-status.png)
+
+## Traces
+
+A session-level list of recent traces with token cost, duration, and span count. Open one for the **cost-annotated waterfall**: every span is laid out by magnitude (toggle **By tokens** / **By duration**) with a per-span cost/token column, and hovering a span reveals the call detail — provider, model, input/output tokens, and cache read/write.
+
+![tj traces page — cost-annotated span waterfall with per-span token detail](/docs/web-ui/tj-traces.png)
+
+## Cost
+
+**Spend over time** (in tokens) with a linear run-rate marker, paired with the **Caching** card — cache hit-rate, cached reads in the window, and per-day cached-token volume. Cached input bills at roughly a tenth of the normal input rate, so high cache reads spare your token budget. A per-day table breaks input, output, cache-read, cache-write, and total cost down by agent or model.
+
+![tj cost page — spend-over-time chart, caching card, and the per-day cost table](/docs/web-ui/tj-cost.png)
+
+## Analytics
+
+The same pivot explorer as the Dashboard's **Explore** band, given the full screen — metric × dimension × chart, stacking, presets, and CSV export — for when you want to dig past triage into ad-hoc analysis.
+
+## Alerts
+
+Full alert history with a severity filter and inline detail expansion. Retry loops, drift, and budget breaches all surface here.
+
+## Drift
+
+Behavioral drift report with Z-score analysis: it compares the latest session against a learned baseline and flags where behavior has moved outside normal range.
+
+## Optimize
+
+The recoverable-waste analyzers in full — the same Downsize / Cache / Script / Trim / Reuse findings summarized on the Dashboard, expanded with the per-finding evidence behind each estimate. Mirrors `tj optimize` on the CLI.
+
+## Budget
+
+View and edit **daily** and **per-session** ceilings per agent. Clearing a field (or entering `0`) removes the limit, and changes are written to your config file immediately. Recent budget alerts are listed inline so you can see which scopes have breached.
+
+![tj budget page — per-agent daily and per-session limits with inline budget alerts](/docs/web-ui/tj-budget.png)
 
 ## Auto-polling
 
-The UI auto-refreshes every few seconds while a session is active. Disable from the settings menu if you'd rather refresh manually.
+The UI auto-refreshes every few seconds while a session is active. Disable it from the settings menu if you'd rather refresh manually.
 
 ## Sharing
 
-By default `tj serve` binds to `127.0.0.1` (loopback only). To make the dashboard accessible from another machine on your network:
+By default `tj serve` binds to `127.0.0.1` (loopback only). To reach the dashboard from another machine on your network:
 
 ```bash
 tj serve --host 0.0.0.0
