@@ -388,7 +388,7 @@ export const products: ProductData[] = [
     name: 'Lens',
     cardVariant: 'browser',
     shortBlurb: "See your spend, your recoverable waste, and your alerts at a glance, in a local browser dashboard.",
-    heroClaim: "The local dashboard for every analyzer's findings.",
+    heroClaim: "See exactly where your agent tokens go — and what's recoverable — without leaving your machine.",
     accent: '#06B6D4',
     accentRgb: '6, 182, 212',
   },
