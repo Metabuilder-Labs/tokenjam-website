@@ -24,10 +24,10 @@ const product = getProduct('lens')!;
       </h1>
       <p class="pp-claim">{product.heroClaim}</p>
       <p class="pp-sub">
-        The heart of Lens is its explorer: one pivot — <strong>metric × dimension × chart</strong> —
-        that slices spend, tokens, and tool calls every way you need, with one-click presets and CSV
-        export. It's the dashboard you get from <code>tj serve</code>: runs entirely on your machine,
-        no signup, no cloud.
+        The heart of Lens is its explorer. Pick a <strong>metric × dimension × chart</strong> and
+        read that exact slice of your usage. One pivot covers spend by model, tokens over time, or
+        tool calls by category, with presets and CSV export built in. It's the dashboard
+        <code>tj serve</code> gives you, running locally with no signup and nothing sent to a cloud.
       </p>
       <div class="pp-hero-ctas">
         <a href="/#install" class="btn-primary">Get started</a>
@@ -48,11 +48,11 @@ const product = getProduct('lens')!;
       <h2 class="pp-h2">One chart, every slice</h2>
       <p class="pp-section-lede">
         Static cost dashboards give you the views their authors thought of. Lens gives you the pivot.
-        Pick a <strong>metric</strong> (spend, tokens, events), a <strong>dimension</strong> (model,
-        tool, agent, time), and a <strong>chart</strong> (bars, lines, leaderboard) — then read the
-        answer. Presets like <em>Spend by model</em>, <em>Cost leaderboard</em>, <em>Tokens over
-        time</em>, and <em>Tool usage</em> are one click; <strong>Export CSV</strong> drops the same
-        slice into your own tooling. It's the same explorer the Analytics tab opens full-screen.
+        Want spend ranked by model? Two dropdowns. Tool calls over time? Two more. Pick the
+        <strong>metric</strong>, the <strong>dimension</strong>, and the <strong>chart</strong>, and
+        the answer is on screen. Presets like <em>Spend by model</em> and <em>Cost leaderboard</em>
+        jump straight to the common ones, <strong>Export CSV</strong> hands the same slice to your own
+        tooling, and the Analytics tab opens this explorer full-screen.
       </p>
       <div class="lens-duo">
         <figure class="lens-fig">
@@ -61,7 +61,7 @@ const product = getProduct('lens')!;
               <img class="lens-shot" src="/products/lens/tj-dashboard-leaderboard.png" width="1211" height="1013" loading="lazy" alt="Lens explorer configured as a spend-by-model leaderboard over the last 90 days" />
             </Browser>
           </div>
-          <figcaption>Spend × Model, ranked — where the tokens actually concentrate.</figcaption>
+          <figcaption>Spend × Model, ranked. This is where the tokens concentrate.</figcaption>
         </figure>
         <figure class="lens-fig">
           <div class="lens-screenshot">
@@ -69,7 +69,7 @@ const product = getProduct('lens')!;
               <img class="lens-shot" src="/products/lens/tj-dashboard-tools.png" width="1116" height="895" loading="lazy" alt="Lens explorer configured as a tool-usage leaderboard by event count" />
             </Browser>
           </div>
-          <figcaption>Events × Tool category — same pivot, a completely different question.</figcaption>
+          <figcaption>Events × Tool category. Same pivot, a different question.</figcaption>
         </figure>
       </div>
     </section>
@@ -78,15 +78,14 @@ const product = getProduct('lens')!;
     <section class="pp-section">
       <h2 class="pp-h2">Your triage front door</h2>
       <p class="pp-section-lede">
-        The Dashboard is the default landing view — what used to be a separate Overview page is now
-        merged in, so the first screen answers "where am I, and what should I look at next?" A
-        <strong>recoverable-waste</strong> band carries one tile per analyzer (Downsize, Cache,
-        Script, Reuse, Trim), each tagged <em>Estimated</em> and showing its finding or
-        <code>✓ 100% cache efficacy</code> when there's nothing to recover. A
-        <strong>health-at-a-glance</strong> row covers unread alerts, agents drifting from baseline,
-        budgets at risk, and recent activity. Every waste tile drills into its detail in place — no
-        page hop — and the explorer sits right below it. New analyzers appear automatically: the band
-        is registry-driven.
+        The Dashboard is the default landing view. What used to be a separate Overview page now lives
+        here, so the first screen answers a simple question: where am I, and what should I look at
+        next? A <strong>recoverable-waste</strong> band carries one tile per analyzer (Downsize,
+        Cache, Script, Reuse, Trim), each tagged <em>Estimated</em>, each showing its finding or a
+        clean <code>✓ 100% cache efficacy</code> when there's nothing to recover. Above it, a health
+        row tracks unread alerts, agents drifting from baseline, budgets at risk, and recent activity.
+        Click a waste tile and it expands in place, no page hop, with the explorer sitting right
+        below. New analyzers show up on their own, since the band is registry-driven.
       </p>
     </section>
 
@@ -94,12 +93,12 @@ const product = getProduct('lens')!;
     <section class="pp-section">
       <h2 class="pp-h2">Cost, with the math shown</h2>
       <p class="pp-section-lede">
-        Spend over time as a real chart, paired with a <strong>Caching</strong> card so a
-        cache-heavy window is no longer a mystery: cache hit-rate, cached reads, and per-day cached
-        volume, with the reminder that cached input bills at roughly a tenth of the normal rate. The
-        per-day table breaks input, output, <code>CACHE R</code>, <code>CACHE W</code>, and total
-        cost down by agent or model. Projections are captioned
-        <em>"linear run-rate, not a forecast"</em> — Lens never claims to predict.
+        Spend over time as a real chart, paired with a <strong>Caching</strong> card so a cache-heavy
+        window stops being a mystery. You see the hit-rate, the cached reads, and how much cached
+        volume ran each day, with a note that cached input bills at about a tenth of the normal rate.
+        The per-day table breaks the numbers down by agent or model: input, output, <code>CACHE R</code>,
+        <code>CACHE W</code>, total cost. Projections carry the caption
+        <em>"linear run-rate, not a forecast."</em> Lens never claims to predict.
       </p>
       <div class="lens-screenshot">
         <Browser url="127.0.0.1:7391/#/cost">
@@ -112,10 +111,10 @@ const product = getProduct('lens')!;
     <section class="pp-section">
       <h2 class="pp-h2">Trace any session down to the span</h2>
       <p class="pp-section-lede">
-        Open a session for the <strong>cost-annotated waterfall</strong>: every span laid out by
-        magnitude (toggle by tokens or by duration), with a per-span cost column. Hover a span and
-        you get the call detail — provider, model, input/output tokens, and cache read/write — so the
-        expensive span in a long run is obvious at a glance.
+        Open a session for the <strong>cost-annotated waterfall</strong>. Every span is laid out by
+        magnitude, toggleable by tokens or by duration, with a per-span cost column down the side.
+        Hover a span and the call detail comes up: provider, model, input and output tokens, cache
+        read and write. The one expensive span in a long run stops hiding.
       </p>
       <div class="lens-screenshot">
         <Browser url="127.0.0.1:7391/#/traces">
@@ -128,11 +127,11 @@ const product = getProduct('lens')!;
     <section class="pp-section">
       <Callout type="tip">
         <p><strong>Lens runs entirely on your machine.</strong> No data leaves it, not even to
-        TokenJam — the dashboard works fully offline. Every recoverable-waste figure is an honest
-        heuristic estimate, never a promise. If you're on a flat-rate subscription (Claude Max,
-        ChatGPT Plus), Lens reports your usage as a <strong>× plan value</strong> multiple — what the
-        same tokens would cost at on-demand API rates. A heavy Max user can see their usage is worth
-        20–30× their subscription fee. It's implied value, never money you spent.</p>
+        TokenJam, and the dashboard works fully offline. Every recoverable-waste figure is an honest
+        heuristic estimate, never a promise. If you pay a flat subscription (Claude Max, ChatGPT
+        Plus), Lens reports your usage as a <strong>× plan value</strong> multiple: what the same
+        tokens would cost at on-demand API rates. A heavy Max user often sees their usage worth 20 to
+        30 times the subscription fee. It's implied value, never money you spent.</p>
       </Callout>
     </section>
 
@@ -140,9 +139,9 @@ const product = getProduct('lens')!;
     <section class="pp-section">
       <h2 class="pp-h2">Get started</h2>
       <p class="pp-section-lede">
-        Local, no signup. <code>tj onboard</code> backfills your last 30 days of Claude Code
-        sessions, so the dashboard is full of <em>your own</em> data the moment it opens at
-        <code>127.0.0.1:7391</code>.
+        No signup, nothing to configure. <code>tj onboard</code> backfills your last 30 days of
+        Claude Code sessions, so the dashboard opens at <code>127.0.0.1:7391</code> already full of
+        <em>your own</em> data.
       </p>
       <div class="terminal pp-terminal">
         <div class="terminal-titlebar">
@@ -159,9 +158,9 @@ const product = getProduct('lens')!;
 <span class="tline t-dim">  → open http://127.0.0.1:7391/</span></pre>
       </div>
       <p class="pp-fineprint">
-        Curious where you land first? <a href="/tokenmaxxing">Are you TokenMaxxing hard enough?</a> —
-        find your tier in under a minute. Source on
-        <a href="https://github.com/metabuilder-labs/tokenjam" target="_blank" rel="noopener noreferrer">GitHub</a>;
+        Curious where you'd land? <a href="/tokenmaxxing">Are you TokenMaxxing hard enough?</a> finds
+        your tier in under a minute. Source on
+        <a href="https://github.com/metabuilder-labs/tokenjam" target="_blank" rel="noopener noreferrer">GitHub</a>,
         full <a href="/docs/web-ui">Web UI reference</a> in the docs.
       </p>
     </section>

@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Content style (read before writing any copy)
+
+All written content for the site — marketing copy, docs, blog posts, product pages, changelogs — must follow `.claude/content-style.md`. Read that file before drafting or editing site copy and self-edit against its nine rules. The top three tells to watch hardest: em-dashes (3 per piece max), "X but Y" contrast pairs, and tricolons (A, B, and C lists).
+
 ## Project overview
 
 TokenJam is an open-source, OTel-native observability tool for autonomous AI agents, by Metabuilder Labs. This repo is the **website** for [tokenjam.dev](https://tokenjam.dev). The CLI command is `tj`.

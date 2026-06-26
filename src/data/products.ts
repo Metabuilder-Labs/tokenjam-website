@@ -77,16 +77,16 @@ export const products: ProductData[] = [
     accentRgb: '59, 130, 246',
     problem: [
       "Coding agents default to premium models on every call. Most calls don't need it. A \"fix this typo\" task gets routed to Claude Opus 4 the same way a \"refactor the entire authentication module\" task does.",
-      "The structural shape of those two requests is wildly different. The first one runs fine on Haiku for a fraction of the price. Downsize finds the calls that look like the cheap kind, computes what they would have cost on a smaller model, and shows you the difference — grounded in your own session history, not a vendor benchmark.",
+      "The structural shape of those two requests is wildly different. The first one runs fine on Haiku for a fraction of the price. Downsize finds the calls that look like the cheap kind, computes what they would have cost on a smaller model, and shows you the difference, grounded in your own session history rather than a vendor benchmark.",
     ],
     mechanism: [
       'Walk every LLM call in your captured trace history. Classify each session by structural shape: input token count, output token count, tool-call count, single-turn vs multi-turn.',
-      'Sessions matching a known small-task pattern get flagged as candidates for a cheaper model. Compute what those sessions would have cost on the target model and report the difference. The recommendation is a structural heuristic, not a quality claim — so you decide whether to apply it.',
+      'Sessions matching a known small-task pattern get flagged as candidates for a cheaper model. Compute what those sessions would have cost on the target model and report the difference. The recommendation is a structural heuristic, not a quality claim, so you decide whether to apply it.',
     ],
     confidence: [
       {
         level: 1, name: 'Structural', tier: 'OSS',
-        body: 'Ships today. Flags candidates by structural heuristic — token counts, tool-call shape, turn count. Conservative thresholds keep false positives low.',
+        body: 'Ships today. Flags candidates by structural heuristic: token counts, tool-call shape, turn count. Conservative thresholds keep false positives low.',
       },
       {
         level: 2, name: 'Replay-validated', tier: 'Pro',
@@ -158,10 +158,10 @@ export const products: ProductData[] = [
       "The actual signal in a 4,000-token system prompt might be 800 tokens of real instructions and 3,200 tokens of historical scar tissue. You pay for the whole thing on every call. Trim runs significance analysis on your captured prompts and shows you which sections carry the load and which are dead weight.",
     ],
     mechanism: [
-      "Trim runs LLMLingua-2's token-classification model — BERT-class, MIT-licensed, runs locally on CPU — over your captured prompts. Each token gets a score reflecting its contribution to model outputs.",
+      "Trim runs LLMLingua-2's token-classification model (BERT-class, MIT-licensed, runs locally on CPU) over your captured prompts. Each token gets a score reflecting its contribution to model outputs.",
       'Sections of consistently low-significance tokens get flagged as bloat candidates. The output is a highlighted view of your prompt with high-significance regions in bold and low-significance regions dimmed. You decide what to remove; Trim never edits your prompts at runtime.',
     ],
-    privacyNote: "Trim needs your prompt content, which TokenJam doesn't capture by default. To enable it, set alerts.include_captured_content: true in your config. Captured content stays on your local machine — it never leaves, except during opt-in replay validation against alternative models you've configured.",
+    privacyNote: "Trim needs your prompt content, which TokenJam doesn't capture by default. To enable it, set alerts.include_captured_content: true in your config. Captured content stays on your local machine. It never leaves, except during opt-in replay validation against alternative models you've configured.",
     confidence: [
       {
         level: 1, name: 'Structural', tier: 'OSS',
@@ -191,7 +191,7 @@ export const products: ProductData[] = [
       {
         paper: 'LLMLingua-2',
         attribution: 'Microsoft Research — ACL 2024',
-        contribution: 'Token classification via GPT-4 distillation. 3–6× faster than LLMLingua-1. We use the same scoring mechanism for detection only — leaving the editing decision with you.',
+        contribution: 'Token classification via GPT-4 distillation. 3–6× faster than LLMLingua-1. We use the same scoring mechanism for detection only, leaving the editing decision with you.',
       },
     ],
   },
@@ -206,7 +206,7 @@ export const products: ProductData[] = [
     accentRgb: '245, 158, 11',
     problem: [
       "Anthropic, OpenAI, and Google all offer prompt caching. The cached portion of a prompt is billed at roughly 10% of the normal input rate. For a Claude Code user, the system prompt plus tool schemas plus CLAUDE.md is 2–4K tokens that are identical across every call in a session.",
-      "Without explicit cache_control markers, you pay full price for that prefix on every call. Cache walks your prompt history, finds the stable prefixes, and tells you exactly where to place the cache_control markers — with the exact savings calculation per provider.",
+      "Without explicit cache_control markers, you pay full price for that prefix on every call. Cache walks your prompt history, finds the stable prefixes, and tells you exactly where to place the cache_control markers, with the exact savings calculation per provider.",
     ],
     mechanism: [
       'Walk every prompt in the window. Compute prefix hashes at common breakpoint positions (after the system message, after tool schemas, after project context). Identify identical prefixes across calls within each provider\'s cache TTL window.',
@@ -262,16 +262,16 @@ export const products: ProductData[] = [
     accentRgb: '239, 68, 68',
     problem: [
       "A user types \"deploy staging\" into Claude Code. The agent thinks for a few seconds, runs git pull, npm install, reads .env.staging, runs npm run build, runs pm2 restart staging-app. Same five commands, same order, every single time.",
-      "The agent's reasoning didn't change anything; the user just paid Opus pricing to have it figure out a 5-line shell script. Multiply that across hundreds of deterministic tasks and you have meaningful, recoverable cost. Script finds those tight clusters — and only the tight ones, where the reasoning genuinely added nothing.",
+      "The agent's reasoning didn't change anything; the user just paid Opus pricing to have it figure out a 5-line shell script. Multiply that across hundreds of deterministic tasks and you have meaningful, recoverable cost. Script finds those tight clusters, and only the tight ones, where the reasoning genuinely added nothing.",
     ],
     mechanism: [
-      'Cluster sessions by tool-call signature: the ordered list of tools called, with which arguments are fixed vs variable. Inside each cluster, measure three kinds of variation — argument variation, branch variation (did the agent ever skip or add a step?), outcome variation (did the user accept the result every time?).',
+      'Cluster sessions by tool-call signature: the ordered list of tools called, with which arguments are fixed vs variable. Inside each cluster, measure three kinds of variation: argument variation, branch variation (did the agent ever skip or add a step?), and outcome variation (did the user accept the result every time?).',
       "Surface clusters where >90% of instances follow identical patterns, where the agent's reasoning contributed no observed variation. The output names the cluster, shows the example sequence, counts instances, and projects the savings from replacing it with a script you write.",
     ],
     confidence: [
       {
         level: 1, name: 'Structural', tier: 'OSS',
-        body: 'Conservative thresholds in v1 to minimize false positives — only flag clusters with 100% argument-pattern stability, 20+ instances, and zero observed branching. Surfaces fewer findings, but the findings are reliable.',
+        body: 'Conservative thresholds in v1 to minimize false positives: only flag clusters with 100% argument-pattern stability, 20+ instances, and zero observed branching. Surfaces fewer findings, but the findings are reliable.',
       },
     ],
     exampleCaption: 'tj optimize --finding workflow-restructure',
@@ -339,7 +339,7 @@ export const products: ProductData[] = [
       },
       {
         level: 2, name: 'Replay-validated', tier: 'Pro',
-        body: 'Samples a flagged cluster and replays the planning step through a lightweight adapter to confirm the cached skeleton still produces an equivalent tool-call sequence. Recoverable estimates now carry evidence from your own data, not just a clustering heuristic.',
+        body: 'Samples a flagged cluster and replays the planning step through a lightweight adapter to confirm the cached skeleton still produces an equivalent tool-call sequence. Recoverable estimates now carry evidence from your own data, beyond the clustering heuristic.',
       },
       {
         level: 3, name: 'User-validated', tier: 'Pro',

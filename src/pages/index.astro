@@ -506,7 +506,7 @@ const installJoined = installLines.join('\n');
       <div class="how-col">
         <h3 class="how-h3">Gathering Data</h3>
         <p>
-          TokenJam reads from wherever your agent telemtry data lives. Local log files if you're on Claude Code or Codex. Ingestion from Langfuse, Helicone, LangSmith, or Phoenix if you have one of those running for observability. Direct OpenTelemetry capture if you don't have an observability tool.
+          TokenJam reads from wherever your agent telemetry already lives. On Claude Code or Codex, that's your local log files. If you run Langfuse, Helicone, LangSmith, or Phoenix for observability, it ingests from there. No observability tool? It captures OpenTelemetry directly.
         </p>
       </div>
       <div class="how-col">
