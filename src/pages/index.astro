@@ -762,7 +762,7 @@ const installJoined = installLines.join('\n');
 
     /* ── HERO ─────────────────────────────────────── */
     .hero {
-      padding: calc(64px + var(--banner-h, 0px)) 48px 4px;
+      padding: calc(42px + var(--banner-h, 0px)) 48px 4px;
       background:
         radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--accent-blue-rgb), 0.08), transparent 60%),
         var(--navy);
@@ -773,7 +773,7 @@ const installJoined = installLines.join('\n');
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 8px;
     }
     .hero-copy { text-align: center; max-width: none; margin: 0 auto; }
     /* Single-line headline (Vercel-style hero). The calc() picks the largest font
@@ -831,8 +831,8 @@ const installJoined = installLines.join('\n');
          Analyzers shrink to compact chips (icon + name + arrow only).
          Lens grows into a full browser preview at the end so the visualization
          step is visible, not just hinted at. */
-      grid-template-columns: minmax(104px, 116px) minmax(190px, 240px) max-content minmax(248px, 300px);
-      gap: clamp(16px, 2vw, 36px);
+      grid-template-columns: minmax(104px, 116px) minmax(188px, 208px) max-content minmax(320px, 360px);
+      gap: clamp(30px, 3.6vw, 54px);
       align-items: center;
       justify-content: center;
       min-height: 340px;
@@ -897,8 +897,8 @@ const installJoined = installLines.join('\n');
     /* Headings above the Bench + Lens windows. Two lines (product name on top,
        subtitle under) so they read as prominent product labels, not captions. */
     .flow-cardcap {
-      margin: 0 0 7px; padding-left: 2px;
-      display: flex; flex-direction: column; gap: 1px;
+      margin: 0 0 4px; padding-left: 2px;
+      display: flex; flex-direction: column; gap: 0;
       font-family: 'Geist', sans-serif;
     }
     .flow-cardcap strong {
@@ -910,7 +910,7 @@ const installJoined = installLines.join('\n');
       color: var(--white-faint);
     }
     /* More breathing room between the Bench window and the Lens window. */
-    .flow-cardcap--lens { margin-top: 18px; }
+    .flow-cardcap--lens { margin-top: 7px; }
 
     /* Bench + Lens hero windows are PEERS: both wrap the same <Browser> Mac
        chrome (traffic lights + title bar), both neutral border + elevation at
@@ -927,7 +927,7 @@ const installJoined = installLines.join('\n');
     .flow-bench:hover, .flow-lens-preview:hover { transform: translateX(2px); }
     .flow-bench :global(.browser),
     .flow-lens-preview :global(.browser) {
-      font-size: 11px;
+      font-size: 11.5px;
       line-height: 1.4;
       border-color: var(--blue-line);
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
@@ -940,21 +940,21 @@ const installJoined = installLines.join('\n');
     }
     /* Compact window chrome, shared by both hero windows. */
     .flow-bench :global(.browser-titlebar),
-    .flow-lens-preview :global(.browser-titlebar) { padding: 7px 10px; }
+    .flow-lens-preview :global(.browser-titlebar) { padding: 8px 12px; }
     .flow-bench :global(.browser-url),
-    .flow-lens-preview :global(.browser-url) { font-size: 10px; padding: 2px 8px; }
-    .flow-bench :global(.browser-body) { padding: 11px 13px; }
-    .flow-lens-preview :global(.browser-body) { padding: 9px 11px; }
+    .flow-lens-preview :global(.browser-url) { font-size: 10.5px; padding: 2px 9px; }
+    .flow-bench :global(.browser-body) { padding: 12px 14px; }
+    .flow-lens-preview :global(.browser-body) { padding: 11px 13px; }
     /* Compact Lens internals (now actually applied — :global pierces the slot). */
-    .flow-lens-preview :global(.lp-band) { padding: 8px 10px; margin-top: 6px; }
-    .flow-lens-preview :global(.lp-band-head) { margin-bottom: 4px; }
-    .flow-lens-preview :global(.lp-band-label) { font-size: 9.5px; }
-    .flow-lens-preview :global(.lp-band-chip) { font-size: 8.5px; padding: 1px 5px; }
-    .flow-lens-preview :global(.lp-hero-val) { font-size: 19px; }
-    .flow-lens-preview :global(.lp-spark) { height: 16px; gap: 2px; margin: 5px 0 4px; }
-    .flow-lens-preview :global(.lp-tile) { padding: 5px 7px; }
-    .flow-lens-preview :global(.lp-tile-name) { font-size: 9px; }
-    .flow-lens-preview :global(.lp-tile-val) { font-size: 10px; }
+    .flow-lens-preview :global(.lp-band) { padding: 9px 11px; margin-top: 7px; }
+    .flow-lens-preview :global(.lp-band-head) { margin-bottom: 5px; }
+    .flow-lens-preview :global(.lp-band-label) { font-size: 10px; }
+    .flow-lens-preview :global(.lp-band-chip) { font-size: 9px; padding: 1px 6px; }
+    .flow-lens-preview :global(.lp-hero-val) { font-size: 22px; }
+    .flow-lens-preview :global(.lp-spark) { height: 19px; gap: 2px; margin: 6px 0 4px; }
+    .flow-lens-preview :global(.lp-tile) { padding: 6px 8px; }
+    .flow-lens-preview :global(.lp-tile-name) { font-size: 9.5px; }
+    .flow-lens-preview :global(.lp-tile-val) { font-size: 11px; }
 
     .flow-sources, .flow-products {
       list-style: none;
@@ -1237,7 +1237,11 @@ const installJoined = installLines.join('\n');
       align-items: center;
       gap: 10px;
       justify-content: center;
-      margin-top: 0;
+      /* Clear separation from the windows above so the analyzer→window beams
+         (and the Lens window's bottom edge) never crowd this row. */
+      margin-top: 22px;
+      position: relative;
+      z-index: 7;
       font-family: 'Geist Mono', monospace;
       font-size: 12px;
       color: var(--white-dim);

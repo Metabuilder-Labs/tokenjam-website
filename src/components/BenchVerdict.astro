@@ -1,9 +1,10 @@
 ---
 /*
  * Shared TokenJam Bench verdict viz — a per-suite pass-rate chart (candidate
- * fill + baseline marker + holds/regressed tag). One canonical treatment used
- * in the home hero card, the home Bench section, and the /bench page, so the
- * Bench visual is identical everywhere.
+ * fill + baseline marker + pass-rate numbers + holds/regressed tag) plus a
+ * stat tile row (paired-task count, McNemar p, suites-held). One canonical
+ * treatment used in the home hero card, the home Bench section, and the
+ * /bench page, so the Bench visual is identical everywhere.
  *
  * Honest framing: measured pass-rate per suite with a hedged verdict, never
  * "certified". Example numbers are illustrative.
@@ -21,6 +22,15 @@ const suites = [
   { name: 'gsm8k', cand: 94, base: 95, verdict: 'holds' as const },
 ];
 const tone = (v: string) => (v === 'holds' ? 'good' : 'bad');
+
+// Derived facts shown as the stat tiles (all consistent with the copy on the
+// /bench page and the tjb terminal — 200 paired tasks/suite, humaneval McNemar
+// p ≈ 0.000, one of the two suites held).
+const stats = [
+  { v: '200', l: 'paired / suite' },
+  { v: 'p≈0.000', l: 'humaneval McNemar' },
+  { v: '1 / 2', l: 'suites held' },
+];
 ---
 <div class:list={['bv', `bv--${size}`]}>
   {caption && <p class="bv-cap"><strong>TokenJam Bench</strong> · {caption}</p>}
@@ -32,11 +42,20 @@ const tone = (v: string) => (v === 'holds' ? 'good' : 'bad');
           <span class={`bv-fill bv-fill--${tone(s.verdict)}`} style={`width:${s.cand}%`}></span>
           <span class="bv-base" style={`left:${s.base}%`} title={`baseline ${s.base}%`}></span>
         </div>
+        <span class="bv-val"><strong>{s.cand}</strong><span class="bv-val-sep">/</span>{s.base}<span class="bv-val-unit">%</span></span>
         <span class={`bv-tag bv-tag--${tone(s.verdict)}`}>{s.verdict}</span>
       </div>
     ))}
   </div>
-  <div class="bv-foot"><span class="bv-cand">haiku</span> vs <span class="bv-baseline">opus</span> · Wilson CI + McNemar p · measured, never "certified"</div>
+  <div class="bv-stats">
+    {stats.map((st) => (
+      <div class="bv-stat">
+        <span class="bv-stat-v">{st.v}</span>
+        <span class="bv-stat-l">{st.l}</span>
+      </div>
+    ))}
+  </div>
+  <div class="bv-foot"><span class="bv-cand">haiku</span> vs <span class="bv-baseline">opus</span> · Wilson CI · measured, never "certified"</div>
 </div>
 
 <style>
@@ -51,9 +70,22 @@ const tone = (v: string) => (v === 'holds' ? 'good' : 'bad');
   .bv-fill--bad { background: rgba(239, 68, 68, 0.7); }
   .bv-fill--good { background: rgba(16, 185, 129, 0.7); }
   .bv-base { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--white); border-radius: 1px; }
+  .bv-val { flex-shrink: 0; color: var(--white-faint); text-align: right; }
+  .bv-val strong { color: var(--white); font-weight: 600; }
+  .bv-val-sep { margin: 0 1px; opacity: .6; }
+  .bv-val-unit { opacity: .6; margin-left: 1px; }
   .bv-tag { font-family: 'Geist Mono', monospace; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border-radius: 4px; flex-shrink: 0; }
   .bv-tag--bad { color: var(--red); background: rgba(239, 68, 68, 0.12); }
   .bv-tag--good { color: var(--green); background: rgba(16, 185, 129, 0.12); }
+  /* Stat tiles — echo the Lens window's recoverable-waste tiles so Bench reads
+     as a peer dashboard, not a bare chart. */
+  .bv-stats { display: grid; grid-template-columns: repeat(3, 1fr); }
+  .bv-stat {
+    display: flex; flex-direction: column; min-width: 0;
+    background: var(--navy); border: 1px solid var(--blue-line); border-radius: 6px;
+  }
+  .bv-stat-v { font-family: 'Geist Mono', monospace; color: var(--white); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bv-stat-l { font-family: 'Geist Mono', monospace; color: var(--white-faint); text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .bv-foot { font-family: 'Geist Mono', monospace; color: var(--white-faint); }
   .bv-cand { color: var(--green); }
   .bv-baseline { color: var(--white-dim); }
@@ -61,11 +93,16 @@ const tone = (v: string) => (v === 'holds' ? 'good' : 'bad');
   /* Compact (home hero card) */
   .bv--sm .bv-cap { font-size: 10px; margin-bottom: 6px; }
   .bv--sm .bv-chart { gap: 7px; }
-  .bv--sm .bv-row { gap: 9px; font-size: 10.5px; }
-  .bv--sm .bv-name { width: 60px; }
+  .bv--sm .bv-row { gap: 8px; font-size: 10.5px; }
+  .bv--sm .bv-name { width: 58px; }
   .bv--sm .bv-bar { height: 8px; }
+  .bv--sm .bv-val { font-size: 9.5px; width: 38px; }
   .bv--sm .bv-tag { font-size: 9px; padding: 1px 6px; }
-  .bv--sm .bv-foot { font-size: 9.5px; margin-top: 6px; }
+  .bv--sm .bv-stats { gap: 5px; margin-top: 7px; }
+  .bv--sm .bv-stat { padding: 4px 6px; gap: 0; }
+  .bv--sm .bv-stat-v { font-size: 10.5px; }
+  .bv--sm .bv-stat-l { font-size: 7px; }
+  .bv--sm .bv-foot { font-size: 9.5px; margin-top: 7px; }
 
   /* Full (home Bench section + /bench page) */
   .bv--md .bv-cap { font-size: 11px; }
@@ -73,6 +110,11 @@ const tone = (v: string) => (v === 'holds' ? 'good' : 'bad');
   .bv--md .bv-row { gap: 12px; font-size: 13px; }
   .bv--md .bv-name { width: 84px; }
   .bv--md .bv-bar { height: 11px; }
+  .bv--md .bv-val { font-size: 12px; width: 52px; }
   .bv--md .bv-tag { font-size: 10px; padding: 1px 7px; }
-  .bv--md .bv-foot { font-size: 11.5px; margin-top: 12px; line-height: 1.5; }
+  .bv--md .bv-stats { gap: 8px; margin-top: 16px; }
+  .bv--md .bv-stat { padding: 9px 11px; gap: 2px; }
+  .bv--md .bv-stat-v { font-size: 15px; }
+  .bv--md .bv-stat-l { font-size: 9px; }
+  .bv--md .bv-foot { font-size: 11.5px; margin-top: 14px; line-height: 1.5; }
 </style>
