@@ -1,0 +1,24 @@
+---
+/*
+ * Shared `tjb run` terminal for the Bench surfaces (home Bench section and the
+ * /bench page). Uses the site's .tline / .t-* terminal classes, so the output
+ * is syntax-colored like the analyzer terminals AND wraps instead of chopping
+ * the long command line (.tline is white-space: pre-wrap).
+ */
+---
+<div class="terminal bench-terminal">
+  <div class="terminal-titlebar">
+    <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+    <span class="terminal-title">tjb</span>
+  </div>
+  <pre class="terminal-body bench-terminal-body"><span class="tline"><span class="t-prompt">$ </span><span class="t-cmd">tjb run --suite humaneval,gsm8k --baseline opus --candidate haiku</span></span>
+<span class="tline t-dim">  running 200 paired tasks per suite…</span>
+<span class="tline t-dim">  humaneval · 200/200   gsm8k · 200/200</span>
+<span class="tline">  <span class="t-warn">humaneval REGRESSED</span>   <span class="t-success">gsm8k HOLDS</span></span>
+<span class="tline t-label">  verdict → ./bench-report.json</span></pre>
+</div>
+
+<style>
+  .bench-terminal { width: 100%; }
+  .bench-terminal-body { padding: 14px 16px; margin: 0; font-size: 12.5px; line-height: 1.7; }
+</style>

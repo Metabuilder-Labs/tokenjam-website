@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Callout from '@/components/Callout.astro';
+import BenchTerminal from '@/components/BenchTerminal.astro';
+import BenchVerdict from '@/components/BenchVerdict.astro';
 
 const accent = '#10B981';
 const accentRgb = '16, 185, 129';
@@ -28,33 +30,12 @@ const pypiUrl = 'https://pypi.org/project/tokenjam-bench';
       </div>
     </header>
 
-    <!-- HERO VISUAL: a tjb run flowing into the verdict -->
+    <!-- HERO VISUAL: a tjb run flowing into the shared verdict -->
     <div class="bench-demo">
-      <div class="terminal bench-term">
-        <div class="terminal-titlebar">
-          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
-          <span class="terminal-title">tjb</span>
-        </div>
-        <pre class="terminal-body bench-term-body"><span class="tline"><span class="t-prompt">$ </span><span class="t-cmd">tjb run --suite humaneval,gsm8k --baseline opus --candidate haiku</span></span>
-<span class="tline t-dim">  running 200 paired tasks per suite…</span>
-<span class="tline t-dim">  humaneval · 200/200   gsm8k · 200/200</span>
-<span class="tline t-label">  verdict written to ./bench-report.json</span></pre>
-      </div>
-
+      <BenchTerminal />
       <div class="bench-arrow" aria-hidden="true">→</div>
-
-      <div class="bench-verdict" aria-label="Example Bench verdict">
-        <div class="bv-suite">
-          <div class="bv-row"><span class="bv-name">humaneval</span><span class="bv-tag bv-tag--bad">REGRESSED</span></div>
-          <div class="bv-stat">haiku 71% <span class="bv-dim">(CI 64&ndash;77)</span> vs opus 89%</div>
-          <div class="bv-stat bv-dim">McNemar p &lt; 0.001</div>
-        </div>
-        <div class="bv-suite">
-          <div class="bv-row"><span class="bv-name">gsm8k</span><span class="bv-tag bv-tag--good">HOLDS</span></div>
-          <div class="bv-stat">haiku 94% <span class="bv-dim">(CI 90&ndash;97)</span> vs opus 95%</div>
-          <div class="bv-stat bv-dim">McNemar p = 0.42</div>
-        </div>
-        <p class="bv-caption">An example run. Pass rate is per suite, with Wilson intervals and a McNemar p-value.</p>
+      <div class="bench-verdict-card">
+        <BenchVerdict size="md" caption="per-suite verdict" />
       </div>
     </div>
 
@@ -160,21 +141,14 @@ const pypiUrl = 'https://pypi.org/project/tokenjam-bench';
     .pp-card h3 { font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: var(--white); margin: 0; }
     .pp-card p { font-size: 14px; line-height: 1.55; color: var(--white-dim); margin: 0; }
 
-    /* Hero visual: tjb run -> verdict */
+    /* Hero visual: shared tjb terminal -> shared BenchVerdict */
     .bench-demo { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 18px; margin: 8px 0; }
-    .bench-term { width: 100%; }
-    .bench-term-body { padding: 14px 16px; margin: 0; font-size: 12px; line-height: 1.7; }
     .bench-arrow { color: var(--white-faint); font-size: 22px; }
-    .bench-verdict { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 12px; background: var(--navy-2); border: 1px solid rgba(16, 185, 129, 0.3); }
-    .bv-suite { display: flex; flex-direction: column; gap: 3px; }
-    .bv-row { display: flex; align-items: center; gap: 10px; }
-    .bv-name { font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--white); }
-    .bv-tag { font-family: 'Geist Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: .05em; padding: 1px 7px; border-radius: 4px; }
-    .bv-tag--bad { color: var(--red); background: rgba(239, 68, 68, 0.12); }
-    .bv-tag--good { color: var(--green); background: rgba(16, 185, 129, 0.12); }
-    .bv-stat { font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--white-dim); }
-    .bv-dim { color: var(--white-faint); }
-    .bv-caption { font-size: 12px; color: var(--white-faint); margin: 4px 0 0; line-height: 1.4; }
+    .bench-verdict-card {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 18px; border-radius: 12px;
+      background: var(--navy-2); border: 1px solid var(--blue-line);
+    }
 
     @media (max-width: 760px) {
       .pp-card-grid { grid-template-columns: 1fr; }

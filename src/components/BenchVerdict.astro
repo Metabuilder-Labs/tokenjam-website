@@ -1,0 +1,78 @@
+---
+/*
+ * Shared TokenJam Bench verdict viz — a per-suite pass-rate chart (candidate
+ * fill + baseline marker + holds/regressed tag). One canonical treatment used
+ * in the home hero card, the home Bench section, and the /bench page, so the
+ * Bench visual is identical everywhere.
+ *
+ * Honest framing: measured pass-rate per suite with a hedged verdict, never
+ * "certified". Example numbers are illustrative.
+ */
+interface Props {
+  /** 'sm' for the compact home-hero card, 'md' for the section / page. */
+  size?: 'sm' | 'md';
+  /** Optional label line above the chart, e.g. "per-suite verdict". */
+  caption?: string;
+}
+const { size = 'md', caption } = Astro.props;
+
+const suites = [
+  { name: 'humaneval', cand: 71, base: 89, verdict: 'regressed' as const },
+  { name: 'gsm8k', cand: 94, base: 95, verdict: 'holds' as const },
+];
+const tone = (v: string) => (v === 'holds' ? 'good' : 'bad');
+---
+<div class:list={['bv', `bv--${size}`]}>
+  {caption && <p class="bv-cap"><strong>TokenJam Bench</strong> · {caption}</p>}
+  <div class="bv-chart">
+    {suites.map((s) => (
+      <div class="bv-row">
+        <span class="bv-name">{s.name}</span>
+        <div class="bv-bar">
+          <span class={`bv-fill bv-fill--${tone(s.verdict)}`} style={`width:${s.cand}%`}></span>
+          <span class="bv-base" style={`left:${s.base}%`} title={`baseline ${s.base}%`}></span>
+        </div>
+        <span class={`bv-tag bv-tag--${tone(s.verdict)}`}>{s.verdict}</span>
+      </div>
+    ))}
+  </div>
+  <div class="bv-foot"><span class="bv-cand">haiku</span> vs <span class="bv-baseline">opus</span> · Wilson CI + McNemar p · measured, never "certified"</div>
+</div>
+
+<style>
+  .bv { display: flex; flex-direction: column; }
+  .bv-cap { margin: 0 0 8px; font-family: 'Geist Mono', monospace; color: var(--white-faint); }
+  .bv-cap strong { color: var(--white-dim); font-weight: 600; }
+  .bv-chart { display: flex; flex-direction: column; }
+  .bv-row { display: flex; align-items: center; font-family: 'Geist Mono', monospace; color: var(--white-dim); }
+  .bv-name { color: var(--white); flex-shrink: 0; }
+  .bv-bar { position: relative; flex: 1; background: var(--navy-3); border-radius: 4px; }
+  .bv-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
+  .bv-fill--bad { background: rgba(239, 68, 68, 0.7); }
+  .bv-fill--good { background: rgba(16, 185, 129, 0.7); }
+  .bv-base { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--white); border-radius: 1px; }
+  .bv-tag { font-family: 'Geist Mono', monospace; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border-radius: 4px; flex-shrink: 0; }
+  .bv-tag--bad { color: var(--red); background: rgba(239, 68, 68, 0.12); }
+  .bv-tag--good { color: var(--green); background: rgba(16, 185, 129, 0.12); }
+  .bv-foot { font-family: 'Geist Mono', monospace; color: var(--white-faint); }
+  .bv-cand { color: var(--green); }
+  .bv-baseline { color: var(--white-dim); }
+
+  /* Compact (home hero card) */
+  .bv--sm .bv-cap { font-size: 10px; margin-bottom: 6px; }
+  .bv--sm .bv-chart { gap: 7px; }
+  .bv--sm .bv-row { gap: 9px; font-size: 10.5px; }
+  .bv--sm .bv-name { width: 60px; }
+  .bv--sm .bv-bar { height: 8px; }
+  .bv--sm .bv-tag { font-size: 9px; padding: 1px 6px; }
+  .bv--sm .bv-foot { font-size: 9.5px; margin-top: 6px; }
+
+  /* Full (home Bench section + /bench page) */
+  .bv--md .bv-cap { font-size: 11px; }
+  .bv--md .bv-chart { gap: 12px; }
+  .bv--md .bv-row { gap: 12px; font-size: 13px; }
+  .bv--md .bv-name { width: 84px; }
+  .bv--md .bv-bar { height: 11px; }
+  .bv--md .bv-tag { font-size: 10px; padding: 1px 7px; }
+  .bv--md .bv-foot { font-size: 11.5px; margin-top: 12px; line-height: 1.5; }
+</style>

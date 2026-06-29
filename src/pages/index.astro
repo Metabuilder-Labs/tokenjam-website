@@ -3,6 +3,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { products as productCatalog, productIcons } from '@/data/products';
 import Browser from '@/components/Browser.astro';
 import LensOverviewPreview from '@/components/LensOverviewPreview.astro';
+import BenchVerdict from '@/components/BenchVerdict.astro';
+import BenchTerminal from '@/components/BenchTerminal.astro';
 import { getStarCount, formatStars, ghUrl } from '@/lib/github';
 
 const heroStarLabel = formatStars(await getStarCount());
@@ -393,22 +395,10 @@ const installJoined = installLines.join('\n');
                  to /bench. -->
             <p class="flow-cardcap"><strong>TokenJam Bench</strong> · Benchmark &amp; Evaluate</p>
             <a href="/bench" class="flow-bench" id="flow-bench" aria-label="TokenJam Bench — measured pass-rate per suite">
-              <div class="flow-bench-chart">
-                <div class="fbc-row">
-                  <span class="fbc-name">humaneval</span>
-                  <div class="fbc-bar"><span class="fbc-fill fbc-fill--bad" style="width:71%"></span><span class="fbc-base" style="left:89%"></span></div>
-                  <span class="fb-tag fb-tag--bad">regressed</span>
-                </div>
-                <div class="fbc-row">
-                  <span class="fbc-name">gsm8k</span>
-                  <div class="fbc-bar"><span class="fbc-fill fbc-fill--good" style="width:94%"></span><span class="fbc-base" style="left:95%"></span></div>
-                  <span class="fb-tag fb-tag--good">holds</span>
-                </div>
-              </div>
-              <div class="flow-bench-foot"><span class="fbc-cand">haiku</span> vs <span class="fbc-baseline">opus</span> · Wilson CI + McNemar p</div>
+              <BenchVerdict size="sm" />
             </a>
 
-            <p class="flow-cardcap"><strong>TokenJam Lens</strong> · Observe, Analyze &amp; Optimize</p>
+            <p class="flow-cardcap flow-cardcap--lens"><strong>TokenJam Lens</strong> · Observe, Analyze &amp; Optimize</p>
             <a href="/products/lens" id="flow-lens" class="flow-lens-preview" aria-label="TokenJam Lens — local dashboard">
               <Browser url="127.0.0.1:7391/#/overview">
                 <LensOverviewPreview title="Lens" compact={true} />
@@ -534,23 +524,9 @@ const installJoined = installLines.join('\n');
       </p>
     </header>
     <div class="bench-section-grid">
-      <div class="terminal bench-sec-term">
-        <div class="terminal-titlebar">
-          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
-          <span class="terminal-title">tjb</span>
-        </div>
-        <pre class="terminal-body">{`$ tjb run --suite humaneval,gsm8k --baseline opus --candidate haiku
-  running 200 paired tasks per suite…
-  humaneval · 200/200   gsm8k · 200/200
-  verdict written to ./bench-report.json`}</pre>
-      </div>
+      <BenchTerminal />
       <div class="bench-sec-card">
-        <p class="bench-sec-cap"><strong>TokenJam Bench</strong> · per-suite verdict</p>
-        <div class="flow-bench-chart">
-          <div class="fbc-row"><span class="fbc-name">humaneval</span><div class="fbc-bar"><span class="fbc-fill fbc-fill--bad" style="width:71%"></span><span class="fbc-base" style="left:89%"></span></div><span class="fb-tag fb-tag--bad">regressed</span></div>
-          <div class="fbc-row"><span class="fbc-name">gsm8k</span><div class="fbc-bar"><span class="fbc-fill fbc-fill--good" style="width:94%"></span><span class="fbc-base" style="left:95%"></span></div><span class="fb-tag fb-tag--good">holds</span></div>
-        </div>
-        <div class="flow-bench-foot"><span class="fbc-cand">haiku</span> vs <span class="fbc-baseline">opus</span> · Wilson CI + McNemar p · measured, never "certified"</div>
+        <BenchVerdict size="md" caption="per-suite verdict" />
       </div>
     </div>
     <div class="products-cta-strip">
@@ -567,8 +543,8 @@ const installJoined = installLines.join('\n');
     <header class="section-head">
       <h2 class="section-h2">How it works</h2>
       <p class="section-lede">
-        Analyze your usage, optimize it, then prove the change holds before you switch.
-        <strong>TokenJam Lens</strong> visualizes all three in a local dashboard.
+        <strong>TokenJam Lens</strong> and <strong>TokenJam Bench</strong> bring all three — analyze,
+        optimize, prove — into local dashboards you can explore.
       </p>
     </header>
     <div class="how-grid">
@@ -787,7 +763,7 @@ const installJoined = installLines.join('\n');
 
     /* ── HERO ─────────────────────────────────────── */
     .hero {
-      padding: calc(72px + var(--banner-h, 0px)) 48px 8px;
+      padding: calc(64px + var(--banner-h, 0px)) 48px 4px;
       background:
         radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--accent-blue-rgb), 0.08), transparent 60%),
         var(--navy);
@@ -798,7 +774,7 @@ const installJoined = installLines.join('\n');
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 14px;
     }
     .hero-copy { text-align: center; max-width: none; margin: 0 auto; }
     /* Single-line headline (Vercel-style hero). The calc() picks the largest font
@@ -812,7 +788,7 @@ const installJoined = installLines.join('\n');
       line-height: 1.08;
       font-size: clamp(32px, calc((100vw - 96px) / 22), 62px);
       color: var(--white);
-      margin: 0 0 14px;
+      margin: 0 0 8px;
       white-space: nowrap;
     }
     @media (max-width: 720px) {
@@ -937,50 +913,50 @@ const installJoined = installLines.join('\n');
       color: var(--white-faint);
     }
     .flow-cardcap strong { color: var(--white-dim); font-weight: 600; }
+    /* More breathing room between the Bench box and the Lens box. */
+    .flow-cardcap--lens { margin-top: 16px; }
 
-    /* TokenJam Bench card: Lens-style — elevated, charted, whole card clickable. */
+    /* TokenJam Bench card holds the shared BenchVerdict chart. The Bench and
+       Lens cards are peers: neutral border + elevation at rest, green accent
+       border on hover only. */
     .flow-bench {
       position: relative; z-index: 6; display: block; text-decoration: none;
       background: var(--navy-2);
-      border: 1px solid rgba(16, 185, 129, 0.4);
+      border: 1px solid var(--blue-line);
       border-radius: 12px;
-      padding: 11px 14px;
-      box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.10), 0 16px 40px rgba(0, 0, 0, 0.42), 0 0 70px rgba(16, 185, 129, 0.06);
+      padding: 9px 14px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
       transition: transform .2s, box-shadow .2s, border-color .2s;
       cursor: pointer;
     }
     .flow-bench:hover {
       transform: translateX(2px);
       border-color: rgba(16, 185, 129, 0.7);
-      box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.18), 0 18px 46px rgba(0, 0, 0, 0.5), 0 0 80px rgba(16, 185, 129, 0.10);
+      box-shadow: 0 18px 46px rgba(0, 0, 0, 0.5), 0 0 70px rgba(16, 185, 129, 0.10);
     }
-    .flow-bench-chart { display: flex; flex-direction: column; gap: 7px; }
-    .fbc-row { display: flex; align-items: center; gap: 9px; font-family: 'Geist Mono', monospace; font-size: 10.5px; }
-    .fbc-name { color: var(--white); width: 60px; flex-shrink: 0; }
-    .fbc-bar { position: relative; flex: 1; height: 8px; background: var(--navy-3); border-radius: 4px; }
-    .fbc-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; }
-    .fbc-fill--bad { background: rgba(239, 68, 68, 0.7); }
-    .fbc-fill--good { background: rgba(16, 185, 129, 0.7); }
-    .fbc-base { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--white); border-radius: 1px; }
-    .fb-tag { font-family: 'Geist Mono', monospace; font-size: 9px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; flex-shrink: 0; }
-    .fb-tag--bad { color: var(--red); background: rgba(239, 68, 68, 0.12); }
-    .fb-tag--good { color: var(--green); background: rgba(16, 185, 129, 0.12); }
-    .flow-bench-foot { margin-top: 6px; font-family: 'Geist Mono', monospace; font-size: 9.5px; color: var(--white-faint); }
-    .fbc-cand { color: var(--green); }
-    .fbc-baseline { color: var(--white-dim); }
     .flow-lens-preview {
       display: block;
       text-decoration: none;
-      transition: transform .2s, box-shadow .2s;
+      transition: transform .2s;
       width: 100%;
       --product-accent: #06B6D4;
       --product-accent-rgb: 6, 182, 212;
     }
     .flow-lens-preview:hover { transform: translateX(2px); }
-    /* Compact the inner browser frame for the hero scale. */
-    .flow-lens-preview .browser {
+    /* Lens card matches the Bench card: neutral border + elevation at rest,
+       green accent on hover only. The Browser's .browser lives in a child
+       component, so :global() is required to pierce the scope boundary and win
+       over the Browser's own rgba(var(--accent-rgb),0.2) border. */
+    .flow-lens-preview :global(.browser) {
       font-size: 11px;
       line-height: 1.4;
+      border-color: var(--blue-line);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .flow-lens-preview:hover :global(.browser) {
+      border-color: rgba(16, 185, 129, 0.7);
+      box-shadow: 0 18px 46px rgba(0, 0, 0, 0.5), 0 0 70px rgba(16, 185, 129, 0.10);
     }
     .flow-lens-preview .browser-titlebar { padding: 7px 10px; }
     .flow-lens-preview .browser-url { font-size: 10px; padding: 2px 8px; }
@@ -1720,21 +1696,12 @@ const installJoined = installLines.join('\n');
       display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; align-items: stretch;
       max-width: 980px; margin: 0 auto 8px;
     }
-    .bench-sec-term { width: 100%; }
-    .bench-sec-term .terminal-body { padding: 16px 18px; margin: 0; font-size: 12.5px; line-height: 1.7; }
     .bench-sec-card {
-      display: flex; flex-direction: column; gap: 12px; justify-content: center;
-      padding: 20px; border-radius: 14px;
-      background: var(--navy-2); border: 1px solid rgba(16, 185, 129, 0.35);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3), 0 0 60px rgba(16, 185, 129, 0.05);
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 22px; border-radius: 14px;
+      background: var(--navy-2); border: 1px solid var(--blue-line);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
     }
-    .bench-sec-cap { margin: 0 0 2px; font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--white-faint); }
-    .bench-sec-cap strong { color: var(--white-dim); font-weight: 600; }
-    .bench-sec-card .fbc-row { font-size: 13px; gap: 12px; }
-    .bench-sec-card .fbc-name { width: 84px; }
-    .bench-sec-card .fbc-bar { height: 11px; }
-    .bench-sec-card .flow-bench-chart { gap: 12px; }
-    .bench-sec-card .flow-bench-foot { font-size: 11.5px; margin-top: 12px; }
     @media (max-width: 760px) {
       .bench-section-grid { grid-template-columns: 1fr; }
       .bench-section { padding: 64px 20px; }
