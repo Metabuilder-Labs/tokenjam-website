@@ -245,6 +245,7 @@ const installLines = [
   'pipx install tokenjam',
   'tj onboard --claude-code',
   'tj optimize',
+  'pip install tokenjam-bench',
 ];
 const installJoined = installLines.join('\n');
 ---
@@ -290,6 +291,8 @@ const installJoined = installLines.join('\n');
                 class="flow-node flow-source"
                 data-id={s.id}
                 data-group={s.group}
+                tabindex="0"
+                aria-label={`${s.name}: ${s.products.join(', ')}`}
                 style={`--brand: ${s.brand}; --brand-rgb: ${s.brandRgb};`}
               >
                 <span class={`flow-source-mark${s.multiColor ? ' is-multicolor' : ''}`} aria-hidden="true">
@@ -297,6 +300,7 @@ const installJoined = installLines.join('\n');
                 </span>
                 <span class="flow-source-name">{s.name}</span>
                 <div class="flow-source-tooltip" role="tooltip">
+                  <div class="flow-source-tooltip-name">{s.name}</div>
                   {s.products.map((p) => (
                     <div class="flow-source-tooltip-row">
                       <span class="flow-source-tooltip-dot" aria-hidden="true"></span>
@@ -345,7 +349,6 @@ const installJoined = installLines.join('\n');
             </span>
             <span class="flow-observe-text">
               <span class="flow-observe-name">Observe</span>
-              <span class="flow-observe-tag">Observability layer</span>
             </span>
             <span class="flow-observe-tooltip" role="tooltip">{observeTagline}</span>
           </a>
@@ -384,9 +387,30 @@ const installJoined = installLines.join('\n');
                Showing the full preview (not a chip) makes the visualization
                step the visible terminus of the entire flow. -->
           <div class="flow-lens-col">
+            <!-- Prove: a Bench verdict card branched off the Downsize node.
+                 One downsize candidate, measured on real suites — not all
+                 analyzers, and not a replacement for Lens. -->
+            <div class="flow-bench" id="flow-bench">
+              <div class="flow-bench-head">
+                <span class="flow-bench-title">Bench</span>
+                <span class="flow-bench-sub">proves a downsize candidate</span>
+              </div>
+              <div class="flow-bench-row">
+                <span class="fb-suite">humaneval</span>
+                <span class="fb-tag fb-tag--bad">regressed</span>
+                <span class="fb-dim">p&lt;0.001</span>
+              </div>
+              <div class="flow-bench-stat">haiku 71% <span class="fb-dim">(CI 64&ndash;77)</span> vs opus 89%</div>
+              <div class="flow-bench-row">
+                <span class="fb-suite">gsm8k</span>
+                <span class="fb-tag fb-tag--good">holds</span>
+                <a href="/bench" class="flow-bench-link">Explore Bench <span aria-hidden="true">→</span></a>
+              </div>
+            </div>
+
             <a href="/products/lens" id="flow-lens" class="flow-lens-preview" aria-label="TokenJam Lens — local dashboard">
               <Browser url="127.0.0.1:7391/#/overview">
-                <LensOverviewPreview title="Lens" />
+                <LensOverviewPreview title="Lens" compact={true} />
               </Browser>
             </a>
           </div>
@@ -715,7 +739,7 @@ const installJoined = installLines.join('\n');
 
     /* ── HERO ─────────────────────────────────────── */
     .hero {
-      padding: calc(120px + var(--banner-h, 0px)) 48px 80px;
+      padding: calc(74px + var(--banner-h, 0px)) 48px 10px;
       background:
         radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--accent-blue-rgb), 0.08), transparent 60%),
         var(--navy);
@@ -726,7 +750,7 @@ const installJoined = installLines.join('\n');
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 48px;
+      gap: 30px;
     }
     .hero-copy { text-align: center; max-width: none; margin: 0 auto; }
     /* Single-line headline (Vercel-style hero). The calc() picks the largest font
@@ -738,9 +762,9 @@ const installJoined = installLines.join('\n');
       font-weight: 600;
       letter-spacing: -.03em;
       line-height: 1.08;
-      font-size: clamp(34px, calc((100vw - 96px) / 19), 84px);
+      font-size: clamp(32px, calc((100vw - 96px) / 22), 62px);
       color: var(--white);
-      margin: 0 0 24px;
+      margin: 0 0 14px;
       white-space: nowrap;
     }
     @media (max-width: 720px) {
@@ -784,10 +808,10 @@ const installJoined = installLines.join('\n');
          Analyzers shrink to compact chips (icon + name + arrow only).
          Lens grows into a full browser preview at the end so the visualization
          step is visible, not just hinted at. */
-      grid-template-columns: minmax(120px, 132px) minmax(220px, 1fr) max-content minmax(260px, 320px);
-      gap: clamp(24px, 4vw, 72px);
+      grid-template-columns: minmax(104px, 116px) minmax(200px, 1fr) max-content minmax(248px, 300px);
+      gap: clamp(18px, 2.8vw, 48px);
       align-items: center;
-      min-height: 500px;
+      min-height: 340px;
     }
     /* Center column wrapper. Holds the jar and the Observe satellite side
        by side so Observe reads as visually "attached to" TokenJam. */
@@ -806,8 +830,8 @@ const installJoined = installLines.join('\n');
        show through the pill on hover (was using var(--white-ghost), which is
        a semi-transparent overlay). z-index above .flow-svg keeps it on top. */
     .flow-observe {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 14px;
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 13px 7px 9px;
       background: var(--navy-2);
       border: 1px solid var(--blue-line);
       border-radius: 999px;
@@ -826,18 +850,19 @@ const installJoined = installLines.join('\n');
     }
     .flow-observe-icon {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 28px; height: 28px;
+      width: 22px; height: 22px;
       border-radius: 50%;
       background: rgba(var(--accent-rgb), 0.06);
       color: var(--white);
       flex-shrink: 0;
     }
+    .flow-observe-icon svg { width: 14px; height: 14px; }
     .flow-observe-text {
       display: flex; flex-direction: column;
       font-family: 'Geist', sans-serif;
       line-height: 1.1;
     }
-    .flow-observe-name { font-size: 14px; font-weight: 500; color: var(--white); }
+    .flow-observe-name { font-size: 13px; font-weight: 500; color: var(--white); }
     .flow-observe-tag {
       font-family: 'Geist Mono', monospace;
       font-size: 10.5px;
@@ -850,11 +875,41 @@ const installJoined = installLines.join('\n');
        Cyan accent on the browser chrome differentiates it from analyzers. */
     .flow-lens-col {
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: stretch;
       justify-content: center;
+      gap: 14px;
       position: relative;
       z-index: 2;
     }
+
+    /* Bench verdict card: the Prove step, branched off Downsize. */
+    .flow-bench {
+      position: relative; z-index: 6;
+      background: var(--navy-2);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 10px;
+      padding: 11px 13px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: var(--white-dim);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .flow-bench-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+    .flow-bench-title { font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 600; color: var(--white); }
+    .flow-bench-sub { font-size: 9.5px; color: var(--white-faint); }
+    .flow-bench-row { display: flex; align-items: center; gap: 8px; }
+    .fb-suite { color: var(--white); }
+    .fb-tag { font-size: 9px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; }
+    .fb-tag--bad { color: var(--red); background: rgba(239, 68, 68, 0.12); }
+    .fb-tag--good { color: var(--green); background: rgba(16, 185, 129, 0.12); }
+    .flow-bench-stat { font-size: 10.5px; }
+    .fb-dim { color: var(--white-faint); }
+    .flow-bench-link {
+      margin-left: auto; font-size: 11px; font-weight: 500;
+      color: var(--green); text-decoration: none; white-space: nowrap;
+    }
+    .flow-bench-link:hover { text-decoration: underline; text-underline-offset: 2px; }
     .flow-lens-preview {
       display: block;
       text-decoration: none;
@@ -871,7 +926,7 @@ const installJoined = installLines.join('\n');
     }
     .flow-lens-preview .browser-titlebar { padding: 7px 10px; }
     .flow-lens-preview .browser-url { font-size: 10px; padding: 2px 8px; }
-    .flow-lens-preview .browser-body { padding: 10px 12px; }
+    .flow-lens-preview .browser-body { padding: 9px 11px; }
     .flow-lens-preview .lp-title { font-size: 12px; }
     .flow-lens-preview .lp-meta { font-size: 10px; }
     .flow-lens-preview .lp-band { padding: 8px 10px; margin-top: 6px; }
@@ -891,14 +946,15 @@ const installJoined = installLines.join('\n');
       list-style: none;
       margin: 0;
       padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
       position: relative;
       /* Above the center/observe stacking contexts (z-index 3/4) so the
          side tooltips lift in front of the TokenJam circle and beams. */
       z-index: 6;
     }
+    .flow-products { display: flex; flex-direction: column; gap: 10px; }
+    /* Sources are logo-only chips, 2-up, to keep the hero within one laptop
+       screen. The name + products show in the hover/focus tooltip. */
+    .flow-sources { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .flow-node {
       position: relative;
       background: var(--navy-2);
@@ -907,12 +963,14 @@ const installJoined = installLines.join('\n');
       transition: border-color .2s, background .2s, transform .2s;
     }
     .flow-source {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 12px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 6px;
       font-family: 'Geist Mono', monospace;
       font-size: 12px;
       color: var(--white-dim);
+      cursor: default;
     }
+    .flow-source:focus-visible { outline: 2px solid rgba(var(--brand-rgb), 0.7); outline-offset: 2px; }
     .flow-source:hover {
       border-color: rgba(var(--brand-rgb), 0.55);
       background: rgba(var(--brand-rgb), 0.06);
@@ -941,19 +999,20 @@ const installJoined = installLines.join('\n');
       border-color: rgba(127, 127, 127, 0.4);
     }
     .flow-source-mark svg { display: block; }
-    .flow-source-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Logo-only chips: the vendor name lives in the tooltip, not the chip. */
+    .flow-source-name { display: none; }
 
-    /* Tooltip showing the underlying products for a vendor. Positioned to the right
-       of the chip (over the diagram beam area). Hidden on small screens. */
+    /* Tooltip showing the vendor name + underlying products. Positioned above
+       the chip (works for the 2-up grid without overlapping the neighbour). */
     .flow-source-tooltip {
       position: absolute;
-      top: 50%;
-      left: calc(100% + 12px);
-      transform: translateY(-50%);
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
       background: var(--navy);
       border: 1px solid rgba(var(--brand-rgb), 0.4);
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 9px 13px;
       font-family: 'Geist Mono', monospace;
       font-size: 11px;
       line-height: 1.55;
@@ -963,9 +1022,14 @@ const installJoined = installLines.join('\n');
       opacity: 0;
       pointer-events: none;
       transition: opacity .18s;
-      z-index: 5;
+      z-index: 12;
+    }
+    .flow-source-tooltip-name {
+      font-weight: 600; color: var(--white); margin-bottom: 5px;
+      padding-bottom: 5px; border-bottom: 1px solid rgba(var(--brand-rgb), 0.25);
     }
     .flow-source:hover .flow-source-tooltip,
+    .flow-source:focus-visible .flow-source-tooltip,
     .flow-source:focus-within .flow-source-tooltip {
       opacity: 1;
     }
@@ -1159,7 +1223,7 @@ const installJoined = installLines.join('\n');
       align-items: center;
       gap: 10px;
       justify-content: center;
-      margin-top: 24px;
+      margin-top: 6px;
       font-family: 'Geist Mono', monospace;
       font-size: 12px;
       color: var(--white-dim);
@@ -1178,22 +1242,6 @@ const installJoined = installLines.join('\n');
 
     /* Mobile-only flow direction cues — hidden on desktop so the 3-col grid layout is unchanged. */
     .flow-mobile-label, .flow-mobile-rail { display: none; }
-
-    /* Intermediate width: before the full mobile collapse, drop the source
-       labels and show just the brand logos on the left so they never truncate
-       ("Anthro…"). Engages just above where names start clipping (~1050px),
-       down to the 900px mobile breakpoint. */
-    @media (min-width: 901px) and (max-width: 1050px) {
-      .flow-grid {
-        grid-template-columns: minmax(46px, 54px) minmax(220px, 1fr) max-content minmax(260px, 320px);
-      }
-      .flow-source {
-        justify-content: center;
-        padding: 8px 6px;
-        gap: 0;
-      }
-      .flow-source-name { display: none; }
-    }
 
     /* Mobile flow: collapse to vertical. Set above the width where the Lens
        preview starts cutting off / overlapping the analyzers (~835px) so the
@@ -1232,6 +1280,7 @@ const installJoined = installLines.join('\n');
       /* Sources collapse to a centered logo cluster (1–2 rows) — just the brand
          marks, no names or card chrome, so the long vendor list stays compact. */
       .flow-sources {
+        display: flex; /* base is now a 2-up grid; reset for the mobile cluster */
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
@@ -1911,6 +1960,21 @@ const installJoined = installLines.join('\n');
             svg.appendChild(path);
             beamElements.push({ path: path, fromEl: el, toEl: lens, dir: 'lens' });
           });
+        }
+
+        // Prove branch: a single beam from the Downsize node to the Bench card.
+        // Only Downsize -> Bench (Bench verifies one downsize candidate), not
+        // all analyzers.
+        var bench = document.getElementById('flow-bench');
+        var downsize = document.querySelector('#flow-products .flow-product[data-id="downsize"]');
+        if (bench && downsize) {
+          var bFrom = edgePoint(downsize, wrapRect, 'right');
+          var bTo = edgePoint(bench, wrapRect, 'left');
+          var bPath = document.createElementNS(SVG_NS, 'path');
+          bPath.setAttribute('class', 'flow-beam flow-beam--bench');
+          bPath.setAttribute('d', makePath(bFrom, bTo));
+          svg.appendChild(bPath);
+          beamElements.push({ path: bPath, fromEl: downsize, toEl: bench, dir: 'bench' });
         }
 
         // Set viewBox to wrap size
