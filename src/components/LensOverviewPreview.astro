@@ -21,10 +21,12 @@ interface Props {
 }
 const { expanded = false, title = 'Overview', compact = false } = Astro.props;
 ---
-<div class="lp-row">
-  <span class="lp-title">{title}</span>
-  <span class="lp-meta">Last 7d</span>
-</div>
+{!compact && (
+  <div class="lp-row">
+    <span class="lp-title">{title}</span>
+    <span class="lp-meta">Last 7d</span>
+  </div>
+)}
 
 <div class="lp-band">
   <div class="lp-band-head">

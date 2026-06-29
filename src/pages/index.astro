@@ -317,10 +317,10 @@ const installJoined = installLines.join('\n');
           <!-- Mobile-only rail (animated dots flowing down) -->
           <div class="flow-mobile-rail flow-mobile-rail--in" aria-hidden="true"><span></span><span></span></div>
 
-          <!-- TokenJam center + Observe satellite. Observe is rendered
-               attached to the right edge of the jar to convey that
-               observability is the extraction layer of TokenJam itself,
-               before the analyzers do anything with the data. -->
+          <!-- TokenJam center. Observe lives INSIDE the circle (below the
+               TOKENJAM label) to convey that observability is the extraction
+               layer of TokenJam itself, before the analyzers do anything with
+               the data. The analyzer beams fan out from the circle's border. -->
           <div class="flow-center-wrap">
           <div class="flow-center" id="flow-center" aria-label="TokenJam">
             <div class="flow-center-ring"></div>
@@ -342,18 +342,15 @@ const installJoined = installLines.join('\n');
                 </g>
               </svg>
               <span class="flow-center-name">TOKENJAM</span>
+              <a href="/observe" id="flow-observe" class="flow-observe" aria-label="TokenJam Observe">
+                <span class="flow-observe-icon" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
+                <span class="flow-observe-name">Observe</span>
+                <span class="flow-observe-tooltip" role="tooltip">{observeTagline}</span>
+              </a>
             </div>
           </div>
-
-          <a href="/observe" id="flow-observe" class="flow-observe" aria-label="TokenJam Observe">
-            <span class="flow-observe-icon" aria-hidden="true">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            </span>
-            <span class="flow-observe-text">
-              <span class="flow-observe-name">Observe</span>
-            </span>
-            <span class="flow-observe-tooltip" role="tooltip">{observeTagline}</span>
-          </a>
           </div>
 
           <!-- Mobile-only rail (animated dots flowing down to products) -->
@@ -393,15 +390,17 @@ const installJoined = installLines.join('\n');
                  One downsize candidate, measured on real suites — not all
                  analyzers, and not a replacement for Lens. The whole card links
                  to /bench. -->
-            <p class="flow-cardcap"><strong>TokenJam Bench</strong> · Benchmark &amp; Evaluate</p>
+            <p class="flow-cardcap"><strong>TokenJam Bench</strong><span class="flow-cardcap-sub">Benchmark &amp; Evaluate</span></p>
             <a href="/bench" class="flow-bench" id="flow-bench" aria-label="TokenJam Bench — measured pass-rate per suite">
-              <BenchVerdict size="sm" />
+              <Browser url="bench-report.json">
+                <BenchVerdict size="sm" />
+              </Browser>
             </a>
 
-            <p class="flow-cardcap flow-cardcap--lens"><strong>TokenJam Lens</strong> · Observe, Analyze &amp; Optimize</p>
+            <p class="flow-cardcap flow-cardcap--lens"><strong>TokenJam Lens</strong><span class="flow-cardcap-sub">Observe, Analyze &amp; Optimize</span></p>
             <a href="/products/lens" id="flow-lens" class="flow-lens-preview" aria-label="TokenJam Lens — local dashboard">
               <Browser url="127.0.0.1:7391/#/overview">
-                <LensOverviewPreview title="Lens" compact={true} />
+                <LensOverviewPreview compact={true} />
               </Browser>
             </a>
           </div>
@@ -832,67 +831,56 @@ const installJoined = installLines.join('\n');
          Analyzers shrink to compact chips (icon + name + arrow only).
          Lens grows into a full browser preview at the end so the visualization
          step is visible, not just hinted at. */
-      grid-template-columns: minmax(104px, 116px) minmax(200px, 1fr) max-content minmax(248px, 300px);
-      gap: clamp(18px, 2.8vw, 48px);
+      grid-template-columns: minmax(104px, 116px) minmax(190px, 240px) max-content minmax(248px, 300px);
+      gap: clamp(16px, 2vw, 36px);
       align-items: center;
+      justify-content: center;
       min-height: 340px;
     }
-    /* Center column wrapper. Holds the jar and the Observe satellite side
-       by side so Observe reads as visually "attached to" TokenJam. */
+    /* Center column wrapper — just centers the TokenJam circle now that
+       Observe lives inside it. */
     .flow-center-wrap {
       display: flex;
       align-items: center;
-      gap: 18px;
       justify-content: center;
       position: relative;
       z-index: 3;
     }
-    /* Observe satellite — small pill anchored to the right of the jar.
-       Neutral white accent so it reads as infrastructure, not a 5th analyzer. */
-    /* Observe sits over the jar -> analyzer beams, so its background must be
-       a solid (non-translucent) token in both states; otherwise the beams
-       show through the pill on hover (was using var(--white-ghost), which is
-       a semi-transparent overlay). z-index above .flow-svg keeps it on top. */
+    /* Observe pill — sits INSIDE the circle, below the TOKENJAM label, so it
+       reads as the extraction layer of TokenJam itself (not a 5th analyzer).
+       Compact so the jar + label + pill fit within the ring. Solid background
+       so it never lets a beam show through. */
     .flow-observe {
-      display: flex; align-items: center; gap: 8px;
-      padding: 7px 13px 7px 9px;
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 3px;
+      padding: 4px 10px 4px 5px;
       background: var(--navy-2);
       border: 1px solid var(--blue-line);
       border-radius: 999px;
       text-decoration: none;
       color: var(--white-dim);
-      transition: border-color .2s, color .2s, background .2s, transform .2s;
-      flex-shrink: 0;
+      transition: border-color .2s, color .2s, background .2s;
       position: relative;
-      z-index: 4;
+      z-index: 5;
     }
     .flow-observe:hover {
       color: var(--white);
       border-color: rgba(var(--accent-rgb), 0.35);
       background: var(--navy-3);
-      transform: translateX(2px);
     }
     .flow-observe-icon {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 22px; height: 22px;
+      width: 19px; height: 19px;
       border-radius: 50%;
       background: rgba(var(--accent-rgb), 0.06);
       color: var(--white);
       flex-shrink: 0;
     }
-    .flow-observe-icon svg { width: 14px; height: 14px; }
-    .flow-observe-text {
-      display: flex; flex-direction: column;
+    .flow-observe-icon svg { width: 12px; height: 12px; }
+    .flow-observe-name {
       font-family: 'Geist', sans-serif;
+      font-size: 12px; font-weight: 500; color: var(--white);
       line-height: 1.1;
-    }
-    .flow-observe-name { font-size: 13px; font-weight: 500; color: var(--white); }
-    .flow-observe-tag {
-      font-family: 'Geist Mono', monospace;
-      font-size: 10.5px;
-      color: var(--white-faint);
-      letter-spacing: .02em;
-      margin-top: 2px;
     }
 
     /* Lens end-cap column. Full browser preview vertically centered.
@@ -906,47 +894,38 @@ const installJoined = installLines.join('\n');
       position: relative;
       z-index: 2;
     }
-    /* Consistent label above the Bench + Lens cards. */
+    /* Headings above the Bench + Lens windows. Two lines (product name on top,
+       subtitle under) so they read as prominent product labels, not captions. */
     .flow-cardcap {
-      margin: 2px 0 0; padding-left: 2px;
-      font-family: 'Geist Mono', monospace; font-size: 10px; letter-spacing: .02em;
+      margin: 0 0 7px; padding-left: 2px;
+      display: flex; flex-direction: column; gap: 1px;
+      font-family: 'Geist', sans-serif;
+    }
+    .flow-cardcap strong {
+      font-size: 14px; font-weight: 600; letter-spacing: -.01em;
+      color: var(--white);
+    }
+    .flow-cardcap-sub {
+      font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: .02em;
       color: var(--white-faint);
     }
-    .flow-cardcap strong { color: var(--white-dim); font-weight: 600; }
-    /* More breathing room between the Bench box and the Lens box. */
-    .flow-cardcap--lens { margin-top: 16px; }
+    /* More breathing room between the Bench window and the Lens window. */
+    .flow-cardcap--lens { margin-top: 18px; }
 
-    /* TokenJam Bench card holds the shared BenchVerdict chart. The Bench and
-       Lens cards are peers: neutral border + elevation at rest, green accent
-       border on hover only. */
-    .flow-bench {
-      position: relative; z-index: 6; display: block; text-decoration: none;
-      background: var(--navy-2);
-      border: 1px solid var(--blue-line);
-      border-radius: 12px;
-      padding: 9px 14px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
-      transition: transform .2s, box-shadow .2s, border-color .2s;
-      cursor: pointer;
-    }
-    .flow-bench:hover {
-      transform: translateX(2px);
-      border-color: rgba(16, 185, 129, 0.7);
-      box-shadow: 0 18px 46px rgba(0, 0, 0, 0.5), 0 0 70px rgba(16, 185, 129, 0.10);
-    }
-    .flow-lens-preview {
-      display: block;
-      text-decoration: none;
+    /* Bench + Lens hero windows are PEERS: both wrap the same <Browser> Mac
+       chrome (traffic lights + title bar), both neutral border + elevation at
+       rest, green accent border on hover only. The .browser lives in a child
+       component, so :global() is required to pierce the scope boundary and beat
+       the Browser's own rgba(var(--accent-rgb),0.2) border. */
+    .flow-bench, .flow-lens-preview {
+      display: block; text-decoration: none;
       transition: transform .2s;
       width: 100%;
-      --product-accent: #06B6D4;
-      --product-accent-rgb: 6, 182, 212;
+      position: relative; z-index: 6;
     }
-    .flow-lens-preview:hover { transform: translateX(2px); }
-    /* Lens card matches the Bench card: neutral border + elevation at rest,
-       green accent on hover only. The Browser's .browser lives in a child
-       component, so :global() is required to pierce the scope boundary and win
-       over the Browser's own rgba(var(--accent-rgb),0.2) border. */
+    .flow-lens-preview { --product-accent: #06B6D4; --product-accent-rgb: 6, 182, 212; }
+    .flow-bench:hover, .flow-lens-preview:hover { transform: translateX(2px); }
+    .flow-bench :global(.browser),
     .flow-lens-preview :global(.browser) {
       font-size: 11px;
       line-height: 1.4;
@@ -954,27 +933,28 @@ const installJoined = installLines.join('\n');
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
       transition: border-color .2s, box-shadow .2s;
     }
+    .flow-bench:hover :global(.browser),
     .flow-lens-preview:hover :global(.browser) {
       border-color: rgba(16, 185, 129, 0.7);
       box-shadow: 0 18px 46px rgba(0, 0, 0, 0.5), 0 0 70px rgba(16, 185, 129, 0.10);
     }
-    .flow-lens-preview .browser-titlebar { padding: 7px 10px; }
-    .flow-lens-preview .browser-url { font-size: 10px; padding: 2px 8px; }
-    .flow-lens-preview .browser-body { padding: 9px 11px; }
-    .flow-lens-preview .lp-title { font-size: 12px; }
-    .flow-lens-preview .lp-meta { font-size: 10px; }
-    .flow-lens-preview .lp-band { padding: 8px 10px; margin-top: 6px; }
-    .flow-lens-preview .lp-band-head { margin-bottom: 4px; }
-    .flow-lens-preview .lp-band-label { font-size: 9.5px; }
-    .flow-lens-preview .lp-band-chip { font-size: 8.5px; padding: 1px 5px; }
-    .flow-lens-preview .lp-hero-val { font-size: 19px; }
-    .flow-lens-preview .lp-spark { height: 16px; gap: 2px; margin: 5px 0 4px; }
-    .flow-lens-preview .lp-caveat { font-size: 9px; }
-    .flow-lens-preview .lp-tile { padding: 5px 7px; }
-    .flow-lens-preview .lp-tile-name { font-size: 9px; }
-    .flow-lens-preview .lp-tile-val { font-size: 10px; }
-    .flow-lens-preview .lp-health { font-size: 9.5px; margin-top: 6px; gap: 6px; }
-    .flow-lens-preview .lp-health-dot { width: 5px; height: 5px; }
+    /* Compact window chrome, shared by both hero windows. */
+    .flow-bench :global(.browser-titlebar),
+    .flow-lens-preview :global(.browser-titlebar) { padding: 7px 10px; }
+    .flow-bench :global(.browser-url),
+    .flow-lens-preview :global(.browser-url) { font-size: 10px; padding: 2px 8px; }
+    .flow-bench :global(.browser-body) { padding: 11px 13px; }
+    .flow-lens-preview :global(.browser-body) { padding: 9px 11px; }
+    /* Compact Lens internals (now actually applied — :global pierces the slot). */
+    .flow-lens-preview :global(.lp-band) { padding: 8px 10px; margin-top: 6px; }
+    .flow-lens-preview :global(.lp-band-head) { margin-bottom: 4px; }
+    .flow-lens-preview :global(.lp-band-label) { font-size: 9.5px; }
+    .flow-lens-preview :global(.lp-band-chip) { font-size: 8.5px; padding: 1px 5px; }
+    .flow-lens-preview :global(.lp-hero-val) { font-size: 19px; }
+    .flow-lens-preview :global(.lp-spark) { height: 16px; gap: 2px; margin: 5px 0 4px; }
+    .flow-lens-preview :global(.lp-tile) { padding: 5px 7px; }
+    .flow-lens-preview :global(.lp-tile-name) { font-size: 9px; }
+    .flow-lens-preview :global(.lp-tile-val) { font-size: 10px; }
 
     .flow-sources, .flow-products {
       list-style: none;
@@ -1163,11 +1143,11 @@ const installJoined = installLines.join('\n');
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
       z-index: 1;
     }
     .flow-center-mark {
-      width: 64px;
+      width: 52px;
       height: auto;
       color: var(--white);
     }

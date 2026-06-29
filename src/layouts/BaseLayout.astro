@@ -147,14 +147,23 @@ const imageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).toSt
       var now = Date.now();
       if (cached && typeof cached.value === 'number') apply(cached.value);
       if (cached && now - cached.ts < TTL) return;
-      fetch('https://api.github.com/repos/metabuilder-labs/tokenjam', {
+      // Honest org total: sum stars across our own (non-fork) repos, excluding
+      // the .github meta repo. Mirrors src/lib/github.ts so the live number
+      // never disagrees with the build-time one (and never counts the fork).
+      fetch('https://api.github.com/orgs/Metabuilder-Labs/repos?per_page=100&type=public', {
         headers: { Accept: 'application/vnd.github+json' },
       }).then(function (r) {
         if (!r.ok) throw new Error('rate-limited');
         return r.json();
       }).then(function (data) {
-        var n = typeof data.stargazers_count === 'number' ? data.stargazers_count : null;
-        if (n == null) return;
+        if (!Array.isArray(data)) return;
+        var n = 0;
+        for (var i = 0; i < data.length; i++) {
+          var repo = data[i];
+          if (!repo || repo.fork) continue;
+          if (repo.name === '.github') continue;
+          if (typeof repo.stargazers_count === 'number') n += repo.stargazers_count;
+        }
         apply(n);
         try { localStorage.setItem(KEY, JSON.stringify({ value: n, ts: now })); } catch (e) {}
       }).catch(function () { /* fall through to build-time number */ });
