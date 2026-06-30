@@ -15,13 +15,18 @@ interface Props {
   /** Heading shown in the mock's title row. Defaults to the route name
    *  ("Overview"); the hero flow terminus overrides it to "Lens". */
   title?: string;
+  /** Trimmed variant for the compacted homepage hero: keeps the spend block
+   *  and the recoverable-waste row, drops the health summary line. */
+  compact?: boolean;
 }
-const { expanded = false, title = 'Overview' } = Astro.props;
+const { expanded = false, title = 'Overview', compact = false } = Astro.props;
 ---
-<div class="lp-row">
-  <span class="lp-title">{title}</span>
-  <span class="lp-meta">Last 7d</span>
-</div>
+{!compact && (
+  <div class="lp-row">
+    <span class="lp-title">{title}</span>
+    <span class="lp-meta">Last 7d</span>
+  </div>
+)}
 
 <div class="lp-band">
   <div class="lp-band-head">
@@ -37,8 +42,8 @@ const { expanded = false, title = 'Overview' } = Astro.props;
     <span style="height: 70%"></span>
     <span style="height: 48%"></span>
   </div>
-  <div class="lp-caveat">At this pace, ~$1,219 by end of June</div>
-  <div class="lp-caveat">(linear run-rate, not a forecast)</div>
+  {!compact && <div class="lp-caveat">At this pace, ~$1,219 by end of June</div>}
+  {!compact && <div class="lp-caveat">(linear run-rate, not a forecast)</div>}
 </div>
 
 <div class="lp-band">
@@ -80,11 +85,13 @@ const { expanded = false, title = 'Overview' } = Astro.props;
   </div>
 </div>
 
-<div class="lp-health">
-  <span class="lp-health-dot" aria-hidden="true"></span>
-  <span>3 unread alerts</span>
-  <span>·</span>
-  <span>0 agents drifting</span>
-  {expanded && <span>·</span>}
-  {expanded && <span>1 budget near 80%</span>}
-</div>
+{!compact && (
+  <div class="lp-health">
+    <span class="lp-health-dot" aria-hidden="true"></span>
+    <span>3 unread alerts</span>
+    <span>·</span>
+    <span>0 agents drifting</span>
+    {expanded && <span>·</span>}
+    {expanded && <span>1 budget near 80%</span>}
+  </div>
+)}

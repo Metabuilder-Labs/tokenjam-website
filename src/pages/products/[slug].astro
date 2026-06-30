@@ -106,6 +106,19 @@ const { product } = Astro.props;
       </div>
     </section>
 
+    {product.slug === 'downsize' && (
+      <!-- PROVE IT (cross-link to Bench, downsize only) -->
+      <section class="pp-section">
+        <h2 class="pp-h2">Prove it before you switch</h2>
+        <p class="pp-section-lede">
+          A downsize candidate is a structural heuristic, not a guarantee. Before you move a task to a
+          cheaper model, measure it: <a href="/bench">TokenJam Bench</a> runs the candidate against the
+          original on real task suites and reports, per suite, whether accuracy holds, with Wilson
+          confidence intervals and a McNemar p-value. Measured, never "certified". You decide what to apply.
+        </p>
+      </section>
+    )}
+
     <!-- EXAMPLE OUTPUT -->
     <section class="pp-section">
       <h2 class="pp-h2">Example output</h2>

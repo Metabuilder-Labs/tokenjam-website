@@ -1,0 +1,159 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Callout from '@/components/Callout.astro';
+import BenchTerminal from '@/components/BenchTerminal.astro';
+import BenchVerdict from '@/components/BenchVerdict.astro';
+
+const accent = '#10B981';
+const accentRgb = '16, 185, 129';
+const repoUrl = 'https://github.com/Metabuilder-Labs/tokenjam-bench';
+const pypiUrl = 'https://pypi.org/project/tokenjam-bench';
+---
+<BaseLayout
+  title="TokenJam Bench — measure whether a cheaper model holds up"
+  description="TokenJam Bench runs a cheaper model candidate against the original on real task suites and reports, per suite, whether accuracy holds. Wilson confidence intervals and McNemar's test, not a single quality score. Open source, pip install tokenjam-bench."
+  wide
+>
+  <article class="pp pp--wide" style={`--product-accent: ${accent}; --product-accent-rgb: ${accentRgb};`}>
+    <header class="pp-hero">
+      <p class="pp-eyebrow">Open source · the prove step</p>
+      <h1 class="pp-name"><span class="pp-name-brand">TokenJam</span> <span class="pp-name-product">Bench</span></h1>
+      <p class="pp-claim">Measure whether a cheaper model actually holds up.</p>
+      <p class="pp-sub">
+        A downsize recommendation is a hypothesis. Bench tests it: run the cheaper candidate against the
+        original on real task suites and measure, per suite, whether accuracy holds, with real statistics
+        rather than a vibe.
+      </p>
+      <div class="pp-hero-ctas">
+        <a href={repoUrl} target="_blank" rel="noopener noreferrer" class="btn-primary">View the repo</a>
+        <a href={pypiUrl} target="_blank" rel="noopener noreferrer" class="btn-secondary">PyPI</a>
+      </div>
+    </header>
+
+    <!-- HERO VISUAL: a tjb run flowing into the shared verdict -->
+    <div class="bench-demo">
+      <BenchTerminal />
+      <div class="bench-arrow" aria-hidden="true">→</div>
+      <div class="bench-verdict-card">
+        <BenchVerdict size="md" caption="per-suite verdict" />
+      </div>
+    </div>
+
+    <section class="pp-section">
+      <h2 class="pp-h2">Why a benchmark, and why this one</h2>
+      <p class="pp-section-lede">
+        <a href="/products/downsize">Downsize</a> surfaces cheaper-model candidates from your real usage.
+        Whether a candidate is actually safe is a measurement question, not a guess. Bench answers it on task
+        suites that look like your work, and reports the result <strong>per suite</strong>, never as one
+        blended "quality" number.
+      </p>
+    </section>
+
+    <section class="pp-section">
+      <h2 class="pp-h2">Cost and accuracy, with the statistics</h2>
+      <div class="pp-body">
+        <p>
+          For each suite Bench runs the original and the candidate on the same prompts, then compares the
+          paired outcomes. It reports the pass rate for each model with <strong>Wilson confidence
+          intervals</strong>, and tests whether the difference is real with <strong>McNemar's test</strong>
+          on the cases where the two models disagree.
+        </p>
+        <p>
+          A worked example shows why this matters. Downsizing from opus to haiku regressed on a coding suite
+          (McNemar p ≈ 0.000) while holding on a math suite. The lesson is the whole reason Bench exists:
+          blanket downsizing is unsafe, and the only way to know for your tasks is to measure them.
+        </p>
+      </div>
+      <div class="pp-card-grid">
+        <div class="pp-card">
+          <h3>Pass rate per suite</h3>
+          <p>Each suite gets its own pass rate and Wilson interval. A model that holds on math and breaks on
+          code reads as exactly that, with no averaging to hide it.</p>
+        </div>
+        <div class="pp-card">
+          <h3>Paired significance</h3>
+          <p>McNemar's test on the disagreements tells you whether a drop is signal or noise, with a p-value
+          you can cite instead of a single confidence percentage.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="pp-section">
+      <h2 class="pp-h2">Run it yourself</h2>
+      <p class="pp-section-lede">
+        Bench is open source. Install it, point it at a suite, give it the original and the candidate, and
+        read the verdict.
+      </p>
+      <div class="terminal pp-terminal">
+        <div class="terminal-titlebar">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="terminal-title">bench</span>
+        </div>
+        <pre class="terminal-body pp-terminal-body"><span class="tline"><span class="t-prompt">$ </span><span class="t-cmd">pip install tokenjam-bench</span></span>
+<span class="tline"><span class="t-prompt">$ </span><span class="t-cmd">tjb run --suite humaneval --baseline opus --candidate haiku</span></span>
+<span class="tline t-dim">  → pass rate + Wilson CI per suite, plus a McNemar p-value</span></pre>
+      </div>
+      <p class="pp-fineprint">
+        Source: <a href={repoUrl} target="_blank" rel="noopener noreferrer">github.com/Metabuilder-Labs/tokenjam-bench</a>
+        · <a href={pypiUrl} target="_blank" rel="noopener noreferrer">tokenjam-bench on PyPI</a>. Pairs with
+        the <a href="/products/downsize">Downsize</a> analyzer.
+      </p>
+    </section>
+
+    <section class="pp-section">
+      <Callout type="tip">
+        <p><strong>Pass rate is always per suite.</strong> Bench reports cost and accuracy with confidence
+        intervals and p-values for the suites you run. It does not extrapolate to a general "quality"
+        rating, it never says a swap is "certified" or "safe", and it does not promise a dollar figure for
+        your production traffic. It tells you whether a specific swap held up on a specific suite, which is
+        the honest thing a benchmark can claim.</p>
+      </Callout>
+    </section>
+  </article>
+
+  <style>
+    /* Self-contained product-page shell (the .pp-* pattern used by
+       /products/lens), so this page carries no restructure-branch deps. */
+    .pp { max-width: 980px; margin: 0 auto; padding: calc(72px + var(--banner-h, 0px)) 24px 96px; }
+    .pp--wide { max-width: 1040px; }
+    .pp-hero { text-align: center; margin-bottom: 48px; }
+    .pp-eyebrow { font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--white-faint); margin: 0 0 14px; }
+    .pp-name { font-family: 'Geist', sans-serif; font-weight: 700; letter-spacing: -.04em; line-height: 1; font-size: clamp(44px, 6.5vw, 84px); margin: 0 0 18px; display: flex; justify-content: center; flex-wrap: wrap; gap: 0.22em; }
+    .pp-name-brand { color: var(--white); }
+    .pp-name-product { color: var(--product-accent); }
+    .pp-claim { font-family: 'Geist', sans-serif; font-weight: 500; letter-spacing: -.015em; line-height: 1.2; font-size: clamp(20px, 2.2vw, 28px); color: var(--white); margin: 0 auto 16px; max-width: 760px; }
+    .pp-sub { color: var(--white-dim); font-size: 17px; line-height: 1.6; max-width: 700px; margin: 0 auto 26px; }
+    .pp-sub strong { color: var(--white); font-weight: 600; }
+    .pp-sub code, .pp-section-lede code, .pp-fineprint code, .pp-body code { font-family: 'Geist Mono', monospace; font-size: .9em; padding: 1px 6px; background: var(--white-ghost); border-radius: 4px; color: var(--white); }
+    .pp-hero-ctas { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .pp-section { padding-top: 48px; border-top: 1px solid var(--blue-line); margin-top: 48px; }
+    .pp-h2 { font-family: 'Geist', sans-serif; font-weight: 600; letter-spacing: -.015em; font-size: clamp(24px, 2.6vw, 30px); color: var(--white); margin: 0 0 16px; }
+    .pp-section-lede { color: var(--white-dim); font-size: 16px; line-height: 1.6; margin: 0 0 24px; max-width: 780px; }
+    .pp-section-lede strong, .pp-body strong { color: var(--white); font-weight: 600; }
+    .pp-section-lede a, .pp-fineprint a, .pp-body a { color: var(--accent-blue); text-decoration: underline; text-underline-offset: 3px; }
+    .pp-body { color: var(--white-dim); font-size: 16px; line-height: 1.65; max-width: 780px; }
+    .pp-body p { margin: 0 0 16px; }
+    .pp-fineprint { color: var(--white-faint); font-size: 13px; margin: 16px 0 0; }
+    .pp-terminal { margin-top: 4px; }
+    .pp-terminal-body { padding: 18px 22px; margin: 0; }
+    .pp-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+    .pp-card { display: flex; flex-direction: column; gap: 8px; padding: 22px; border-radius: 12px; background: var(--navy-2); border: 1px solid rgba(16, 185, 129, 0.25); }
+    .pp-card h3 { font-family: 'Geist', sans-serif; font-size: 18px; font-weight: 600; color: var(--white); margin: 0; }
+    .pp-card p { font-size: 14px; line-height: 1.55; color: var(--white-dim); margin: 0; }
+
+    /* Hero visual: shared tjb terminal -> shared BenchVerdict */
+    .bench-demo { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 18px; margin: 8px 0; }
+    .bench-arrow { color: var(--white-faint); font-size: 22px; }
+    .bench-verdict-card {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 18px; border-radius: 12px;
+      background: var(--navy-2); border: 1px solid var(--blue-line);
+    }
+
+    @media (max-width: 760px) {
+      .pp-card-grid { grid-template-columns: 1fr; }
+      .bench-demo { grid-template-columns: 1fr; }
+      .bench-arrow { transform: rotate(90deg); justify-self: center; }
+    }
+  </style>
+</BaseLayout>
