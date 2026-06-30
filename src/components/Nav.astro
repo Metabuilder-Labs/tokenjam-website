@@ -1,11 +1,12 @@
 ---
 import Logo from './Logo.astro';
 import { products as productCatalog, productIcons } from '@/data/products';
-import { getStarCount, formatStars, ghUrl } from '@/lib/github';
+import { getStarCount, formatStars, ghReposUrl } from '@/lib/github';
 
 // Build-time star count. Cached in the module so a full build hits GitHub once.
 const starLabel = formatStars(await getStarCount());
-const navStarHref = ghUrl('nav-star');
+// The count is the org-wide own-repo total, so the pill links to the org repos list.
+const navStarHref = ghReposUrl('nav-star');
 
 const path = Astro.url.pathname;
 function isActive(prefix: string) {

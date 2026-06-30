@@ -5,11 +5,11 @@ import Browser from '@/components/Browser.astro';
 import LensOverviewPreview from '@/components/LensOverviewPreview.astro';
 import BenchVerdict from '@/components/BenchVerdict.astro';
 import BenchTerminal from '@/components/BenchTerminal.astro';
-import { getStarCount, formatStars, ghUrl } from '@/lib/github';
+import { getStarCount, formatStars, ghReposUrl } from '@/lib/github';
 
 const heroStarLabel = formatStars(await getStarCount());
-const heroGhHref = ghUrl('hero');
-const installGhHref = ghUrl('install');
+const heroGhHref = ghReposUrl('hero');
+const installGhHref = ghReposUrl('install');
 
 // Per-product accents (single source of truth lives in src/data/products.ts).
 const accentBySlug = Object.fromEntries(
@@ -271,7 +271,7 @@ const installJoined = installLines.join('\n');
         <div class="hero-ctas">
           <a href="#install" class="btn-primary btn-lg" onclick="window.trackEvent && window.trackEvent('cta_click', 'conversion', 'get_started_hero')">Get started</a>
           <a href={heroGhHref} target="_blank" rel="noopener noreferrer" class="btn-secondary btn-lg" onclick="window.trackEvent && window.trackEvent('cta_click', 'conversion', 'star_github_hero')">
-            <span data-star-phrase="Star it on GitHub">{heroStarLabel ? `Star it on GitHub (${heroStarLabel} ⭐)` : 'Star it on GitHub'}</span>
+            <span data-star-phrase="Star us on GitHub">{heroStarLabel ? `Star us on GitHub (${heroStarLabel} ⭐)` : 'Star us on GitHub'}</span>
           </a>
           <button type="button" class="btn-secondary btn-lg" data-subscribe-open="hero">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -390,16 +390,16 @@ const installJoined = installLines.join('\n');
                  One downsize candidate, measured on real suites — not all
                  analyzers, and not a replacement for Lens. The whole card links
                  to /bench. -->
-            <p class="flow-cardcap"><strong>TokenJam Bench</strong><span class="flow-cardcap-sub">Benchmark &amp; Evaluate</span></p>
+            <p class="flow-cardcap">Benchmark &amp; Evaluate</p>
             <a href="/bench" class="flow-bench" id="flow-bench" aria-label="TokenJam Bench — measured pass-rate per suite">
-              <Browser url="bench-report.json">
+              <Browser title="TokenJam Bench">
                 <BenchVerdict size="sm" />
               </Browser>
             </a>
 
-            <p class="flow-cardcap flow-cardcap--lens"><strong>TokenJam Lens</strong><span class="flow-cardcap-sub">Observe, Analyze &amp; Optimize</span></p>
+            <p class="flow-cardcap flow-cardcap--lens">Observe, Analyze &amp; Optimize</p>
             <a href="/products/lens" id="flow-lens" class="flow-lens-preview" aria-label="TokenJam Lens — local dashboard">
-              <Browser url="127.0.0.1:7391/#/overview">
+              <Browser title="TokenJam Lens">
                 <LensOverviewPreview compact={true} />
               </Browser>
             </a>
@@ -676,7 +676,7 @@ const installJoined = installLines.join('\n');
         </button>
         <a class="btn-secondary" href={installGhHref} target="_blank" rel="noopener noreferrer" onclick="window.trackEvent && window.trackEvent('cta_click', 'conversion', 'star_github_install')">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          Star on GitHub
+          Star us on GitHub
         </a>
         <button type="button" class="btn-secondary" data-subscribe-open="install">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -762,7 +762,7 @@ const installJoined = installLines.join('\n');
 
     /* ── HERO ─────────────────────────────────────── */
     .hero {
-      padding: calc(42px + var(--banner-h, 0px)) 48px 4px;
+      padding: calc(28px + var(--banner-h, 0px)) 48px 4px;
       background:
         radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--accent-blue-rgb), 0.08), transparent 60%),
         var(--navy);
@@ -773,7 +773,7 @@ const installJoined = installLines.join('\n');
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
     .hero-copy { text-align: center; max-width: none; margin: 0 auto; }
     /* Single-line headline (Vercel-style hero). The calc() picks the largest font
@@ -894,19 +894,11 @@ const installJoined = installLines.join('\n');
       position: relative;
       z-index: 2;
     }
-    /* Headings above the Bench + Lens windows. Two lines (product name on top,
-       subtitle under) so they read as prominent product labels, not captions. */
+    /* Tagline caption above each window — the product NAME now lives in the
+       window's title bar, so this line is just the short descriptor. */
     .flow-cardcap {
-      margin: 0 0 4px; padding-left: 2px;
-      display: flex; flex-direction: column; gap: 0;
-      font-family: 'Geist', sans-serif;
-    }
-    .flow-cardcap strong {
-      font-size: 14px; font-weight: 600; letter-spacing: -.01em;
-      color: var(--white);
-    }
-    .flow-cardcap-sub {
-      font-family: 'Geist Mono', monospace; font-size: 10.5px; letter-spacing: .02em;
+      margin: 0 0 5px; padding-left: 2px;
+      font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: .02em;
       color: var(--white-faint);
     }
     /* More breathing room between the Bench window and the Lens window. */
@@ -938,11 +930,11 @@ const installJoined = installLines.join('\n');
       border-color: rgba(16, 185, 129, 0.7);
       box-shadow: 0 18px 46px rgba(0, 0, 0, 0.5), 0 0 70px rgba(16, 185, 129, 0.10);
     }
-    /* Compact window chrome, shared by both hero windows. */
+    /* Taller title bar so the centered product-name title reads clearly. */
     .flow-bench :global(.browser-titlebar),
-    .flow-lens-preview :global(.browser-titlebar) { padding: 8px 12px; }
-    .flow-bench :global(.browser-url),
-    .flow-lens-preview :global(.browser-url) { font-size: 10.5px; padding: 2px 9px; }
+    .flow-lens-preview :global(.browser-titlebar) { padding: 11px 14px; }
+    .flow-bench :global(.browser-title),
+    .flow-lens-preview :global(.browser-title) { font-size: 13px; color: var(--white); }
     .flow-bench :global(.browser-body) { padding: 12px 14px; }
     .flow-lens-preview :global(.browser-body) { padding: 11px 13px; }
     /* Compact Lens internals (now actually applied — :global pierces the slot). */

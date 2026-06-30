@@ -59,3 +59,11 @@ export function formatStars(n: number | null): string {
 export function ghUrl(source: string): string {
   return `${REPO_URL}?ref=tokenjam.dev/${source}`;
 }
+
+// The org repositories list — where the "Star us on GitHub" CTAs point, since the
+// count shown is the org-wide own-repo total (you can't star an org, but this lists
+// every repo to star).
+export const ORG_REPOS_URL = `https://github.com/orgs/${ORG}/repositories`;
+export function ghReposUrl(source: string): string {
+  return `${ORG_REPOS_URL}?ref=tokenjam.dev/${source}`;
+}

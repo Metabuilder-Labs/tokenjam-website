@@ -13,15 +13,20 @@
  */
 interface Props {
   url?: string;
+  /** When set, the title bar shows this as a centered window title (on the grey
+   *  bar) instead of the address-bar URL pill. */
+  title?: string;
 }
-const { url = '127.0.0.1:7391/' } = Astro.props;
+const { url = '127.0.0.1:7391/', title } = Astro.props;
 ---
 <div class="browser">
   <div class="browser-titlebar">
     <span class="dot dot-r"></span>
     <span class="dot dot-y"></span>
     <span class="dot dot-g"></span>
-    <span class="browser-url">{url}</span>
+    {title
+      ? <span class="browser-title">{title}</span>
+      : <span class="browser-url">{url}</span>}
   </div>
   <div class="browser-body">
     <slot />
@@ -45,10 +50,22 @@ const { url = '127.0.0.1:7391/' } = Astro.props;
     color: var(--white-dim);
   }
   .browser-titlebar {
+    position: relative;
     display: flex; align-items: center; gap: 8px;
     padding: 10px 14px;
     background: rgba(var(--accent-rgb), 0.05);
     border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
+  }
+  /* Window title (product name) — centered over the full grey bar, with the
+     traffic-light dots floating on the left. */
+  .browser-title {
+    position: absolute; left: 0; right: 0;
+    text-align: center;
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    color: var(--white-dim);
+    pointer-events: none;
   }
   .browser .dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
   .browser .dot-r { background: #ff5f57; }
