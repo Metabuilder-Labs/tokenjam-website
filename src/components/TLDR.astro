@@ -1,6 +1,12 @@
 ---
+/*
+ * TL;DR summary box for blog posts. Renders a "Star on GitHub" CTA right after
+ * the summary so every post carries the ask near the top as well as the foot.
+ */
+import StarCTA from './StarCTA.astro';
 ---
 <aside class="tj-tldr">
   <span class="tj-tldr-label">TL;DR</span>
   <slot />
 </aside>
+<StarCTA tight />

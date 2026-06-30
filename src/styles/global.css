@@ -772,6 +772,13 @@ footer.tj-footer .footer-right {
   margin: 1.2em 0;
 }
 .prose pre code { background: transparent; padding: 0; font-size: inherit; }
+/* Shiki uses the github-dark theme (light syntax text). In light mode --navy-2
+   is near-white, so that light text lands on a light background and disappears.
+   Keep code blocks dark in light mode so the syntax text stays legible. */
+[data-theme="light"] .prose pre {
+  background: #0a0a0a !important;
+  border-color: rgba(255, 255, 255, 0.12);
+}
 .prose img { max-width: 100%; border-radius: 8px; margin: 1.2em 0; }
 .prose hr { border: 0; border-top: 1px solid var(--blue-line); margin: 2em 0; }
 .prose table {
@@ -935,6 +942,13 @@ footer.tj-footer .footer-right {
   border: 1px solid var(--blue-line);
   border-radius: 12px;
 }
+/* Tighter top margin for the in-flow CTA placed right after the TL;DR. */
+.post-star-cta--tight { margin: 20px 0 8px; }
+/* The after-TL;DR CTA lives inside .prose, so the prose link rule would paint
+   its button accent-blue + underlined. Keep it styled like the footer CTA
+   (btn-primary): white label, no underline. */
+.prose a.post-star-cta-btn,
+.prose a.post-star-cta-btn:hover { color: var(--navy); text-decoration: none; }
 .post-star-cta-text { flex: 1; min-width: 240px; display: flex; flex-direction: column; gap: 2px; }
 .post-star-cta-text strong { color: var(--white); font-weight: 600; font-size: 15px; }
 .post-star-cta-text span { color: var(--white-dim); font-size: 14px; line-height: 1.55; }

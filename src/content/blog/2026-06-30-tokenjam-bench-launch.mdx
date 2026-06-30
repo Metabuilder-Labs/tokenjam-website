@@ -1,0 +1,125 @@
+---
+title: "Introducing TokenJam Bench: Benchmarks & Evaluations for Agents and LLMs"
+description: "TokenJam Bench is an open-source tool to benchmark and evaluate LLMs and agents. Run a candidate model against an original on real, executable task suites and get a measured pass-rate, confidence intervals, and a holds-or-regressed verdict. Local, no signup."
+author: "anil-murty"
+publishDate: 2026-06-30
+tags: ["benchmarks", "evaluation", "llms", "agents", "cost", "launch"]
+pillar: "evaluation"
+image: "/blog/images/bench-dashboard.png"
+---
+
+import TLDR from '@/components/TLDR.astro';
+import FAQBlock from '@/components/FAQBlock.astro';
+
+<TLDR>
+- TokenJam Bench is an open-source tool to benchmark and evaluate LLMs and agents on real, executable task suites. Measured pass-rate, not vibes.
+- Run a candidate model against an original on suites like HumanEval and GSM8K, or your own tasks, scoring pass/fail and cost on each.
+- It reports the accuracy delta with a Wilson confidence interval and a McNemar test, plus a per-suite verdict: HOLDS or REGRESSED. Measured on the tasks you ran, never "certified."
+- It runs locally. No cloud, no signup. `pipx install tokenjam-bench`, then `tjb run`.
+- It pairs with TokenJam: when an analyzer flags a cheaper model, Bench checks whether that swap actually holds before you switch.
+</TLDR>
+
+**What is TokenJam Bench?** TokenJam Bench is an open-source tool for benchmarking and evaluating LLMs and agents. You give it a task suite, an original model, and a candidate. It runs both, scores each on pass/fail and cost, and reports where the candidate keeps up and where it breaks, with the statistics to tell a real difference from noise.
+
+Teams change models constantly: a cheaper one to cut cost, a newer one for a capability bump, a faster one for latency. The question is always the same. Does it still get the work right? The usual answer is a gut feel or a public leaderboard that never saw your tasks. Bench gives you evidence from the tasks you care about, scored the same way every time. If you run TokenJam, it is also the proof step after an analyzer flags a cheaper model: Bench checks the swap before you trust it.
+
+## Why a model swap needs evidence
+
+Switching models is a quality claim. Saying "this workload runs fine on Haiku" asserts something about quality on a workload nobody has actually run on Haiku. Get it wrong and the cost is asymmetric: the swap ships, the agent degrades in some subtle way, and you find out weeks later. The downside of a bad swap dwarfs the upside of a hopeful one.
+
+The honest fix is evidence pulled from the work itself. (I wrote about [the same gap between reporting a bill and recommending a change](/blog/2026-05-31-cost-dashboards-tell-you-the-bill) a couple of months ago; it applies to any model swap.) Not "Haiku is good at coding," which is a leaderboard claim. Instead: "we ran a code suite on Haiku, it passed 18 of 40 where Opus passed 33 of 40, a 37-point drop the McNemar test puts at p=0.0001." That second sentence is what Bench produces.
+
+## How it works
+
+```
+benchmark tasks → run on ORIGINAL model  → score (pass/fail) + cost
+                → run on CANDIDATE model → score (pass/fail) + cost
+                → report: Δaccuracy (objective) + Δcost, with statistics
+```
+
+Bench takes a set of executable tasks where a grader checks the result instead of a human opinion. Start with humaneval or gsm8k, or point it at your own suite. It runs every task twice, once per model. Each run yields a pass or a fail and a measured cost. Then it compares the two.
+
+The comparison is where the statistics earn their place. Bench puts a Wilson confidence interval on each pass rate and runs a McNemar test on the paired results, so a real regression reads differently from sampling jitter. Here is a live run, Opus 4.8 against Haiku 4.5, 40 tasks per suite:
+
+```
+OPUS 4.8 → HAIKU 4.5   ·   N = 40 / suite   ·   measured, never "certified"
+
+humaneval (code)   33/40 → 18/40   −37.5pp   McNemar p=0.0001   REGRESSED
+gsm8k (math)       40/40 → 39/40    −2.5pp   McNemar p=1.000    HOLDS
+
+COST   $0.3405 → $0.0672   (−80.3% measured)   ·   suites held: 1 of 2
+```
+
+Same swap, two verdicts. On math the candidate holds: a 2.5-point drop with a McNemar p of 1.000 is noise, not a regression. On code it breaks: 15 tasks that passed on Opus failed on Haiku, none went the other way, and the 37.5-point drop lands at p=0.0001. Cost fell about 80% either way. Routing the math workload to Haiku is defensible. Routing the code workload would have shipped a quiet quality drop, and Bench caught it before a user did.
+
+![Per-suite verdict from a live Opus 4.8 to Haiku 4.5 run: gsm8k holds, humaneval regresses](/blog/images/bench-run-per-suite.png)
+
+Bench does not make the call for you. It hands you the measured result and the confidence around it.
+
+## Honest by construction
+
+Bench reports a measured pass-rate on the tasks you ran. It never prints "certified," "safe," or "guaranteed." Those words promise something a benchmark cannot deliver: that the model will hold on the inputs you didn't test. The verdict stays scoped to the suite, with its interval visible.
+
+This is deliberate. The eval space runs on leaderboards that crush a model down to one number, and every major agent benchmark has been shown reward-hackable to near-perfect scores. A pass-rate without its confidence interval is marketing. Bench shows the interval and the test, and it says so plainly when a result is too close to call.
+
+Cost is measured the same careful way. On the math suite above, Haiku emitted about 2.1 times the output tokens Opus did. Cost still fell 70.6%, because Haiku's per-token rate is far lower, while the extra verbosity ate into the per-token saving. Bench reports the cost it measured, that wrinkle included, not a clean rate-card delta.
+
+## More than a two-model diff
+
+The pass-rate proof is the core. Bench does more around it:
+
+- **A local dashboard** (`tjb serve`): offline and self-contained, with an overview, leaderboards, a regression center, and the scenario library on separate screens.
+- **Replay mode**: point Bench at your real telemetry and test a candidate against the work you actually ran, not just synthetic suites.
+- **Agent benchmarks**: multi-turn trajectories with a tool-use safety gate, so you can prove an agent holds, not just a single answer.
+- **History and a version-regression matrix**: track a model's pass-rate over time and flag regressions automatically.
+- **Workflow suites**: production-shaped tasks like customer support, RAG, email, and research, beyond humaneval and gsm8k.
+
+![The TokenJam Bench dashboard: a run summary with cost delta and the regression banner, over your recorded runs](/blog/images/bench-run-overview.png)
+
+![The TokenJam Bench leaderboard: candidate models scored across seven benchmarks, with per-suite hold and regress verdicts](/blog/images/bench-dashboard.png)
+
+Everything above runs locally and offline, same as the core proof.
+
+## Where Bench fits
+
+Bench fits anywhere you are choosing between models: a cost downsize, a provider migration, a new release you want to adopt without regressing. Point it at suites that mirror your work, run the candidate against what you ship today, and let the verdict decide.
+
+It also plugs into TokenJam directly. Lens reads your agent telemetry and surfaces five savings areas (downsize, trim, cache, script, reuse), including cheaper-model candidates drawn from your real usage. Bench is the step that proves one of those candidates holds before you switch. Lens finds the candidate; Bench tests it.
+
+## Try it
+
+Bench runs entirely on your machine. No cloud, no signup.
+
+```bash
+pipx install tokenjam-bench
+tjb run --original anthropic:claude-opus-4-8 \
+        --candidate anthropic:claude-haiku-4-5 \
+        --suite humaneval
+```
+
+The repo is MIT-licensed and open at [github.com/Metabuilder-Labs/tokenjam-bench](https://github.com/Metabuilder-Labs/tokenjam-bench). If it saves you from a bad swap, star it.
+
+<FAQBlock
+  items={[
+    {
+      question: "I want to move to a cheaper or newer model. How do I know it won't break my agent?",
+      answer: "Run the swap through Bench. Point it at a task suite that resembles your agent's work, set the original and candidate models, and read the per-suite verdict. A HOLDS means the candidate matched on the tasks you tested. A REGRESSED means it dropped, with the McNemar test confirming the drop is real rather than noise. If you use TokenJam, run the exact candidate its analyzer flagged."
+    },
+    {
+      question: "Is a 37-point pass-rate drop a real regression, or just noise?",
+      answer: "That is what the Wilson interval and McNemar test decide. In a live Opus-to-Haiku run, the code suite dropped 37.5 points with a McNemar p of 0.0001, a decisive regression. The math suite in the same run dropped 2.5 points with p=1.000, which is noise. Same swap, and the statistics separate the real drop from the jitter."
+    },
+    {
+      question: "Do I need API keys, and does running it cost money?",
+      answer: "Yes. Bench makes real calls to both models, so you need keys for the providers you test, and each run costs whatever those calls cost. The cost is reported per task, and you control the suite size, so you can start small and scale up once a candidate looks promising."
+    },
+    {
+      question: "Can I use my own tasks instead of humaneval or gsm8k?",
+      answer: "Yes. Any suite with an executable grader works. If a script can check the result as pass or fail, Bench can run your original and candidate models against it and report the delta."
+    },
+    {
+      question: "Why won't Bench just tell me a model is safe to switch to?",
+      answer: "Because a benchmark measures the tasks you ran, not the ones you didn't. Calling a model 'safe' would promise coverage Bench does not have. It reports a measured pass-rate with a confidence interval and lets you make the call. That honesty is the point."
+    }
+  ]}
+/>
