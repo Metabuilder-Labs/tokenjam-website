@@ -70,6 +70,20 @@ Cost is measured the same careful way. On the math suite above, Haiku emitted ab
 
 TokenJam Lens observes your agents, analyzes the telemetry, and surfaces five savings areas: downsize, trim, cache, script, and reuse. It points at spend you could recover. Bench is the step after. It proves a specific swap holds before you make it. Lens finds the candidate. Bench tests it. You decide with the evidence on the table.
 
+## More than a two-model diff
+
+The pass-rate proof is the core. Bench does more around it:
+
+- **A local dashboard** (`tjb serve`): offline and self-contained, with an overview, leaderboards, a regression center, and the scenario library on separate screens.
+- **Replay mode**: point Bench at your real TokenJam telemetry and test a candidate against the work you actually ran, not just synthetic suites.
+- **Agent benchmarks**: multi-turn trajectories with a tool-use safety gate, so you can prove an agent holds, not just a single answer.
+- **History and a version-regression matrix**: track a model's pass-rate across TokenJam versions and over time, and flag regressions automatically.
+- **Workflow suites**: production-shaped tasks like customer support, RAG, email, and research, beyond humaneval and gsm8k.
+
+![The TokenJam Bench dashboard: leaderboards and a regression center over your recorded runs](/blog/images/bench-dashboard.png)
+
+Everything above runs locally and offline, same as the core proof.
+
 ## Try it
 
 Bench runs entirely on your machine. No cloud, no signup.
