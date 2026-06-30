@@ -1,35 +1,33 @@
 ---
-title: "TokenJam Bench: measure whether the cheaper model actually holds"
-description: "TokenJam Bench runs your candidate model against executable benchmarks and reports, with statistics, where it keeps up and where it breaks. Measured pass-rate with confidence intervals, never a 'certified' badge."
+title: "Introducing TokenJam Bench: Benchmarks & Evaluations for Agents and LLMs"
+description: "TokenJam Bench is an open-source tool to benchmark and evaluate LLMs and agents. Run a candidate model against an original on real, executable task suites and get a measured pass-rate, confidence intervals, and a holds-or-regressed verdict. Local, no signup."
 author: "anil-murty"
 publishDate: 2026-06-30
-tags: ["benchmarks", "evaluation", "cost", "optimization", "launch"]
+tags: ["benchmarks", "evaluation", "llms", "agents", "cost", "launch"]
 pillar: "evaluation"
-image: "/blog/images/bench-run-overview.png"
+image: "/blog/images/bench-dashboard.png"
 ---
 
 import TLDR from '@/components/TLDR.astro';
 import FAQBlock from '@/components/FAQBlock.astro';
 
 <TLDR>
-- TokenJam flags which models look safe to downsize. Bench answers the question it can't: does the cheaper model still get the work right, and how much does it actually save?
-- Bench runs your task suite on both the original and candidate model, scores pass/fail plus cost on each, and reports the accuracy delta with a Wilson confidence interval and a McNemar test.
-- The verdict is per-suite and honest: HOLDS or REGRESSED, measured on the tasks you ran. Never a "certified" guarantee.
+- TokenJam Bench is an open-source tool to benchmark and evaluate LLMs and agents on real, executable task suites. Measured pass-rate, not vibes.
+- Run a candidate model against an original on suites like HumanEval and GSM8K, or your own tasks, scoring pass/fail and cost on each.
+- It reports the accuracy delta with a Wilson confidence interval and a McNemar test, plus a per-suite verdict: HOLDS or REGRESSED. Measured on the tasks you ran, never "certified."
 - It runs locally. No cloud, no signup. `pipx install tokenjam-bench`, then `tjb run`.
-- Bench is the proof layer next to Lens. Lens observes, analyzes, and optimizes. Bench proves the swap before you trust it.
+- It pairs with TokenJam: when an analyzer flags a cheaper model, Bench checks whether that swap actually holds before you switch.
 </TLDR>
 
-**What is TokenJam Bench?** TokenJam Bench is an open-source tool that measures whether a cheaper model does the same job as the one you run now. You give it a task suite, an original model, and a candidate. It runs both, scores each on pass/fail and cost, and reports where the candidate keeps up and where it breaks.
+**What is TokenJam Bench?** TokenJam Bench is an open-source tool for benchmarking and evaluating LLMs and agents. You give it a task suite, an original model, and a candidate. It runs both, scores each on pass/fail and cost, and reports where the candidate keeps up and where it breaks, with the statistics to tell a real difference from noise.
 
-TokenJam already reads your agent telemetry and flags models that look safe to downsize. That flag is a structural heuristic. It can be wrong. Acting on it without evidence is the part that breaks production quietly, three weeks after you forgot you changed anything. Bench closes that gap.
+Teams change models constantly: a cheaper one to cut cost, a newer one for a capability bump, a faster one for latency. The question is always the same. Does it still get the work right? The usual answer is a gut feel or a public leaderboard that never saw your tasks. Bench gives you evidence from the tasks you care about, scored the same way every time. If you run TokenJam, it is also the proof step after an analyzer flags a cheaper model: Bench checks the swap before you trust it.
 
-## The question a cost tool can't answer
+## Why a model swap needs evidence
 
-Two months ago I wrote that [cost dashboards report the bill and stop short of telling you what to change](/blog/2026-05-31-cost-dashboards-tell-you-the-bill). Reporting spend is summation: walk the spans, multiply by the rate, show the total. Recommending a change is inference. To say "this workload runs fine on Haiku" is a claim about quality on a workload nobody has actually run on Haiku.
+Switching models is a quality claim. Saying "this workload runs fine on Haiku" asserts something about quality on a workload nobody has actually run on Haiku. Get it wrong and the cost is asymmetric: the swap ships, the agent degrades in some subtle way, and you find out weeks later. The downside of a bad swap dwarfs the upside of a hopeful one.
 
-Get that claim wrong and the cost is asymmetric. The user applies the swap, their agent degrades in some subtle way, and they lose trust in the tool for good. The downside of a bad recommendation dwarfs the upside of a vague one. That asymmetry is why most cost tools stop at the bill.
-
-The honest fix is evidence pulled from the work itself. Not "Haiku is good at coding," which is a leaderboard claim. Instead: "we ran a code suite on Haiku, it passed 18 of 40 where Opus passed 33 of 40, a 37-point drop the McNemar test puts at p=0.0001." That second sentence is what Bench produces.
+The honest fix is evidence pulled from the work itself. (I wrote about [the same gap between reporting a bill and recommending a change](/blog/2026-05-31-cost-dashboards-tell-you-the-bill) a couple of months ago; it applies to any model swap.) Not "Haiku is good at coding," which is a leaderboard claim. Instead: "we ran a code suite on Haiku, it passed 18 of 40 where Opus passed 33 of 40, a 37-point drop the McNemar test puts at p=0.0001." That second sentence is what Bench produces.
 
 ## How it works
 
@@ -64,25 +62,29 @@ Bench reports a measured pass-rate on the tasks you ran. It never prints "certif
 
 This is deliberate. The eval space runs on leaderboards that crush a model down to one number, and every major agent benchmark has been shown reward-hackable to near-perfect scores. A pass-rate without its confidence interval is marketing. Bench shows the interval and the test, and it says so plainly when a result is too close to call.
 
-Cost is measured the same careful way. On the math suite above, Haiku emitted about 2.1 times the output tokens Opus did. Cost still fell 70.6%, because Haiku's per-token rate is far lower, but the extra verbosity ate into the per-token saving. Bench reports the cost it measured, that wrinkle included, not a clean rate-card delta.
-
-## Where Bench fits
-
-TokenJam Lens observes your agents, analyzes the telemetry, and surfaces five savings areas: downsize, trim, cache, script, and reuse. It points at spend you could recover. Bench is the step after. It proves a specific swap holds before you make it. Lens finds the candidate. Bench tests it. You decide with the evidence on the table.
+Cost is measured the same careful way. On the math suite above, Haiku emitted about 2.1 times the output tokens Opus did. Cost still fell 70.6%, because Haiku's per-token rate is far lower, while the extra verbosity ate into the per-token saving. Bench reports the cost it measured, that wrinkle included, not a clean rate-card delta.
 
 ## More than a two-model diff
 
 The pass-rate proof is the core. Bench does more around it:
 
 - **A local dashboard** (`tjb serve`): offline and self-contained, with an overview, leaderboards, a regression center, and the scenario library on separate screens.
-- **Replay mode**: point Bench at your real TokenJam telemetry and test a candidate against the work you actually ran, not just synthetic suites.
+- **Replay mode**: point Bench at your real telemetry and test a candidate against the work you actually ran, not just synthetic suites.
 - **Agent benchmarks**: multi-turn trajectories with a tool-use safety gate, so you can prove an agent holds, not just a single answer.
-- **History and a version-regression matrix**: track a model's pass-rate across TokenJam versions and over time, and flag regressions automatically.
+- **History and a version-regression matrix**: track a model's pass-rate over time and flag regressions automatically.
 - **Workflow suites**: production-shaped tasks like customer support, RAG, email, and research, beyond humaneval and gsm8k.
 
-![The TokenJam Bench dashboard: leaderboards and a regression center over your recorded runs](/blog/images/bench-dashboard.png)
+![The TokenJam Bench dashboard: a run summary with cost delta and the regression banner, over your recorded runs](/blog/images/bench-run-overview.png)
+
+![The TokenJam Bench leaderboard: candidate models scored across seven benchmarks, with per-suite hold and regress verdicts](/blog/images/bench-dashboard.png)
 
 Everything above runs locally and offline, same as the core proof.
+
+## Where Bench fits
+
+Bench fits anywhere you are choosing between models: a cost downsize, a provider migration, a new release you want to adopt without regressing. Point it at suites that mirror your work, run the candidate against what you ship today, and let the verdict decide.
+
+It also plugs into TokenJam directly. Lens reads your agent telemetry and surfaces five savings areas (downsize, trim, cache, script, reuse), including cheaper-model candidates drawn from your real usage. Bench is the step that proves one of those candidates holds before you switch. Lens finds the candidate; Bench tests it.
 
 ## Try it
 
@@ -100,8 +102,8 @@ The repo is MIT-licensed and open at [github.com/Metabuilder-Labs/tokenjam-bench
 <FAQBlock
   items={[
     {
-      question: "TokenJam told me to downsize a model. How do I know it won't break my agent?",
-      answer: "Run that exact swap through Bench. Point it at a task suite that resembles your agent's work, set the original and candidate models, and read the per-suite verdict. A HOLDS means the candidate matched on the tasks you tested. A REGRESSED means it dropped, with the McNemar test confirming the drop is real rather than noise."
+      question: "I want to move to a cheaper or newer model. How do I know it won't break my agent?",
+      answer: "Run the swap through Bench. Point it at a task suite that resembles your agent's work, set the original and candidate models, and read the per-suite verdict. A HOLDS means the candidate matched on the tasks you tested. A REGRESSED means it dropped, with the McNemar test confirming the drop is real rather than noise. If you use TokenJam, run the exact candidate its analyzer flagged."
     },
     {
       question: "Is a 37-point pass-rate drop a real regression, or just noise?",
