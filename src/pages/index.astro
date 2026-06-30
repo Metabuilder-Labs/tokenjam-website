@@ -895,6 +895,9 @@ const installJoined = installLines.join('\n');
       gap: 7px;
       position: relative;
       z-index: 2;
+      /* Nudge the windows right into the trailing margin so the analyzer→window
+         connectors have more room and read clearly (beams redraw to match). */
+      transform: translateX(30px);
     }
     /* Tagline caption above each window — the product NAME now lives in the
        window's title bar, so this line is just the short descriptor. Centered
@@ -1337,6 +1340,7 @@ const installJoined = installLines.join('\n');
         align-items: center;
         justify-content: center;
         gap: 8px;
+        transform: none; /* no rightward nudge in the mobile stack */
       }
       /* Bench card, its caption, and the Lens preview share one width so the
          stack lines up cleanly on mobile. */
