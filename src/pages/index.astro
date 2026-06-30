@@ -392,14 +392,16 @@ const installJoined = installLines.join('\n');
                  to /bench. -->
             <p class="flow-cardcap">Benchmark &amp; Evaluate</p>
             <a href="/bench" class="flow-bench" id="flow-bench" aria-label="TokenJam Bench — measured pass-rate per suite">
-              <Browser title="TokenJam Bench">
+              <Browser>
+                <span slot="title">TokenJam <span class="win-title-bench">Bench</span></span>
                 <BenchVerdict size="sm" />
               </Browser>
             </a>
 
             <p class="flow-cardcap flow-cardcap--lens">Observe, Analyze &amp; Optimize</p>
             <a href="/products/lens" id="flow-lens" class="flow-lens-preview" aria-label="TokenJam Lens — local dashboard">
-              <Browser title="TokenJam Lens">
+              <Browser>
+                <span slot="title">TokenJam <span class="win-title-lens">Lens</span></span>
                 <LensOverviewPreview compact={true} />
               </Browser>
             </a>
@@ -762,7 +764,7 @@ const installJoined = installLines.join('\n');
 
     /* ── HERO ─────────────────────────────────────── */
     .hero {
-      padding: calc(28px + var(--banner-h, 0px)) 48px 4px;
+      padding: calc(72px + var(--banner-h, 0px)) 48px 4px;
       background:
         radial-gradient(ellipse 80% 50% at 50% 0%, rgba(var(--accent-blue-rgb), 0.08), transparent 60%),
         var(--navy);
@@ -787,7 +789,7 @@ const installJoined = installLines.join('\n');
       line-height: 1.08;
       font-size: clamp(32px, calc((100vw - 96px) / 22), 62px);
       color: var(--white);
-      margin: 0 0 8px;
+      margin: 0 0 5px;
       white-space: nowrap;
     }
     @media (max-width: 720px) {
@@ -800,13 +802,13 @@ const installJoined = installLines.join('\n');
     .hero-sub {
       color: var(--white-dim);
       font-size: clamp(16px, 1.3vw, 19px);
-      line-height: 1.55;
+      line-height: 1.45;
       max-width: var(--hero-h1-width, 100%);
       margin: 0 auto;
       white-space: normal;
     }
     .hero-sub-faint { color: var(--white-faint); }
-    p.hero-sub + p.hero-sub { margin-top: 6px; }
+    p.hero-sub + p.hero-sub { margin-top: 4px; }
     .hero-ctas {
       display: flex;
       gap: 12px;
@@ -895,14 +897,19 @@ const installJoined = installLines.join('\n');
       z-index: 2;
     }
     /* Tagline caption above each window — the product NAME now lives in the
-       window's title bar, so this line is just the short descriptor. */
+       window's title bar, so this line is just the short descriptor. Centered
+       over the window, in a darker tone so it reads clearly. */
     .flow-cardcap {
-      margin: 0 0 5px; padding-left: 2px;
+      margin: 0 0 7px;
+      text-align: center;
       font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: .02em;
-      color: var(--white-faint);
+      color: var(--white-dim);
     }
-    /* More breathing room between the Bench window and the Lens window. */
-    .flow-cardcap--lens { margin-top: 7px; }
+    /* Clear separation between the Bench window and the Lens window. */
+    .flow-cardcap--lens { margin-top: 22px; }
+    /* Product-coloured words in the window title bars. */
+    .win-title-bench { color: #10B981; }
+    .win-title-lens { color: #06B6D4; }
 
     /* Bench + Lens hero windows are PEERS: both wrap the same <Browser> Mac
        chrome (traffic lights + title bar), both neutral border + elevation at

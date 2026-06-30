@@ -14,19 +14,23 @@
 interface Props {
   url?: string;
   /** When set, the title bar shows this as a centered window title (on the grey
-   *  bar) instead of the address-bar URL pill. */
+   *  bar) instead of the address-bar URL pill. For a styled title (e.g. a
+   *  coloured product word) pass a `title` slot instead. */
   title?: string;
 }
 const { url = '127.0.0.1:7391/', title } = Astro.props;
+const hasTitleSlot = Astro.slots.has('title');
 ---
 <div class="browser">
   <div class="browser-titlebar">
     <span class="dot dot-r"></span>
     <span class="dot dot-y"></span>
     <span class="dot dot-g"></span>
-    {title
-      ? <span class="browser-title">{title}</span>
-      : <span class="browser-url">{url}</span>}
+    {hasTitleSlot
+      ? <span class="browser-title"><slot name="title" /></span>
+      : title
+        ? <span class="browser-title">{title}</span>
+        : <span class="browser-url">{url}</span>}
   </div>
   <div class="browser-body">
     <slot />
