@@ -14,3 +14,7 @@ pnpm-debug.log*
 
 # OS
 .DS_Store
+
+# Internal agent notes / briefs (keep out of the public repo). content-style.md
+# and the publish-blog-post skill stay tracked (referenced by CLAUDE.md / used).
+.claude/

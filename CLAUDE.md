@@ -16,6 +16,82 @@ The site is **hybrid**:
 - **Blog and docs:** Astro + MDX, generated at build time from `src/content/`. Routes under `/blog/*` and `/docs/*`.
 - **Legacy API:** `api/waitlist.js` — Vercel serverless function (Resend audience signup). No UI currently calls it; kept for possible future reuse. Don't delete it.
 
+## Shared conventions (hygiene)
+
+> **Shared across all TokenJam repos. Canonical source: `tokenjam/CLAUDE.md`.
+> If you change this section, propagate it to the other repos (bench, engine,
+> website, ai, cloud). Repo-specific rules live elsewhere in this file.**
+
+### Concurrent agents — one worktree per task
+When more than one agent edits this repo in parallel, each agent MUST work in its
+own git worktree. A single working dir shares one `HEAD`, so two `git commit`s
+from different agents land on whichever branch was checked out last, leaking
+commits into the wrong PR. Before starting:
+```bash
+git worktree add -b <type>/<task> ../<repo>-<task> main
+cd ../<repo>-<task>
+```
+Prune when the PR merges: `git worktree remove ../<repo>-<task>`. Symptom of a
+missed worktree: `git log` shows a commit on a branch you didn't intend. Don't
+force-push to fix it — rebase the stray commit off your branch first.
+
+### Branch + PR naming
+- Branches are slash-separated, kebab-case, type-prefixed: `fix/<area>`,
+  `feat/<area>`, `docs/<area>`, `chore/<area>`, `release/<X.Y.Z>`.
+- PR titles lead with the verb/type and reference issues by number when
+  applicable: `Fix #N: …`, `[feature] … (#N)`, `docs: …`, `Bump version to X.Y.Z`.
+- Use `Closes #N` in the PR body (one per line — not `Closes #1, #2`; GitHub
+  only catches the first) so issues auto-close on merge.
+
+### Commit messages
+- Subject (≤72 chars): one-line summary, active voice, reference issues with `#N`.
+- Body (after a blank line): explain *why*, not *what* (the diff shows what).
+- Trailers (after another blank line, at the end): always
+  `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>` (or the
+  appropriate model identifier). When fixing an externally-reported bug, also
+  credit the reporter: `Co-Authored-By: <handle> <noreply@github.com>`.
+- Use a HEREDOC for multi-line messages to preserve formatting.
+
+### PR body structure
+A framing sentence, then `## Summary` (high-level bullets), per-issue/feature
+detail, `## Tests / Verification` (what you ran + results), and
+`## What's NOT in this PR` when scope was deliberately limited (load-bearing —
+it tells the reviewer what you chose to defer).
+
+### Self-review checklist (before requesting review)
+1. Tests/build pass locally.
+2. Lint clean for files you touched.
+3. CI green on the branch (at least the fast jobs).
+4. Acceptance criteria from the issue met, one by one.
+5. No accidental files in the diff (local config, test data, debug artifacts).
+6. PR body explains the WHY (symptom + root cause + fix).
+7. Honesty preserved (below) — no user-facing claim silently strengthened.
+
+### Scope discipline
+Do what the brief/issue says, no more. Notice an adjacent issue? File it
+separately rather than expanding the PR. Exception: a change functionally
+required to make the primary fix work (note it under "What's also in this PR").
+When unsure about scope, ask before expanding.
+
+### Worker vs master
+Worker agents open PRs and request review; they do NOT merge their own PRs, file
+follow-up issues unprompted, or bump versions. The master + the human handle
+merges, follow-ups, and releases.
+
+### Honesty discipline (the brand)
+Never overclaim. Use "candidate," "measured," "estimated," "looks like,"
+"review before…" — never "safe," "certified," "guaranteed," "saves you,"
+"quality preserved." No fabricated customer logos, testimonials, or compliance
+badges we don't hold. Forward-looking work is labeled as such (early-access /
+design-partner / roadmap), never as shipped/GA. If you touch a user-facing
+claim, verify it matches existing caveat language; never silently strengthen it.
+
+### Writing style (all prose: PRs, issues, docs, marketing, comments)
+Write like a person, not an LLM. Full rules in `.claude/content-style.md` (read
+it before drafting site copy). Top tells to strip: em-dashes (≤3 per piece),
+"X but Y" / "not just X" contrast-pair cadence (≤2), and default tricolons
+("A, B, and C" — vary the list lengths).
+
 ## Architecture
 
 - **Astro** (static output) for routed pages. `output: 'static'`, `build.format: 'directory'`, `trailingSlash: 'never'` — matches Vercel `cleanUrls: true`.
